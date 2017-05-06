@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "module": "CommonJS",
+        "newLine": "LF",
+        "noEmitOnError": true,
+        "noImplicitReturns": true,
+        "pretty": true,
+        "removeComments": true,
+        "skipLibCheck": true,
+        "target": "es2015",
+        "types": ["chai", "mocha"]
+    },
+    "compileOnSave": false,
+    "buildOnSave": false
+}
