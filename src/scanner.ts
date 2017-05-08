@@ -1,3 +1,6 @@
+/**
+ * Most of the functions in this file are very performance-sensitive.
+ */
 import {Context, Parser, unimplemented} from "./common";
 import {Chars} from "./chars";
 import {Token, tokenDesc} from "./token";
@@ -9,27 +12,53 @@ export const enum Seek {
     NewLine = 1 << 1,
 }
 
+export function hasNext(parser: Parser) {
+    return parser.index < parser.end;
+}
+
+function advance(parser: Parser) {
+    parser.index++;
+    parser.column++;
+}
+
+function advanceNewline(parser: Parser, skipLF: boolean) {
+    parser.index++;
+    parser.column = 0;
+    parser.line++;
+    if (skipLF && nextIs(parser, Chars.LineFeed)) {
+        parser.index++;
+    }
+}
+
+function rewind(parser: Parser) {
+    parser.index--;
+    parser.column--;
+}
+
+function nextChar(parser: Parser) {
+    return parser.source.charCodeAt(parser.index);
+}
+
+function nextIs(parser: Parser, ch: number) {
+    return hasNext(parser) && nextChar(parser) === ch;
+}
+
 // This is intentionally monolithic, and fairly ugly.
 export function seek(parser: Parser): Seek {
-    let {index, line, column} = parser;
     let result = Seek.None;
 
     all:
-    while (index < parser.source.length) {
-        switch (parser.source.charCodeAt(index++)) {
+    while (hasNext(parser)) {
+        switch (nextChar(parser)) {
             /* line terminators */
             case Chars.CarriageReturn:
-                if (index < parser.source.length &&
-                        parser.source.charCodeAt(index) === Chars.LineFeed) {
-                    index++;
-                }
-                // falls through
+                result |= Seek.NewLine;
+                advanceNewline(parser, true);
+                break;
 
             case Chars.LineFeed: case Chars.LineSeparator: case Chars.ParagraphSeparator:
                 result |= Seek.NewLine;
-                line++;
-                column = 0;
-                index++;
+                advanceNewline(parser, false);
                 break;
 
             /* general whitespace */
@@ -40,97 +69,81 @@ export function seek(parser: Parser): Seek {
             case Chars.PunctuationSpace: case Chars.ThinSpace: case Chars.HairSpace:
             case Chars.NarrowNoBreakSpace: case Chars.MathematicalSpace:
             case Chars.IdeographicSpace: case Chars.ZeroWidthNoBreakSpace:
-                column++;
                 result |= Seek.SameLine;
+                advance(parser);
                 break;
 
             /* comments */
             case Chars.Slash:
-                column++;
                 result |= Seek.SameLine;
-                if (index < parser.source.length) {
-                    let ch = parser.source.charCodeAt(index);
+                advance(parser);
+                if (hasNext(parser)) {
+                    let ch = nextChar(parser);
 
                     if (ch === Chars.Slash) {
-                        while (index < parser.source.length &&
-                                ch !== Chars.CarriageReturn &&
-                                ch !== Chars.LineFeed &&
-                                ch !== Chars.ParagraphSeparator &&
-                                ch !== Chars.LineSeparator) {
-                            ch = parser.source.charCodeAt(index++);
+                        while (hasNext(parser) &&
+                                ch !== Chars.CarriageReturn && ch !== Chars.LineFeed &&
+                                ch !== Chars.ParagraphSeparator && ch !== Chars.LineSeparator) {
+                            ch = nextChar(parser);
+                            advance(parser);
                         }
                         result |= Seek.NewLine;
-                        line++;
-                        column = 0;
+                        advanceNewline(parser, ch === Chars.CarriageReturn);
                         break;
                     } else if (ch === Chars.Asterisk) {
-                        const terminated = false;
-
-                        while (index < parser.source.length) {
-                            switch (parser.source.charCodeAt(index)) {
+                        while (hasNext(parser)) {
+                            switch (nextChar(parser)) {
                                 case Chars.Asterisk:
-                                    if (index < parser.source.length &&
-                                            parser.source.charCodeAt(index) !== Chars.Slash) {
-                                        index++;
-                                        column++;
-                                        break;
-                                    }
-                                    continue all;
+                                    advance(parser);
+                                    if (!nextIs(parser, Chars.Slash)) continue all;
+                                    break;
 
                                 case Chars.CarriageReturn:
-                                    if (index < parser.source.length &&
-                                            parser.source.charCodeAt(index) === Chars.LineFeed) {
-                                        index++;
-                                    }
-                                    // falls through
+                                    result |= Seek.NewLine;
+                                    advanceNewline(parser, true);
+                                    break;
 
-                                case Chars.LineFeed:
-                                case Chars.LineSeparator:
+                                case Chars.LineFeed: case Chars.LineSeparator:
                                 case Chars.ParagraphSeparator:
                                     result |= Seek.NewLine;
-                                    line++;
-                                    column = 0;
-                                    index++;
+                                    advanceNewline(parser, false);
                                     break;
 
                                 default:
-                                    column++;
-                                    index++;
+                                    advance(parser);
                             }
                         }
 
-                        return Errors.report(index, line, column, Errors.unterminatedComment());
+                        return Errors.report(
+                            parser.index,
+                            parser.line,
+                            parser.column,
+                            Errors.unterminatedComment(),
+                        );
                     }
                 }
                 // falls through
 
             default:
-                index--;
                 break all;
         }
     }
 
-    parser.index = index;
-    parser.line = line;
-    parser.column = column;
     return result;
 }
 
-// This is also intentionally monolithic, since it's quickly preparsing for a
-// "use strict" directive.
+// This is also intentionally monolithic, since it's quickly preparsing for a "use strict"
+// directive.
 export function scanDirective(parser: Parser): boolean | void {
-    let {index, line, column} = parser;
-    const start = index;
+    const {index: start, line, column} = parser;
+    let index = start;
     const raw = "";
 
-    if (index === parser.source.length) return false;
+    if (index === parser.end) return false;
     const quote = parser.source.charCodeAt(index++);
+    if (quote !== Chars.SingleQuote && quote !== Chars.DoubleQuote) return false;
 
-    if (quote !== Chars.SingleQuote && quote !== Chars.DoubleQuote) {
-        return false;
-    }
-
-    if (index + 11 < parser.source.length &&
+    if (index + 11 < parser.end &&
             parser.source.charCodeAt(index++) === Chars.LowerU &&
             parser.source.charCodeAt(index++) === Chars.LowerS &&
             parser.source.charCodeAt(index++) === Chars.LowerE &&
@@ -149,62 +162,38 @@ export function scanDirective(parser: Parser): boolean | void {
         let escape = false;
 
         loop:
-        while (index < parser.source.length) {
-            const code = parser.source.charCodeAt(index);
+        while (hasNext(parser)) {
+            const code = nextChar(parser);
             switch (code) {
                 case Chars.Backslash:
                     escape = true;
                     break;
 
-                case Chars.CarriageReturn: case Chars.LineFeed: case Chars.LineSeparator:
+                case Chars.CarriageReturn:
+                    if (!escape) break loop;
+                    escape = false;
+                    advanceNewline(parser, true);
+                    break;
+
+                case Chars.LineFeed: case Chars.LineSeparator:
                 case Chars.ParagraphSeparator:
-                    if (escape) {
-                        escape = false;
-                        line++;
-                        column = 0;
-                        break;
-                    } else {
-                        break loop;
-                    }
+                    if (!escape) break loop;
+                    escape = false;
+                    advanceNewline(parser, false);
+                    break;
 
                 case Chars.DoubleQuote: case Chars.SingleQuote:
-                    if (!escape && code === quote) {
-                        parser.line = line;
-                        parser.column = column;
-                        parser.index = index;
-                        return false;
-                    }
-                    column++;
-                    break;
+                    if (!escape && code === quote) return false;
+                    // falls through
 
                 default:
                     escape = false;
-                    column++;
+                    advance(parser);
             }
-
-            index++;
         }
 
         return Errors.report(start, line, column, Errors.unterminatedTokenString());
     }
-}
-
-export function hasNext(parser: Parser) {
-    return parser.index < parser.source.length;
-}
-
-function advance(parser: Parser) {
-    parser.index++;
-    parser.column++;
-}
-
-function rewind(parser: Parser) {
-    parser.index--;
-    parser.column--;
-}
-
-function nextIs(parser: Parser, ch: number) {
-    return hasNext(parser) && parser.source.charCodeAt(parser.index) === ch;
 }
 
 function scanString(parser: Parser, context: Context, quote: number): string {
@@ -234,7 +223,7 @@ function scanMaybeIdentifier(parser: Parser, context: Context): Token {
 
 export function scan(parser: Parser, context: Context): Token {
     if (!hasNext(parser)) return Token.EndOfSource;
-    const ch = parser.source.charCodeAt(parser.index);
+    const ch = nextChar(parser);
 
     switch (ch) {
         // `!`, `!=`, `!==`
@@ -272,7 +261,7 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.Ampersand:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = parser.source.charCodeAt(parser.index);
+                const ch = nextChar(parser);
 
                 if (ch === Chars.Ampersand) {
                     advance(parser);
@@ -305,7 +294,7 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.Asterisk:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = parser.source.charCodeAt(parser.index);
+                const ch = nextChar(parser);
 
                 if (ch === Chars.Asterisk) {
                     advance(parser);
@@ -326,7 +315,7 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.Plus:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = parser.source.charCodeAt(parser.index);
+                const ch = nextChar(parser);
 
                 if (ch === Chars.Plus) {
                     advance(parser);
@@ -348,7 +337,7 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.Hyphen:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = parser.source.charCodeAt(parser.index);
+                const ch = nextChar(parser);
 
                 if (ch === Chars.Hyphen) {
                     advance(parser);
@@ -365,7 +354,7 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.Period:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = parser.source.charCodeAt(parser.index);
+                const ch = nextChar(parser);
 
                 if (ch === Chars.Period) {
                     advance(parser);
@@ -412,7 +401,7 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.LessThan:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = parser.source.charCodeAt(parser.index);
+                const ch = nextChar(parser);
 
                 if (ch === Chars.LessThan) {
                     advance(parser);
@@ -434,7 +423,7 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.EqualSign:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = parser.source.charCodeAt(parser.index);
+                const ch = nextChar(parser);
 
                 if (ch === Chars.EqualSign) {
                     advance(parser);
@@ -456,13 +445,13 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.GreaterThan:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = parser.source.charCodeAt(parser.index);
+                const ch = nextChar(parser);
 
                 if (ch === Chars.GreaterThan) {
                     advance(parser);
 
                     if (hasNext(parser)) {
-                        const ch = parser.source.charCodeAt(parser.index);
+                        const ch = nextChar(parser);
 
                         if (ch === Chars.GreaterThan) {
                             advance(parser);
@@ -529,7 +518,7 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.VerticalBar:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = parser.source.charCodeAt(parser.index);
+                const ch = nextChar(parser);
 
                 if (ch === Chars.VerticalBar) {
                     advance(parser);
@@ -560,9 +549,9 @@ export function scan(parser: Parser, context: Context): Token {
     }
 }
 
-export function consumeSemicolon(parser: Parser, context: Context) {
-    if (parser.index === parser.source.length) return;
-    const ch = parser.source.charCodeAt(parser.index);
+export function consumeSemicolon(parser: Parser, context: Context, result: Seek) {
+    if (!(result & Seek.NewLine) || !hasNext(parser)) return;
+    const ch = nextChar(parser);
 
     if (ch === Chars.Semicolon || ch === Chars.RightBrace) {
         advance(parser);
