@@ -13,12 +13,29 @@ export const enum Seek {
 }
 
 export function hasNext(parser: Parser) {
-    return parser.index < parser.end;
+    return parser.index < parser.source.length;
 }
 
 function advance(parser: Parser) {
     parser.index++;
     parser.column++;
+}
+
+function nextChar(parser: Parser) {
+    return parser.source.charCodeAt(parser.index);
+}
+
+function nextIs(parser: Parser, code: number) {
+    return hasNext(parser) && nextChar(parser) === code;
+}
+
+function consumeOpt(parser: Parser, code: number) {
+    if (nextIs(parser, code)) {
+        advance(parser);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function advanceNewline(parser: Parser, skipLF: boolean) {
@@ -35,19 +52,71 @@ function rewind(parser: Parser) {
     parser.column--;
 }
 
-function nextChar(parser: Parser) {
-    return parser.source.charCodeAt(parser.index);
+// Skip initial BOM and/or shebang.
+export function skipMeta(parser: Parser) {
+    if (nextIs(parser, Chars.ByteOrderMark)) advance(parser);
+    if (!consumeOpt(parser, Chars.Hash)) return;
+    if (!consumeOpt(parser, Chars.Exclamation)) return;
+    skipToNewline(parser);
 }
 
-function nextIs(parser: Parser, ch: number) {
-    return hasNext(parser) && nextChar(parser) === ch;
+function skipToNewline(parser: Parser) {
+    while (hasNext(parser)) {
+        switch (nextChar(parser)) {
+            case Chars.CarriageReturn:
+                advanceNewline(parser, true);
+                return true;
+
+            case Chars.LineFeed: case Chars.LineSeparator: case Chars.ParagraphSeparator:
+                advanceNewline(parser, false);
+                return true;
+
+            default:
+                advance(parser);
+        }
+    }
+
+    return false;
 }
 
-// This is intentionally monolithic, and fairly ugly.
+function skipBlockComment(parser: Parser): boolean {
+    let result = false;
+
+    while (hasNext(parser)) {
+        switch (nextChar(parser)) {
+            case Chars.Asterisk:
+                advance(parser);
+                if (nextIs(parser, Chars.Slash)) return result;
+                break;
+
+            case Chars.CarriageReturn:
+                result = true;
+                advanceNewline(parser, true);
+                break;
+
+            case Chars.LineFeed: case Chars.LineSeparator: case Chars.ParagraphSeparator:
+                result = true;
+                advanceNewline(parser, false);
+                break;
+
+            default:
+                advance(parser);
+        }
+    }
+
+    return Errors.report(
+        parser.index,
+        parser.line,
+        parser.column,
+        Errors.unterminatedComment(),
+    );
+}
+
+// This is somewhat monolithic, and the main loop handles non-comment whitespace.
+// TODO: add HTML comment support (script code only)
 export function seek(parser: Parser): Seek {
     let result = Seek.None;
 
-    all:
     while (hasNext(parser)) {
         switch (nextChar(parser)) {
             /* line terminators */
@@ -77,55 +146,25 @@ export function seek(parser: Parser): Seek {
             case Chars.Slash:
                 result |= Seek.SameLine;
                 advance(parser);
-                if (hasNext(parser)) {
-                    let ch = nextChar(parser);
-
-                    if (ch === Chars.Slash) {
-                        while (hasNext(parser) &&
-                                ch !== Chars.CarriageReturn && ch !== Chars.LineFeed &&
-                                ch !== Chars.ParagraphSeparator && ch !== Chars.LineSeparator) {
-                            ch = nextChar(parser);
-                            advance(parser);
-                        }
-                        result |= Seek.NewLine;
-                        advanceNewline(parser, ch === Chars.CarriageReturn);
+                if (!hasNext(parser)) return result;
+                switch (nextChar(parser)) {
+                    case Chars.Slash:
+                        advance(parser);
+                        if (skipToNewline(parser)) result |= Seek.NewLine;
                         break;
-                    } else if (ch === Chars.Asterisk) {
-                        while (hasNext(parser)) {
-                            switch (nextChar(parser)) {
-                                case Chars.Asterisk:
-                                    advance(parser);
-                                    if (!nextIs(parser, Chars.Slash)) continue all;
-                                    break;
 
-                                case Chars.CarriageReturn:
-                                    result |= Seek.NewLine;
-                                    advanceNewline(parser, true);
-                                    break;
+                    case Chars.Asterisk:
+                        advance(parser);
+                        if (skipBlockComment(parser)) result |= Seek.NewLine;
+                        break;
 
-                                case Chars.LineFeed: case Chars.LineSeparator:
-                                case Chars.ParagraphSeparator:
-                                    result |= Seek.NewLine;
-                                    advanceNewline(parser, false);
-                                    break;
-
-                                default:
-                                    advance(parser);
-                            }
-                        }
-
-                        return Errors.report(
-                            parser.index,
-                            parser.line,
-                            parser.column,
-                            Errors.unterminatedComment(),
-                        );
-                    }
+                    default:
+                        // ignore
                 }
-                // falls through
+                break;
 
             default:
-                break all;
+                return result;
         }
     }
 
@@ -134,16 +173,17 @@ export function seek(parser: Parser): Seek {
 
 // This is also intentionally monolithic, since it's quickly preparsing for a "use strict"
 // directive.
+// TODO: skip Unicode/ASCII escapes
 export function scanDirective(parser: Parser): boolean | void {
     const {index: start, line, column} = parser;
     let index = start;
     const raw = "";
 
-    if (index === parser.end) return false;
+    if (index === parser.source.length) return false;
     const quote = parser.source.charCodeAt(index++);
     if (quote !== Chars.SingleQuote && quote !== Chars.DoubleQuote) return false;
 
-    if (index + 11 < parser.end &&
+    if (index + 11 < parser.source.length &&
             parser.source.charCodeAt(index++) === Chars.LowerU &&
             parser.source.charCodeAt(index++) === Chars.LowerS &&
             parser.source.charCodeAt(index++) === Chars.LowerE &&
@@ -223,16 +263,14 @@ function scanMaybeIdentifier(parser: Parser, context: Context): Token {
 
 export function scan(parser: Parser, context: Context): Token {
     if (!hasNext(parser)) return Token.EndOfSource;
-    const ch = nextChar(parser);
+    const code = nextChar(parser);
 
-    switch (ch) {
+    switch (code) {
         // `!`, `!=`, `!==`
         case Chars.Exclamation:
             advance(parser);
-            if (nextIs(parser, Chars.EqualSign)) {
-                advance(parser);
-                if (nextIs(parser, Chars.EqualSign)) {
-                    advance(parser);
+            if (consumeOpt(parser, Chars.EqualSign)) {
+                if (consumeOpt(parser, Chars.EqualSign)) {
                     return Token.StrictNotEqual;
                 } else {
                     return Token.LooseNotEqual;
@@ -250,8 +288,7 @@ export function scan(parser: Parser, context: Context): Token {
         // `%`, `%=`
         case Chars.Percent:
             advance(parser);
-            if (nextIs(parser, Chars.EqualSign)) {
-                advance(parser);
+            if (consumeOpt(parser, Chars.EqualSign)) {
                 return Token.ModuloAssign;
             } else {
                 return Token.Modulo;
@@ -261,12 +298,12 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.Ampersand:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = nextChar(parser);
+                const code = nextChar(parser);
 
-                if (ch === Chars.Ampersand) {
+                if (code === Chars.Ampersand) {
                     advance(parser);
                     return Token.LogicalAnd;
-                } else if (ch === Chars.EqualSign) {
+                } else if (code === Chars.EqualSign) {
                     advance(parser);
                     return Token.BitwiseAndAssign;
                 }
@@ -294,16 +331,16 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.Asterisk:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = nextChar(parser);
+                const code = nextChar(parser);
 
-                if (ch === Chars.Asterisk) {
+                if (code === Chars.Asterisk) {
                     advance(parser);
-                    if (nextIs(parser, Chars.EqualSign)) {
-                        advance(parser);
+                    if (consumeOpt(parser, Chars.EqualSign)) {
                         return Token.ExponentiateAssign;
+                    } else {
+                        return Token.Exponentiate;
                     }
-                    return Token.Exponentiate;
-                } else if (ch === Chars.EqualSign) {
+                } else if (code === Chars.EqualSign) {
                     advance(parser);
                     return Token.MultiplyAssign;
                 }
@@ -315,12 +352,12 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.Plus:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = nextChar(parser);
+                const code = nextChar(parser);
 
-                if (ch === Chars.Plus) {
+                if (code === Chars.Plus) {
                     advance(parser);
                     return Token.Increment;
-                } else if (ch === Chars.EqualSign) {
+                } else if (code === Chars.EqualSign) {
                     advance(parser);
                     return Token.AddAssign;
                 }
@@ -337,12 +374,12 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.Hyphen:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = nextChar(parser);
+                const code = nextChar(parser);
 
-                if (ch === Chars.Hyphen) {
+                if (code === Chars.Hyphen) {
                     advance(parser);
                     return Token.Decrement;
-                } else if (ch === Chars.EqualSign) {
+                } else if (code === Chars.EqualSign) {
                     advance(parser);
                     return Token.SubtractAssign;
                 }
@@ -354,17 +391,16 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.Period:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = nextChar(parser);
+                const code = nextChar(parser);
 
-                if (ch === Chars.Period) {
+                if (code === Chars.Period) {
                     advance(parser);
-                    if (nextIs(parser, Chars.Period)) {
-                        advance(parser);
+                    if (consumeOpt(parser, Chars.Period)) {
                         return Token.Ellipsis;
                     }
                     parser.index -= 2;
                     parser.column -= 2;
-                } else if (ch >= Chars.Zero && ch <= Chars.Nine) {
+                } else if (code >= Chars.Zero && code <= Chars.Nine) {
                     // Rewind the initial token.
                     rewind(parser);
                     parser.tokenValue = scanNumeric(parser, context);
@@ -380,8 +416,7 @@ export function scan(parser: Parser, context: Context): Token {
             if (context & Context.Expression) {
                 parser.tokenValue = scanRegExp(parser, context);
                 return Token.RegularExpression;
-            } else if (nextIs(parser, Chars.EqualSign)) {
-                advance(parser);
+            } else if (consumeOpt(parser, Chars.EqualSign)) {
                 return Token.DivideAssign;
             } else {
                 return Token.Divide;
@@ -401,17 +436,16 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.LessThan:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = nextChar(parser);
+                const code = nextChar(parser);
 
-                if (ch === Chars.LessThan) {
+                if (code === Chars.LessThan) {
                     advance(parser);
-                    if (nextIs(parser, Chars.EqualSign)) {
-                        advance(parser);
+                    if (consumeOpt(parser, Chars.EqualSign)) {
                         return Token.ShiftLeftAssign;
                     } else {
                         return Token.ShiftLeft;
                     }
-                } else if (ch === Chars.EqualSign) {
+                } else if (code === Chars.EqualSign) {
                     advance(parser);
                     return Token.LessThanOrEqual;
                 }
@@ -423,17 +457,16 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.EqualSign:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = nextChar(parser);
+                const code = nextChar(parser);
 
-                if (ch === Chars.EqualSign) {
+                if (code === Chars.EqualSign) {
                     advance(parser);
-                    if (nextIs(parser, Chars.EqualSign)) {
-                        advance(parser);
+                    if (consumeOpt(parser, Chars.EqualSign)) {
                         return Token.StrictEqual;
                     } else {
                         return Token.LooseEqual;
                     }
-                } else if (ch === Chars.LessThan) {
+                } else if (code === Chars.LessThan) {
                     advance(parser);
                     return Token.Arrow;
                 }
@@ -445,30 +478,29 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.GreaterThan:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = nextChar(parser);
+                const code = nextChar(parser);
 
-                if (ch === Chars.GreaterThan) {
+                if (code === Chars.GreaterThan) {
                     advance(parser);
 
                     if (hasNext(parser)) {
-                        const ch = nextChar(parser);
+                        const code = nextChar(parser);
 
-                        if (ch === Chars.GreaterThan) {
+                        if (code === Chars.GreaterThan) {
                             advance(parser);
-                            if (nextIs(parser, Chars.EqualSign)) {
-                                advance(parser);
+                            if (consumeOpt(parser, Chars.EqualSign)) {
                                 return Token.LogicalShiftRightAssign;
                             } else {
                                 return Token.LogicalShiftRight;
                             }
-                        } else if (ch === Chars.EqualSign) {
+                        } else if (code === Chars.EqualSign) {
                             advance(parser);
                             return Token.ShiftRightAssign;
                         }
                     }
 
                     return Token.ShiftRight;
-                } else if (ch === Chars.EqualSign) {
+                } else if (code === Chars.EqualSign) {
                     advance(parser);
                     return Token.GreaterThanOrEqual;
                 }
@@ -494,12 +526,11 @@ export function scan(parser: Parser, context: Context): Token {
         // `^`, `^=`
         case Chars.Caret:
             advance(parser);
-            if (nextIs(parser, Chars.EqualSign)) {
-                advance(parser);
+            if (consumeOpt(parser, Chars.EqualSign)) {
                 return Token.BitwiseXorAssign;
+            } else {
+                return Token.BitwiseXor;
             }
-
-            return Token.BitwiseXor;
 
         // `\`
         case Chars.Backtick:
@@ -518,12 +549,12 @@ export function scan(parser: Parser, context: Context): Token {
         case Chars.VerticalBar:
             advance(parser);
             if (hasNext(parser)) {
-                const ch = nextChar(parser);
+                const code = nextChar(parser);
 
-                if (ch === Chars.VerticalBar) {
+                if (code === Chars.VerticalBar) {
                     advance(parser);
                     return Token.LogicalOr;
-                } else if (ch === Chars.EqualSign) {
+                } else if (code === Chars.EqualSign) {
                     advance(parser);
                     return Token.BitwiseOrAssign;
                 }
@@ -540,7 +571,7 @@ export function scan(parser: Parser, context: Context): Token {
             return Token.Complement;
 
         default:
-            if (ch <= Chars.Zero && ch >= Chars.Nine) {
+            if (code <= Chars.Zero && code >= Chars.Nine) {
                 parser.tokenValue = scanNumeric(parser, context);
                 return Token.NumericLiteral;
             } else {
@@ -551,9 +582,9 @@ export function scan(parser: Parser, context: Context): Token {
 
 export function consumeSemicolon(parser: Parser, context: Context, result: Seek) {
     if (!(result & Seek.NewLine) || !hasNext(parser)) return;
-    const ch = nextChar(parser);
+    const code = nextChar(parser);
 
-    if (ch === Chars.Semicolon || ch === Chars.RightBrace) {
+    if (code === Chars.Semicolon || code === Chars.RightBrace) {
         advance(parser);
     } else {
         Errors.report(

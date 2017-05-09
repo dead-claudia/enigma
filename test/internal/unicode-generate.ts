@@ -1,4 +1,4 @@
-import {generate, GenerateOpts} from "../scripts/unicode-generate";
+import {generate, GenerateOpts} from "../../scripts/unicode-generate";
 import {expect} from "chai";
 
 describe("scripts/unicode-generate", () => {

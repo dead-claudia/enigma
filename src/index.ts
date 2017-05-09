@@ -2,6 +2,7 @@ import * as Parser from "./parser";
 import * as ESTree from "./estree";
 import {OnComment, Context} from "./common";
 import {Chars} from "./chars";
+import {skipMeta} from "./scanner";
 
 export interface Options {
     onComment?: OnComment;
@@ -23,7 +24,7 @@ function parseRoot(source: string, options: Options | void, context: Context) {
     const parser = Parser.create(source, onComment);
     const statements: ESTree.Statement[] = [];
 
-    Parser.skipShebang(parser);
+    skipMeta(parser);
 
     const node: ESTree.Program = {
         type: "Program",

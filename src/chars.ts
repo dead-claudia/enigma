@@ -132,4 +132,6 @@ export const enum Chars {
     IdeographicSpace   = 0x3000,
 
     ZeroWidthNoBreakSpace = 0xfeff,
+
+    ByteOrderMark = 0xfeff,
 }

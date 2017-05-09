@@ -28,7 +28,6 @@ export interface Parser {
     onComment: OnComment;
 
     flags: Flags;
-    end: number;
     index: number;
     line: number;
     column: number;
