@@ -18,8 +18,9 @@
 // It accepts these named options:
 //
 // - `eval` - (optional) boolean, `true` if this should emit a JS body
+// - `tables` - (optional) mapping of name + stored table
 // - `write` - promise-returning function called on each written string
-// - `exports` - mapping of name + list of functions returning code points
+// - `exports` - mapping of name + list of functions returning only *positive* code points
 //
 // To use this, you do something like this:
 //
@@ -38,119 +39,122 @@
 // - `start, delta`: between `prev + start` and `prev + start + delta`
 //
 // The `test` helper does this in a very highly optimized way, with some various hacks to reduce
-// branching.
+// branching, and it targets ASM.js for speed, so it gets optimized early.
 //
 // The entire process is done asynchronously and in serial, to avoid blowing up the RAM. It has a
 // few GC hints, too, to keep memory down.
 
+// GC hint
+function gc() {
+    return new Promise(resolve => setTimeout(resolve, 10))
+}
+
+function serialize(codes, values) {
+    const table = Array.from(values).sort((a, b) => a - b)
+    const offset = codes.length
+
+    debugger
+    if (table.length === 0) return offset
+    let top = offset
+    let prev = table[0]
+    codes.push(-prev)
+
+    for (let i = 1; i < table.length; i++) {
+        const child = table[i]
+        if (codes[top] < 0) {
+            if (child !== prev + 1) {
+                codes.push(prev - child)
+                top++
+            } else {
+                codes[top] = -codes[top]
+                codes.push(1)
+                top++
+            }
+        } else if (child !== prev + 1) {
+            codes.push(prev - child)
+            top++
+        } else {
+            codes[top]++
+        }
+        prev = child;
+    }
+
+    return offset
+}
+
 exports.generate = generate
 async function generate(opts) {
-    const js = opts.eval
-    const exportNames = Object.keys(opts.exports)
     const ts = str => opts.eval ? "" : str
     const codes = []
-    const offsets = []
 
-    for (let i = 0; i < exportNames.length; i++) {
-        const exported = exportNames[i]
-        const items = opts.exports[exported]
-        const values = new Set()
+    await opts.write(`/* tslint:disable */
+"use strict";
+`)
 
-        for (const makeList of items) {
-            const list = makeList()
-            for (const item of list) values.add(item)
-            // GC hint
-            await new Promise(resolve => setTimeout(resolve, 10))
-        }
+    for (const exported in opts.exports) {
+        if (hasOwnProperty.call(opts.exports, exported)) {
+            const items = opts.exports[exported]
+            const values = new Set()
 
-        const table = Array.from(values).sort((a, b) => a - b)
-        // GC hint
-        await new Promise(resolve => setTimeout(resolve, 10))
-        let count = 0
-        let prev
-
-        for (let i = 0; i < table.length; i++) {
-            const child = table[i]
-
-            if (prev != null && child === prev.end + 1) {
-                prev.end = child
-            } else {
-                prev = table[count++] = {start: child, end: child}
-            }
-        }
-
-        table.length = count
-        const offset = codes.length
-        let acc = 0
-
-        for (const {start, end} of table) {
-            if (start === end) {
-                codes.push(acc - start)
-            } else {
-                codes.push(start - acc)
-                codes.push(end - start + 1)
+            for (const makeList of items) {
+                for (const item of makeList()) {
+                    if (item === 0) throw new RangeError("Only positive values are allowed")
+                    values.add(item)
+                }
+                await gc()
             }
 
-            acc = end
+            const offset = serialize(codes, values)
+            if (opts.tables != null) opts.tables[exported] = codes.slice(offset)
+
+            await opts.write(`
+function ${exported}(code${ts(":number")}) {
+    return _.test(${
+        offset * Int32Array.BYTES_PER_ELEMENT
+    },${
+        codes.length * Int32Array.BYTES_PER_ELEMENT
+    },code)!==0;
+}
+`)
         }
-
-        offsets.push({
-            offset: offset * Int32Array.BYTES_PER_ELEMENT,
-            count: (codes.length - offset) * Int32Array.BYTES_PER_ELEMENT,
-        })
-
-        // GC hint
-        await new Promise(resolve => setTimeout(resolve, 10))
     }
 
     const size = Math.max(4096, 1 << (32 - Math.clz32(codes.length) + 4))
 
-    // The generated module is intentionally in asm.js for speed.
-    await opts.write(`/* tslint:disable */
-"use strict";
+    await opts.write(`
 var _b=new ArrayBuffer(${size}),
-_=(function(s${ts(":any")}, f${ts(":any")}, h${ts(":any")}) {
+_=(function(s${ts(":any")},f${ts(":any")},h${ts(":any")}) {
     "use asm";
     var t${ts(":Int32Array")}=new s.Int32Array(h);
 
-    function test(i${ts(":number")},l${ts(":number")},s${ts(":number")}) {
-        i=i|0; l=l|0; s=s|0;
-        var r=0;
-        l=l+i|0;
-        while ((i|0)<(l|0)) {
-            r=t[i>>2]|0;
+    function test(i${ts(":number")},e${ts(":number")},s${ts(":number")}) {
+        i=i|0; e=e|0; s=s|0;
+        var a=0;
+        while ((i|0)<(e|0)) {
+            a=t[i>>2]|0;
             i=i+4|0;
-            s=s-(r&0x7fffffff)|0;
-            if ((s|0)==0) return 1;
-            if ((s|0)<0) return 0;
-            if ((r|0)>0) {
+            if ((a|0)>0) {
+                s=s-a|0;
+                if ((s|0)<0) return 0;
                 s=s-(t[i>>2]|0)|0;
-                if ((s|0)<0) return 1;
+                if ((s|0)<=0) return 1;
                 i=i+4|0;
+            } else {
+                s=s+a|0;
+                if ((s|0)==0) return 1;
+                if ((s|0)<0) return 0;
             }
         }
         return 0;
     }
 
     return {test: test};
-})(global,{},_b),
-_v=new Int32Array(_b),
-_c=[${codes}],
-_i=0;
+})({Int32Array},{},_b),
+_v=new Int32Array(_b),_c=[${codes}],_i=0;
 for(;_i<${codes.length};_v[_i]=_c[_i++]);
-`)
 
-        for (let i = 0; i < exportNames.length; i++) {
-            const exported = exportNames[i]
-            const {offset, count} = offsets[i]
-            await opts.write(`
-function ${exported}(code${ts(": number")}) {
-    return _.test(${offset},${count},code)!==0;
-}
+${opts.eval ? "return" : "export"} {${Object.keys(opts.exports)}};
 `)
-        }
-
-    await opts.write(`\n${js ? "return" : "export"} {${exportNames}};\n`)
 }
 
 // Edit these here to change the options when run directly.
@@ -167,11 +171,10 @@ if (require.main === module) {
     }
 
     const stream = require("fs").createWriteStream(
-        path.resolve(__dirname, "../src/unicode-generated.js")
+        path.resolve(__dirname, "../src/unicode-generated.ts")
     )
 
     generate({
-        eval: true,
         write: str => new Promise((resolve, reject) => {
             stream.write(str, err => err != null ? reject(err) : resolve())
         }),
