@@ -135,8 +135,7 @@ _=(function(s${ts(":any")},f${ts(":any")},h${ts(":any")}) {
         i=i|0; e=e|0; s=s|0;
         var a=0;
         while ((i|0)<(e|0)) {
-            a=t[i>>2]|0;
-            i=i+4|0;
+            a=t[i>>2]|0; i=i+4|0;
             if ((a|0)>0) {
                 s=s-a|0;
                 if ((s|0)<0) return 0;

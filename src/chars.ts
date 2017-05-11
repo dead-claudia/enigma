@@ -133,5 +133,5 @@ export const enum Chars {
 
     ZeroWidthNoBreakSpace = 0xfeff,
 
-    ByteOrderMark = 0xfeff,
+    ByteOrderMark = 0xffef,
 }
