@@ -21,7 +21,7 @@ function parseStatementListItem(parser: Parser, context: Context): ESTree.Statem
 }
 
 export function parseBody(parser: Parser, context: Context): ESTree.Statement[] {
-    seek(parser);
+    seek(parser, context);
     if (!hasNext(parser)) return [];
     const {index, line, column} = parser;
 

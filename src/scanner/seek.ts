@@ -1,5 +1,5 @@
 import {Chars} from "../chars";
-import {Parser} from "../common";
+import {Parser, Context} from "../common";
 import * as Errors from "../errors";
 import {
     hasNext, advance, advanceOne, consumeOpt, advanceNewline, nextChar, rewindOne,
@@ -68,7 +68,7 @@ function skipBlockComment(parser: Parser): boolean {
 
 // This is somewhat monolithic, and the main loop handles non-comment whitespace.
 // TODO: add HTML comment support (script code only)
-export function seek(parser: Parser): Seek {
+export function seek(parser: Parser, context: Context): Seek {
     let result = Seek.None;
 
     while (hasNext(parser)) {

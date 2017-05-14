@@ -9,7 +9,7 @@ import {scan} from "./scan";
 // This only inserts semicolons before quotes (which could mean more directives), because the parser
 // is reset anyways.
 export function consumeDirectiveSemicolon(parser: Parser, context: Context): boolean {
-    const result = seek(parser);
+    const result = seek(parser, context);
 
     if (!hasNext(parser)) return false;
     const ch = nextChar(parser);
@@ -28,7 +28,7 @@ export function consumeDirectiveSemicolon(parser: Parser, context: Context): boo
 }
 
 export function consumeSemicolon(parser: Parser, context: Context) {
-    const result = seek(parser);
+    const result = seek(parser, context);
 
     if (!hasNext(parser)) return;
     const ch = nextChar(parser);
