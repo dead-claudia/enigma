@@ -1,7 +1,7 @@
 import {Parser, Context, unimplemented} from "../common";
 import {Token} from "../token";
 import {Chars} from "../chars";
-import {hasNext, nextChar, advance, consumeOpt, rewind} from "./common";
+import {hasNext, nextChar, advance, consumeOpt, rewindOne} from "./common";
 
 function scanString(parser: Parser, context: Context, quote: number): string {
     // TODO
@@ -169,7 +169,7 @@ export function scan(parser: Parser, context: Context): Token {
                     parser.column -= 2;
                 } else if (next >= Chars.Zero && next <= Chars.Nine) {
                     // Rewind the initial token.
-                    rewind(parser, ch);
+                    rewindOne(parser);
                     parser.tokenValue = scanNumeric(parser, context);
                     return Token.NumericLiteral;
                 }

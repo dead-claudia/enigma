@@ -1,7 +1,9 @@
 import {Chars} from "../chars";
 import {Parser} from "../common";
 import * as Errors from "../errors";
-import {hasNext, advance, consumeOpt, advanceNewline, nextChar} from "./common";
+import {
+    hasNext, advance, advanceOne, consumeOpt, advanceNewline, nextChar, rewindOne,
+} from "./common";
 import {isIDStart} from "../unicode-generated";
 
 export const enum Seek {
@@ -11,12 +13,10 @@ export const enum Seek {
 // Skip initial BOM and/or shebang.
 export function skipMeta(parser: Parser) {
     if (!hasNext(parser)) return;
-    if (parser.source.charCodeAt(parser.index) === Chars.ByteOrderMark) {
-        advance(parser, Chars.ByteOrderMark);
-    }
+    if (parser.source.charCodeAt(parser.index) === Chars.ByteOrderMark) parser.index++;
     if (!consumeOpt(parser, Chars.Hash)) return;
-    if (!consumeOpt(parser, Chars.Exclamation)) return;
-    skipToNewline(parser);
+    if (!consumeOpt(parser, Chars.Exclamation)) rewindOne(parser);
+    else skipToNewline(parser);
 }
 
 function skipToNewline(parser: Parser) {
@@ -43,7 +43,7 @@ function skipBlockComment(parser: Parser): boolean {
         const ch = nextChar(parser);
         switch (ch) {
             case Chars.Asterisk:
-                advance(parser, ch);
+                advanceOne(parser);
                 if (consumeOpt(parser, Chars.Slash)) return result;
                 break;
 
@@ -90,20 +90,20 @@ export function seek(parser: Parser): Seek {
             case Chars.NarrowNoBreakSpace: case Chars.MathematicalSpace:
             case Chars.IdeographicSpace: case Chars.ZeroWidthNoBreakSpace:
                 if (!result) result = Seek.SameLine;
-                advance(parser, ch);
+                advanceOne(parser);
                 break;
 
             /* comments */
             case Chars.Slash: {
                 if (!result) result = Seek.SameLine;
-                advance(parser, ch);
+                advanceOne(parser);
                 if (!hasNext(parser)) return result;
                 const next = nextChar(parser);
                 if (next === Chars.Slash) {
-                    advance(parser, next);
+                    advanceOne(parser);
                     if (skipToNewline(parser)) result = Seek.NewLine;
                 } else if (next === Chars.Asterisk) {
-                    advance(parser, next);
+                    advanceOne(parser);
                     if (skipBlockComment(parser)) result = Seek.NewLine;
                 }
                 break;

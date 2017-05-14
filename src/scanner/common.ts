@@ -5,13 +5,14 @@ export function hasNext(parser: Parser) {
     return parser.index < parser.source.length;
 }
 
-export function advance(parser: Parser, ch: number) {
+export function advanceOne(parser: Parser) {
     parser.index++;
     parser.column++;
-    if (ch & 0x10000) {
-        parser.index++;
-        parser.column++;
-    }
+}
+
+export function advance(parser: Parser, ch: number) {
+    advanceOne(parser);
+    if (ch & 0x10000) advanceOne(parser);
 }
 
 // This also converts Unicode pairs
@@ -40,14 +41,14 @@ export function consumeOpt(parser: Parser, code: number) {
             if (codePoint !== code) return false;
             parser.index = index;
             parser.column += 2;
-            return false;
+            return true;
         }
     }
 
     if (hi !== code) return false;
-    parser.index = hi;
+    parser.index = index;
     parser.column++;
-    return false;
+    return true;
 }
 
 export function advanceNewline(parser: Parser, ch: number) {
@@ -60,11 +61,12 @@ export function advanceNewline(parser: Parser, ch: number) {
     }
 }
 
-export function rewind(parser: Parser, ch: number) {
+export function rewindOne(parser: Parser) {
     parser.index--;
     parser.column--;
-    if (ch & 0x10000) {
-        parser.index--;
-        parser.column--;
-    }
+}
+
+export function rewind(parser: Parser, ch: number) {
+    rewindOne(parser);
+    if (ch & 0x10000) rewindOne(parser);
 }

@@ -1,23 +1,19 @@
 import {Parser} from "../common";
 import {Chars} from "../chars";
 import * as Errors from "../errors";
-import {hasNext, nextChar, advance, advanceNewline} from "./common";
+import {hasNext, nextChar, advance, advanceOne, advanceNewline} from "./common";
 
-const enum DirectiveEscapeState {
+const enum Escape {
     None, Any,
     LegacyOctal0,
     LegacyOctal1,
-    Hex0,
-    Hex1,
-    Hex2,
-    Hex3,
-    UCS2,
+    Hex0, Hex1, Hex2, Hex3,
     Unicode,
 }
 
 // This is also intentionally monolithic, since it's quickly preparsing for a "use strict"
 // directive.
-// TODO: skip Unicode/ASCII escapes
+// TODO: skip Unicode/ASCII escapes in strings
 export function scanDirective(parser: Parser): boolean | void {
     const {index: start, line, column} = parser;
     let index = start;
@@ -43,7 +39,11 @@ export function scanDirective(parser: Parser): boolean | void {
         parser.column += 12; // length of decl
         return true;
     } else {
-        let escape = DirectiveEscapeState.None;
+        // We need to skip the quote now.
+        advanceOne(parser);
+
+        // Doing it via finite state machine is easiest here - we're only validating syntax.
+        let escape = Escape.None;
 
         loop:
         while (hasNext(parser)) {
@@ -51,54 +51,86 @@ export function scanDirective(parser: Parser): boolean | void {
             switch (ch) {
                 case Chars.CarriageReturn: case Chars.LineFeed: case Chars.LineSeparator:
                 case Chars.ParagraphSeparator:
-                    if (escape !== DirectiveEscapeState.LegacyOctal0 &&
-                            escape !== DirectiveEscapeState.Any) {
-                        break loop;
-                    }
-                    escape = DirectiveEscapeState.None;
+                    if (escape !== Escape.LegacyOctal0 && escape !== Escape.Any) break loop;
+                    escape = Escape.None;
                     advanceNewline(parser, ch);
                     break;
 
                 case Chars.Zero: case Chars.One: case Chars.Two: case Chars.Three:
-                    advance(parser, ch);
-                    if (escape === DirectiveEscapeState.Any) {
-                        escape = DirectiveEscapeState.LegacyOctal1;
-                    } else if (escape === DirectiveEscapeState.LegacyOctal1) {
-                        escape = DirectiveEscapeState.LegacyOctal0;
-                    } else if (escape === DirectiveEscapeState.LegacyOctal0) {
-                        escape = DirectiveEscapeState.None;
+                    switch (escape) {
+                        case Escape.Any: escape = Escape.LegacyOctal1; break;
+                        case Escape.LegacyOctal1: escape = Escape.LegacyOctal0; break;
+                        case Escape.LegacyOctal0: escape = Escape.None; break;
+                        case Escape.Hex3: escape = Escape.Hex2; break;
+                        case Escape.Hex2: escape = Escape.Hex1; break;
+                        case Escape.Hex1: escape = Escape.Hex0; break;
+                        case Escape.Hex0: escape = Escape.None; break;
+                        default: // ignore
                     }
+
+                    advanceOne(parser);
                     break;
 
                 case Chars.Four: case Chars.Five: case Chars.Six: case Chars.Seven:
-                    advance(parser, ch);
-                    if (escape === DirectiveEscapeState.Any) {
-                        escape = DirectiveEscapeState.LegacyOctal0;
-                    } else if (escape === DirectiveEscapeState.LegacyOctal0) {
-                        escape = DirectiveEscapeState.None;
+                    switch (escape) {
+                        case Escape.Any: case Escape.LegacyOctal1:
+                            escape = Escape.LegacyOctal0; break;
+                        case Escape.LegacyOctal0: escape = Escape.None; break;
+                        case Escape.Hex3: escape = Escape.Hex2; break;
+                        case Escape.Hex2: escape = Escape.Hex1; break;
+                        case Escape.Hex1: escape = Escape.Hex0; break;
+                        case Escape.Hex0: escape = Escape.None; break;
+                        default: // ignore
                     }
+                    advanceOne(parser);
                     break;
 
-                case Chars.DoubleQuote: case Chars.SingleQuote:
-                    if (escape !== DirectiveEscapeState.None && ch === quote) return false;
-                    escape = DirectiveEscapeState.None;
-                    advance(parser, ch);
+                case Chars.Eight: case Chars.Nine:
+                case Chars.UpperA: case Chars.UpperB: case Chars.UpperC:
+                case Chars.UpperD: case Chars.UpperE: case Chars.UpperF:
+                case Chars.LowerA: case Chars.LowerB: case Chars.LowerC:
+                case Chars.LowerD: case Chars.LowerE: case Chars.LowerF:
+                    switch (escape) {
+                        case Escape.Any: case Escape.LegacyOctal1: case Escape.LegacyOctal0:
+                            escape = Escape.None; break;
+                        case Escape.Hex3: escape = Escape.Hex2; break;
+                        case Escape.Hex2: escape = Escape.Hex1; break;
+                        case Escape.Hex1: escape = Escape.Hex0; break;
+                        case Escape.Hex0: escape = Escape.None; break;
+                        case Escape.LegacyOctal0: escape = Escape.None; break;
+                        default: // ignore
+                    }
+                    advanceOne(parser);
                     break;
 
                 case Chars.Backslash:
-                    advance(parser, ch);
-                    if (escape === DirectiveEscapeState.Any) {
-                        escape = DirectiveEscapeState.None;
-                    } else {
-                        escape = DirectiveEscapeState.Any;
-                    }
+                    // TODO: file a TS bug - this cast should be unnecessary.
+                    escape = (escape as Escape) === Escape.Any ? Escape.None : Escape.Any;
+                    advanceOne(parser);
                     break;
 
                 case Chars.UpperX: case Chars.LowerX:
-                    // TODO
+                    if (escape === Escape.Any) escape = Escape.Hex1;
+                    advanceOne(parser);
+                    break;
+
+                case Chars.UpperU: case Chars.LowerU:
+                    if (escape === Escape.Any) escape = Escape.Hex3;
+                    advanceOne(parser);
+                    break;
+
+                case Chars.LeftBrace:
+                    if (escape === Escape.Hex3) escape = Escape.Unicode;
+                    else if (escape === Escape.Any) escape = Escape.None;
+                    advanceOne(parser);
+                    break;
+
+                case Chars.DoubleQuote: case Chars.SingleQuote:
+                    if (escape === Escape.None && ch === quote) return false;
+                    // falls through
 
                 default:
-                    escape = DirectiveEscapeState.None;
+                    escape = Escape.None;
                     advance(parser, ch);
             }
         }
