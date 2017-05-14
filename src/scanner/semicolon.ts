@@ -2,7 +2,7 @@ import {Chars} from "../chars";
 import {Parser, Context} from "../common";
 import * as Errors from "../errors";
 import {tokenDesc} from "../token";
-import {hasNext, nextChar, advance} from "./common";
+import {hasNext, nextChar, advanceOne} from "./common";
 import {Seek, seek} from "./seek";
 import {scan} from "./scan";
 
@@ -12,10 +12,9 @@ export function consumeDirectiveSemicolon(parser: Parser, context: Context): boo
     const result = seek(parser, context);
 
     if (!hasNext(parser)) return false;
-    const ch = nextChar(parser);
-    switch (ch) {
+    switch (nextChar(parser)) {
         case Chars.Semicolon:
-            advance(parser, ch);
+            advanceOne(parser);
             return true;
 
         case Chars.SingleQuote: case Chars.DoubleQuote:
@@ -34,7 +33,7 @@ export function consumeSemicolon(parser: Parser, context: Context) {
     const ch = nextChar(parser);
 
     if (ch === Chars.Semicolon || ch === Chars.RightBrace) {
-        advance(parser, ch);
+        advanceOne(parser);
     } else if (!(result & Seek.NewLine)) {
         Errors.report(
             parser.index, parser.line, parser.column,

@@ -2,7 +2,14 @@ import {Chars} from "../chars";
 import {Parser, Context} from "../common";
 import * as Errors from "../errors";
 import {
-    hasNext, advance, advanceOne, consumeOpt, advanceNewline, nextChar, rewindOne,
+    advanceCR,
+    advanceNewline,
+    advanceOne,
+    consumeAny,
+    consumeOpt,
+    hasNext,
+    nextChar,
+    rewindOne,
 } from "./common";
 import {isIDStart} from "../unicode-generated";
 
@@ -21,15 +28,16 @@ export function skipMeta(parser: Parser) {
 
 function skipToNewline(parser: Parser) {
     while (hasNext(parser)) {
-        const ch = nextChar(parser);
-        switch (ch) {
-            case Chars.CarriageReturn: case Chars.LineFeed: case Chars.LineSeparator:
-            case Chars.ParagraphSeparator:
-                advanceNewline(parser, ch);
+        switch (nextChar(parser)) {
+            case Chars.CarriageReturn:
+                advanceCR(parser);
+                return true;
+            case Chars.LineFeed: case Chars.LineSeparator: case Chars.ParagraphSeparator:
+                advanceNewline(parser);
                 return true;
 
             default:
-                advance(parser, ch);
+                consumeAny(parser);
         }
     }
 
@@ -40,21 +48,24 @@ function skipBlockComment(parser: Parser): boolean {
     let result = false;
 
     while (hasNext(parser)) {
-        const ch = nextChar(parser);
-        switch (ch) {
+        switch (nextChar(parser)) {
             case Chars.Asterisk:
                 advanceOne(parser);
                 if (consumeOpt(parser, Chars.Slash)) return result;
                 break;
 
-            case Chars.CarriageReturn: case Chars.LineFeed: case Chars.LineSeparator:
-            case Chars.ParagraphSeparator:
+            case Chars.CarriageReturn:
                 result = true;
-                advanceNewline(parser, ch);
+                advanceCR(parser);
+                break;
+
+            case Chars.LineFeed: case Chars.LineSeparator: case Chars.ParagraphSeparator:
+                result = true;
+                advanceNewline(parser);
                 break;
 
             default:
-                advance(parser, ch);
+                consumeAny(parser);
         }
     }
 
@@ -72,13 +83,15 @@ export function seek(parser: Parser, context: Context): Seek {
     let result = Seek.None;
 
     while (hasNext(parser)) {
-        const ch = nextChar(parser);
-        switch (ch) {
+        switch (nextChar(parser)) {
             /* line terminators */
-            case Chars.CarriageReturn: case Chars.LineFeed: case Chars.LineSeparator:
-            case Chars.ParagraphSeparator:
+            case Chars.CarriageReturn:
                 result = Seek.NewLine;
-                advanceNewline(parser, ch);
+                advanceCR(parser);
+                break;
+            case Chars.LineFeed: case Chars.LineSeparator: case Chars.ParagraphSeparator:
+                result = Seek.NewLine;
+                advanceNewline(parser);
                 break;
 
             /* general whitespace */

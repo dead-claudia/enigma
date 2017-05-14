@@ -1,7 +1,11 @@
 import {Parser} from "../common";
 import {Chars} from "../chars";
 import * as Errors from "../errors";
-import {hasNext, nextChar, advance, advanceOne, advanceNewline} from "./common";
+import {
+    hasNext, nextChar,
+    advanceOne, advanceCR, advanceNewline,
+    consumeAny,
+} from "./common";
 
 const enum Escape {
     None, Any,
@@ -49,11 +53,15 @@ export function scanDirective(parser: Parser): boolean | void {
         while (hasNext(parser)) {
             const ch = nextChar(parser);
             switch (ch) {
-                case Chars.CarriageReturn: case Chars.LineFeed: case Chars.LineSeparator:
-                case Chars.ParagraphSeparator:
+                case Chars.CarriageReturn:
                     if (escape !== Escape.LegacyOctal0 && escape !== Escape.Any) break loop;
                     escape = Escape.None;
-                    advanceNewline(parser, ch);
+                    advanceCR(parser);
+                    break;
+                case Chars.LineFeed: case Chars.LineSeparator: case Chars.ParagraphSeparator:
+                    if (escape !== Escape.LegacyOctal0 && escape !== Escape.Any) break loop;
+                    escape = Escape.None;
+                    advanceNewline(parser);
                     break;
 
                 case Chars.Zero: case Chars.One: case Chars.Two: case Chars.Three:
@@ -131,7 +139,7 @@ export function scanDirective(parser: Parser): boolean | void {
 
                 default:
                     escape = Escape.None;
-                    advance(parser, ch);
+                    consumeAny(parser);
             }
         }
 
