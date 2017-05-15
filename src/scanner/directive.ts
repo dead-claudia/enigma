@@ -1,33 +1,207 @@
-import {Parser} from "../common";
+import {Parser, Context, unreachable} from "../common";
 import {Chars} from "../chars";
 import * as Errors from "../errors";
+import {seek} from "./seek";
 import {
     hasNext, nextChar,
-    advanceOne, advanceCR, advanceNewline,
-    consumeAny,
+    advanceOne, advanceNewline,
+    consumeAny, consumeLineFeed,
 } from "./common";
+
+/*
+ * Note:
+ *
+ * The directive preparser is structured as an optimized finite state machine. There is no concern
+ * of nested productions because I'm only validating strings (not even parsing them), aborting with
+ * everything else.
+ */
 
 const enum Escape {
     None, Any,
     LegacyOctal0,
     LegacyOctal1,
     Hex0, Hex1, Hex2, Hex3,
-    Unicode,
+    UnicodeInit,
+    UnicodeSucc,
 }
+
+const enum Bail {
+    HexFail = Escape.UnicodeSucc + 1,
+    OctalFail,
+    Unterminated,
+    Return,
+
+    // Must be 1 less than the first flag member.
+    Mask = 0xf,
+
+    // Must be the first power of 2 above the last non-flag member.
+    LastIsCR = 1 << 4,
+}
+
+export const enum Directive {
+    None, Other, Strict,
+}
+
+function invalidHex(start: number, line: number, column: number): never {
+    return Errors.report(start, line, column, Errors.invalidStringHex());
+}
+
+function isEscape(escape: Escape | Bail): escape is Escape {
+    return (escape & Bail.Mask) < Bail.HexFail;
+}
+
+// Note: the lookup table is so it's just a single cache load rather than hard-to-predict
+// branching.
+const enum TableStart {
+    // This must be kept in sync with the last Escape state.
+    SegmentLength = Escape.UnicodeSucc + 1,
+
+    LineTerminator = SegmentLength * 0,
+    LowOctal       = SegmentLength * 1,
+    HighOctal      = SegmentLength * 2,
+    DecimalHex     = SegmentLength * 3,
+    Backslash      = SegmentLength * 4,
+    X              = SegmentLength * 5,
+    U              = SegmentLength * 6,
+    LeftBrace      = SegmentLength * 7,
+    RightBrace     = SegmentLength * 8,
+    Other          = SegmentLength * 9,
+}
+
+const Table = [
+    /* TableStart.LineTerminator */
+    Bail.Unterminated,
+    Escape.None,
+    Bail.OctalFail,
+    Bail.OctalFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+
+    /* TableStart.LowOctal */
+    Escape.None,
+    Escape.LegacyOctal1,
+    Escape.None,
+    Escape.LegacyOctal0,
+    Escape.None,
+    Escape.Hex0,
+    Escape.Hex1,
+    Escape.Hex2,
+    Escape.UnicodeSucc,
+    Escape.UnicodeSucc,
+
+    /* TableStart.HighOctal */
+    Escape.None,
+    Escape.LegacyOctal0,
+    Escape.None,
+    Escape.LegacyOctal0,
+    Escape.None,
+    Escape.Hex0,
+    Escape.Hex1,
+    Escape.Hex2,
+    Escape.UnicodeSucc,
+    Escape.UnicodeSucc,
+
+    /* TableStart.DecimalHex */
+    Escape.None,
+    Escape.None,
+    Escape.None,
+    Escape.None,
+    Escape.None,
+    Escape.Hex0,
+    Escape.Hex1,
+    Escape.Hex2,
+    Escape.UnicodeSucc,
+    Escape.UnicodeSucc,
+
+    /* TableStart.Backslash */
+    Escape.Any,
+    Escape.None,
+    Escape.Any,
+    Escape.Any,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+
+    /* TableStart.X */
+    Escape.None,
+    Escape.Hex1,
+    Escape.None,
+    Escape.None,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+
+    /* TableStart.U */
+    Escape.None,
+    Escape.Hex3,
+    Escape.None,
+    Escape.None,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+
+    /* TableStart.LeftBrace */
+    Escape.None,
+    Escape.None,
+    Escape.None,
+    Escape.None,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Escape.UnicodeInit,
+    Bail.HexFail,
+    Bail.HexFail,
+
+    /* TableStart.RightBrace */
+    Escape.None,
+    Escape.None,
+    Escape.None,
+    Escape.None,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Escape.None,
+
+    /* TableStart.Other */
+    Escape.None,
+    Escape.None,
+    Escape.None,
+    Escape.None,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+    Bail.HexFail,
+];
 
 // This is also intentionally monolithic, since it's quickly preparsing for a "use strict"
 // directive.
-// TODO: skip Unicode/ASCII escapes in strings
-export function scanDirective(parser: Parser): boolean | void {
+export function scanDirective(parser: Parser, context: Context): Directive {
+    seek(parser, context);
     const {index: start, line, column} = parser;
     let index = start;
-    const raw = "";
 
-    if (index === parser.source.length) return false;
+    if (index === parser.source.length) return Directive.None;
     const quote = parser.source.charCodeAt(index++);
-    if (quote !== Chars.SingleQuote && quote !== Chars.DoubleQuote) return false;
+    if (quote !== Chars.SingleQuote && quote !== Chars.DoubleQuote) return Directive.None;
 
-    if (index + 11 < parser.source.length &&
+    if (index + 11 <= parser.source.length &&
             parser.source.charCodeAt(index++) === Chars.LowerU &&
             parser.source.charCodeAt(index++) === Chars.LowerS &&
             parser.source.charCodeAt(index++) === Chars.LowerE &&
@@ -41,108 +215,84 @@ export function scanDirective(parser: Parser): boolean | void {
             parser.source.charCodeAt(index++) === quote) {
         parser.index = index;
         parser.column += 12; // length of decl
-        return true;
+        return Directive.Strict;
     } else {
         // We need to skip the quote now.
         advanceOne(parser);
 
         // Doing it via finite state machine is easiest here - we're only validating syntax.
-        let escape = Escape.None;
+        let escape = Escape.None as Escape | Bail;
 
-        loop:
-        while (hasNext(parser)) {
+        while (isEscape(escape) && hasNext(parser)) {
             const ch = nextChar(parser);
-            switch (ch) {
-                case Chars.CarriageReturn:
-                    if (escape !== Escape.LegacyOctal0 && escape !== Escape.Any) break loop;
-                    escape = Escape.None;
-                    advanceCR(parser);
-                    break;
-                case Chars.LineFeed: case Chars.LineSeparator: case Chars.ParagraphSeparator:
-                    if (escape !== Escape.LegacyOctal0 && escape !== Escape.Any) break loop;
-                    escape = Escape.None;
-                    advanceNewline(parser);
-                    break;
 
-                case Chars.Zero: case Chars.One: case Chars.Two: case Chars.Three:
-                    switch (escape) {
-                        case Escape.Any: escape = Escape.LegacyOctal1; break;
-                        case Escape.LegacyOctal1: escape = Escape.LegacyOctal0; break;
-                        case Escape.LegacyOctal0: escape = Escape.None; break;
-                        case Escape.Hex3: escape = Escape.Hex2; break;
-                        case Escape.Hex2: escape = Escape.Hex1; break;
-                        case Escape.Hex1: escape = Escape.Hex0; break;
-                        case Escape.Hex0: escape = Escape.None; break;
-                        default: // ignore
-                    }
-
-                    advanceOne(parser);
-                    break;
-
-                case Chars.Four: case Chars.Five: case Chars.Six: case Chars.Seven:
-                    switch (escape) {
-                        case Escape.Any: case Escape.LegacyOctal1:
-                            escape = Escape.LegacyOctal0; break;
-                        case Escape.LegacyOctal0: escape = Escape.None; break;
-                        case Escape.Hex3: escape = Escape.Hex2; break;
-                        case Escape.Hex2: escape = Escape.Hex1; break;
-                        case Escape.Hex1: escape = Escape.Hex0; break;
-                        case Escape.Hex0: escape = Escape.None; break;
-                        default: // ignore
-                    }
-                    advanceOne(parser);
-                    break;
-
-                case Chars.Eight: case Chars.Nine:
-                case Chars.UpperA: case Chars.UpperB: case Chars.UpperC:
-                case Chars.UpperD: case Chars.UpperE: case Chars.UpperF:
-                case Chars.LowerA: case Chars.LowerB: case Chars.LowerC:
-                case Chars.LowerD: case Chars.LowerE: case Chars.LowerF:
-                    switch (escape) {
-                        case Escape.Any: case Escape.LegacyOctal1: case Escape.LegacyOctal0:
-                            escape = Escape.None; break;
-                        case Escape.Hex3: escape = Escape.Hex2; break;
-                        case Escape.Hex2: escape = Escape.Hex1; break;
-                        case Escape.Hex1: escape = Escape.Hex0; break;
-                        case Escape.Hex0: escape = Escape.None; break;
-                        case Escape.LegacyOctal0: escape = Escape.None; break;
-                        default: // ignore
-                    }
-                    advanceOne(parser);
-                    break;
-
-                case Chars.Backslash:
-                    // TODO: file a TS bug - this cast should be unnecessary.
-                    escape = (escape as Escape) === Escape.Any ? Escape.None : Escape.Any;
-                    advanceOne(parser);
-                    break;
-
-                case Chars.UpperX: case Chars.LowerX:
-                    if (escape === Escape.Any) escape = Escape.Hex1;
-                    advanceOne(parser);
-                    break;
-
-                case Chars.UpperU: case Chars.LowerU:
-                    if (escape === Escape.Any) escape = Escape.Hex3;
-                    advanceOne(parser);
-                    break;
-
-                case Chars.LeftBrace:
-                    if (escape === Escape.Hex3) escape = Escape.Unicode;
-                    else if (escape === Escape.Any) escape = Escape.None;
-                    advanceOne(parser);
-                    break;
-
-                case Chars.DoubleQuote: case Chars.SingleQuote:
-                    if (escape === Escape.None && ch === quote) return false;
-                    // falls through
-
-                default:
-                    escape = Escape.None;
-                    consumeAny(parser);
+            /* line terminators */
+            if (ch === Chars.CarriageReturn) {
+                advanceNewline(parser);
+                escape = Table[(escape & Bail.Mask) + TableStart.LineTerminator] | Bail.LastIsCR;
+            } else if (ch === Chars.LineFeed) {
+                consumeLineFeed(parser, (escape & Bail.LastIsCR) !== 0);
+                escape = Table[(escape & Bail.Mask) + TableStart.LineTerminator];
+            } else if (ch === Chars.LineSeparator || ch === Chars.ParagraphSeparator) {
+                advanceNewline(parser);
+                escape = Table[(escape & Bail.Mask) + TableStart.LineTerminator];
+            } else if (ch >= Chars.Zero && ch <= Chars.Three) {
+                /* low octal numbers */
+                advanceOne(parser);
+                escape = Table[(escape & Bail.Mask) + TableStart.LowOctal];
+            } else if (ch >= Chars.Four && ch <= Chars.Seven) {
+                /* high octal numbers */
+                advanceOne(parser);
+                escape = Table[(escape & Bail.Mask) + TableStart.LowOctal];
+            } else if (
+                ch === Chars.Eight || ch === Chars.Nine ||
+                ch >= Chars.UpperA && ch <= Chars.UpperF ||
+                ch >= Chars.LowerA && ch <= Chars.LowerF
+            ) {
+                /* decimal/hex numbers */
+                advanceOne(parser);
+                escape = Table[(escape & Bail.Mask) + TableStart.DecimalHex];
+            } else if (ch === Chars.Backslash) {
+                /* escape start */
+                advanceOne(parser);
+                escape = Table[(escape & Bail.Mask) + TableStart.Backslash];
+            } else if (ch === Chars.UpperX || ch === Chars.LowerX) {
+                /* ASCII escape start */
+                advanceOne(parser);
+                escape = Table[(escape & Bail.Mask) + TableStart.X];
+            } else if (ch === Chars.UpperU || ch === Chars.LowerU) {
+                /* Unicode escape start */
+                advanceOne(parser);
+                escape = Table[(escape & Bail.Mask) + TableStart.U];
+            } else if (ch === Chars.LeftBrace) {
+                /* Unicode variadic escape start */
+                advanceOne(parser);
+                escape = Table[(escape & Bail.Mask) + TableStart.LeftBrace];
+            } else if (ch === Chars.RightBrace) {
+                /* Unicode variadic escape end */
+                advanceOne(parser);
+                escape = Table[(escape & Bail.Mask) + TableStart.RightBrace];
+            } else if (ch & 0x10000) {
+                /* Anything else */
+                consumeAny(parser);
+                escape = Table[(escape & Bail.Mask) + TableStart.Other];
+            } else {
+                /* Anything else */
+                advanceOne(parser);
+                escape = Table[(escape & Bail.Mask) + TableStart.Other];
+                if (ch === quote && escape === Escape.None) return Directive.Other;
             }
         }
 
-        return Errors.report(start, line, column, Errors.unterminatedTokenString());
+        switch (escape) {
+            case Bail.HexFail:
+                return Errors.report(start, line, column, Errors.invalidStringHex());
+
+            case Bail.OctalFail:
+                return Errors.report(start, line, column, Errors.invalidStringOctal());
+
+            default:
+                return Errors.report(start, line, column, Errors.unterminatedTokenString());
+        }
     }
 }

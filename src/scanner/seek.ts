@@ -2,20 +2,16 @@ import {Chars} from "../chars";
 import {Parser, Context} from "../common";
 import * as Errors from "../errors";
 import {
-    advanceCR,
     advanceNewline,
     advanceOne,
     consumeAny,
+    consumeLineFeed,
     consumeOpt,
     hasNext,
     nextChar,
     rewindOne,
 } from "./common";
 import {isIDStart} from "../unicode-generated";
-
-export const enum Seek {
-    None, SameLine, NewLine,
-}
 
 // Skip initial BOM and/or shebang.
 export function skipMeta(parser: Parser) {
@@ -26,45 +22,73 @@ export function skipMeta(parser: Parser) {
     else skipToNewline(parser);
 }
 
-function skipToNewline(parser: Parser) {
+/*
+ * The token seeking mechanism is structured as a series of linked optimized finite state machines,
+ * one for single line comments, one for block comments, and one for whitespace. It is designed that
+ * way to ensure speed and maximize branch prediction.
+ *
+ * `seek()` is called between literally every token, so it must be fast.
+ */
+
+export const enum Seek {
+    None, SameLine, NewLine,
+}
+
+const enum SeekState {
+    None = 0,
+    NewLine = 1 << 0,
+    SameLine = 1 << 1,
+    LastIsCR = 1 << 2,
+}
+
+function skipToNewline(parser: Parser): SeekState {
     while (hasNext(parser)) {
         switch (nextChar(parser)) {
             case Chars.CarriageReturn:
-                advanceCR(parser);
-                return true;
+                advanceNewline(parser);
+                if (hasNext(parser) && nextChar(parser) === Chars.LineFeed) parser.index++;
+                return SeekState.NewLine;
+
             case Chars.LineFeed: case Chars.LineSeparator: case Chars.ParagraphSeparator:
                 advanceNewline(parser);
-                return true;
+                return SeekState.NewLine;
 
             default:
                 consumeAny(parser);
         }
     }
 
-    return false;
+    return SeekState.None;
 }
 
-function skipBlockComment(parser: Parser): boolean {
-    let result = false;
+function skipBlockComment(parser: Parser): SeekState {
+    let state = SeekState.None;
 
     while (hasNext(parser)) {
         switch (nextChar(parser)) {
             case Chars.Asterisk:
                 advanceOne(parser);
-                if (consumeOpt(parser, Chars.Slash)) return result;
+                state &= SeekState.NewLine;
+                if (consumeOpt(parser, Chars.Slash)) return state & SeekState.NewLine;
                 break;
 
             case Chars.CarriageReturn:
-                result = true;
-                advanceCR(parser);
+                state |= SeekState.NewLine | SeekState.LastIsCR;
+                advanceNewline(parser);
                 break;
 
-            case Chars.LineFeed: case Chars.LineSeparator: case Chars.ParagraphSeparator:
-                result = true;
+            case Chars.LineFeed:
+                consumeLineFeed(parser, (state & SeekState.LastIsCR) !== 0);
+                state = state & SeekState.SameLine | SeekState.NewLine;
+                break;
+
+            case Chars.LineSeparator: case Chars.ParagraphSeparator:
+                state = SeekState.NewLine;
                 advanceNewline(parser);
                 break;
 
             default:
+                state &= SeekState.NewLine;
                 consumeAny(parser);
         }
     }
@@ -80,17 +104,24 @@ function skipBlockComment(parser: Parser): boolean {
 // This is somewhat monolithic, and the main loop handles non-comment whitespace.
 // TODO: add HTML comment support (script code only)
 export function seek(parser: Parser, context: Context): Seek {
-    let result = Seek.None;
+    let state = SeekState.None;
 
+    loop:
     while (hasNext(parser)) {
         switch (nextChar(parser)) {
             /* line terminators */
             case Chars.CarriageReturn:
-                result = Seek.NewLine;
-                advanceCR(parser);
+                state |= SeekState.NewLine | SeekState.LastIsCR;
+                advanceNewline(parser);
                 break;
-            case Chars.LineFeed: case Chars.LineSeparator: case Chars.ParagraphSeparator:
-                result = Seek.NewLine;
+
+            case Chars.LineFeed:
+                consumeLineFeed(parser, (state & SeekState.LastIsCR) !== 0);
+                state = state & SeekState.SameLine | SeekState.NewLine;
+                break;
+
+            case Chars.LineSeparator: case Chars.ParagraphSeparator:
+                state = state & SeekState.SameLine | SeekState.NewLine;
                 advanceNewline(parser);
                 break;
 
@@ -102,30 +133,31 @@ export function seek(parser: Parser, context: Context): Seek {
             case Chars.PunctuationSpace: case Chars.ThinSpace: case Chars.HairSpace:
             case Chars.NarrowNoBreakSpace: case Chars.MathematicalSpace:
             case Chars.IdeographicSpace: case Chars.ZeroWidthNoBreakSpace:
-                if (!result) result = Seek.SameLine;
+                state |= SeekState.SameLine;
                 advanceOne(parser);
                 break;
 
             /* comments */
             case Chars.Slash: {
-                if (!result) result = Seek.SameLine;
+                state |= SeekState.SameLine;
                 advanceOne(parser);
-                if (!hasNext(parser)) return result;
+                if (!hasNext(parser)) break loop;
                 const next = nextChar(parser);
                 if (next === Chars.Slash) {
                     advanceOne(parser);
-                    if (skipToNewline(parser)) result = Seek.NewLine;
+                    state |= skipToNewline(parser);
                 } else if (next === Chars.Asterisk) {
                     advanceOne(parser);
-                    if (skipBlockComment(parser)) result = Seek.NewLine;
+                    state |= skipBlockComment(parser);
                 }
                 break;
             }
 
-            default:
-                return result;
+            default: break loop;
         }
     }
 
-    return result;
+    if (state & SeekState.NewLine) return Seek.NewLine;
+    if (state & SeekState.SameLine) return Seek.SameLine;
+    return Seek.None;
 }

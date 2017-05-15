@@ -8,6 +8,8 @@ import {scan} from "./scan";
 
 // This only inserts semicolons before quotes (which could mean more directives), because the parser
 // is reset anyways.
+//
+// Returns `true` iff a semicolon was consumed or inserted.
 export function consumeDirectiveSemicolon(parser: Parser, context: Context): boolean {
     const result = seek(parser, context);
 
@@ -18,8 +20,7 @@ export function consumeDirectiveSemicolon(parser: Parser, context: Context): boo
             return true;
 
         case Chars.SingleQuote: case Chars.DoubleQuote:
-            if (result & Seek.NewLine) return true;
-            // falls through
+            return result === Seek.NewLine;
 
         default:
             return false;
@@ -30,14 +31,14 @@ export function consumeSemicolon(parser: Parser, context: Context) {
     const result = seek(parser, context);
 
     if (!hasNext(parser)) return;
-    const ch = nextChar(parser);
-
-    if (ch === Chars.Semicolon || ch === Chars.RightBrace) {
-        advanceOne(parser);
-    } else if (!(result & Seek.NewLine)) {
-        Errors.report(
-            parser.index, parser.line, parser.column,
-            Errors.unexpectedToken(tokenDesc(scan(parser, context))),
-        );
+    switch (nextChar(parser)) {
+        case Chars.Semicolon: advanceOne(parser); break;
+        case Chars.RightBrace: break;
+        default:
+            if (result === Seek.NewLine) return;
+            Errors.report(
+                parser.index, parser.line, parser.column,
+                Errors.unexpectedToken(tokenDesc(scan(parser, context))),
+            );
     }
 }

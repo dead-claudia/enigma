@@ -70,12 +70,11 @@ export function consumeOptAstral(parser: Parser, code: number) {
     return true;
 }
 
-export function advanceCR(parser: Parser) {
+export function consumeLineFeed(parser: Parser, lastIsCR: boolean) {
     parser.index++;
-    parser.column = 0;
-    parser.line++;
-    if (hasNext(parser) && parser.source.charCodeAt(parser.index) === Chars.LineFeed) {
-        parser.index++;
+    if (!lastIsCR) {
+        parser.column = 0;
+        parser.line++;
     }
 }
 

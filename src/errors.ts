@@ -86,6 +86,18 @@ export const invalidEightAndNine = () => (
     "Escapes \\8 or \\9 are not syntactically valid escapes"
 );
 
+export const invalidStringLineTerminator = () => (
+    "Strings may not contain line terminators"
+);
+
+export const invalidStringOctal = () => (
+    "Invalid string octal escape"
+);
+
+export const invalidStringHex = () => (
+    "Invalid string ASCII/Unicode escape"
+);
+
 export const invalidJSXAttributeValue = () => (
     "JSX value should be either an expression or a quoted JSX text"
 );
@@ -95,11 +107,11 @@ export const invalidLHSInAssignment = () => (
 );
 
 export const invalidLHSInForIn = () => (
-    "InvalidLHSInForIn"
+    "Invalid left-hand side in for-in loop"
 );
 
 export const invalidLHSInForLoop = () => (
-    "Invalid left-hand side in for-loop"
+    "Invalid left-hand side in for loop"
 );
 
 export const invalidModuleSpecifier = () => (

@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-        "strict": true,
         "module": "CommonJS",
         "newLine": "LF",
         "noEmitOnError": true,
@@ -8,6 +7,7 @@
         "pretty": true,
         "removeComments": true,
         "skipLibCheck": true,
+        "strict": true,
         "target": "es2015",
         "types": ["chai", "mocha"]
     },

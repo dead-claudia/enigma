@@ -39,6 +39,10 @@ export function unimplemented(): never {
     throw new Error("unimplemented");
 }
 
+// Note: this is intentionally ambient, since it should never be called. (It should be a guaranteed
+// runtime error.)
+export declare function unreachable(...values: never[]): never;
+
 export function finishNode<T extends ESTree.Node>(
     context: Context,
     start: number,

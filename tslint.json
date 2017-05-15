@@ -3,8 +3,8 @@
   "rules": {
     "member-ordering": false,
     "no-bitwise": false,
-    "no-switch-case-fall-through": true,
     "switch-default": true,
+    "no-switch-case-fall-through": true,
     "linebreak-style": [true, "LF"],
     "max-line-length": [true, 100],
     "curly": [true, "ignore-same-line"],
