@@ -1,12 +1,10 @@
 import * as ESTree from "./estree";
 import {Chars} from "./chars";
-import {Context, Flags, Parser, OnComment, unimplemented, finishNode} from "./common";
+import {Context, finishNode, Flags, OnComment, Parser, unimplemented} from "./common";
 import {
-    hasNext, seek,
-    scanDirective, Directive,
-    consumeDirectiveSemicolon, consumeSemicolon,
+    consumeDirectiveSemicolon,
+    Directive, hasNext, scanDirective, seek,
 } from "./scanner";
-import * as Errors from "./errors";
 
 /**
  * Create a new parser instance.

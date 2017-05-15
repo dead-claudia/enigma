@@ -3,9 +3,9 @@ import {Chars} from "../chars";
 import * as Errors from "../errors";
 import {seek} from "./seek";
 import {
-    hasNext, nextChar,
-    advanceOne, advanceNewline,
+    advanceNewline, advanceOne,
     consumeAny, consumeLineFeed,
+    hasNext, nextChar,
 } from "./common";
 
 /*

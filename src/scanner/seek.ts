@@ -2,14 +2,9 @@ import {Chars} from "../chars";
 import {Parser, Context} from "../common";
 import * as Errors from "../errors";
 import {
-    advanceNewline,
-    advanceOne,
-    consumeAny,
-    consumeLineFeed,
-    consumeOpt,
-    hasNext,
-    nextChar,
-    rewindOne,
+    advanceNewline, advanceOne,
+    consumeAny, consumeLineFeed, consumeOpt,
+    hasNext, nextChar, rewindOne,
 } from "./common";
 import {isIDStart} from "../unicode-generated";
 

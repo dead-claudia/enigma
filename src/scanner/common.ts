@@ -93,3 +93,27 @@ export function rewindOne(parser: Parser) {
     parser.index--;
     parser.column--;
 }
+
+// Avoid 90% of the ceremony of String.fromCodePoint
+export function fromCodePoint(code: number): string {
+    if (code & 0x10000) {
+        return String.fromCharCode(code >>> 10) +
+            String.fromCharCode(code & 0x3ff);
+    } else {
+        return String.fromCharCode(code);
+    }
+}
+
+export function toHex(code: number): number {
+    if (code < Chars.Zero) return -1;
+    if (code <= Chars.Nine) return code - Chars.Zero;
+    if (code < Chars.UpperA) return -1;
+    if (code <= Chars.UpperF) return code - Chars.UpperA + 10;
+    if (code < Chars.LowerA) return -1;
+    if (code <= Chars.LowerF) return code - Chars.LowerA + 10;
+    return -1;
+}
+
+export function storeRaw(parser: Parser, start: number) {
+    parser.tokenRaw = parser.source.slice(start, parser.index);
+}
