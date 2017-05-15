@@ -1,3 +1,18 @@
+/**
+ * Report an error with an appropriate index, line, column, and description string. This currently
+ * throws.
+ */
+export function report(index: number, line: number, column: number, description: string): never {
+    const error: any = new SyntaxError(
+        `Line ${line}, column ${column}: ${description}`,
+    );
+    error.index = index;
+    error.line = line;
+    error.column = column;
+    error.description = description;
+    throw error;
+}
+
 export const adjacentJSXElements = () => (
     "Adjacent JSX elements must be wrapped in an enclosing tag"
 );
@@ -95,7 +110,7 @@ export const invalidStringOctal = () => (
 );
 
 export const invalidStringHex = () => (
-    "Invalid string ASCII/Unicode escape"
+    "Invalid string hex escape"
 );
 
 export const invalidJSXAttributeValue = () => (
@@ -214,6 +229,10 @@ export const strictModeWith = () => (
     "Strict mode code may not include a with statement"
 );
 
+export const strictOctalEscape = () => (
+    "Octal escapes are not allowed in strict mode"
+);
+
 export const strictOctalLiteral = () => (
     "Octal literals are not allowed in strict mode"
 );
@@ -224,10 +243,6 @@ export const strictReservedWord = () => (
 
 export const strictVarName = (name: string) => (
     `Variable name may not be ${name} in strict mode`
-);
-
-export const templateOctalLiteral = () => (
-    "Octal literals are not allowed in template strings."
 );
 
 export const unexpected = () => (
@@ -246,6 +261,10 @@ export const unexpectedToken = (name: string) => (
     `Unexpected token '${name}'`
 );
 
+export const unicodeOutOfRange = () => (
+    "Unicode escape code point out of range"
+);
+
 export const uninitalizedBindingPatternForInit = () => (
     "Binding pattern appears without initializer in for statement init"
 );
@@ -258,21 +277,10 @@ export const unterminatedComment = () => (
     "Unterminated comment"
 );
 
-export const unterminatedTokenString = () => (
+export const unterminatedString = () => (
     "Unterminated string literal"
 );
 
 export const varDeclNeitherOfOrOIn = () => (
     "Variable declaration neither 'of' or 'in'"
 );
-
-export function report(index: number, line: number, column: number, description: string): never {
-    const error: any = new SyntaxError(
-        `Line ${line}, column ${column}: ${description}`,
-    );
-    error.index = index;
-    error.line = line;
-    error.column = column;
-    error.description = description;
-    throw error;
-}

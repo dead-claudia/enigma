@@ -4,11 +4,15 @@ import {OnComment, Context} from "./common";
 import {Chars} from "./chars";
 import {skipMeta} from "./scanner";
 
+/**
+ * The parser options.
+ */
 export interface Options {
     onComment?: OnComment;
     next?: boolean;
     ranges?: boolean;
     jsx?: boolean;
+    raw?: boolean;
 }
 
 function parseRoot(source: string, options: Options | void, context: Context) {
@@ -18,6 +22,7 @@ function parseRoot(source: string, options: Options | void, context: Context) {
         if (options.next) context |= Context.OptionsNext;
         if (options.jsx) context |= Context.OptionsJSX;
         if (options.ranges) context |= Context.OptionsRanges;
+        if (options.raw) context |= Context.OptionsRaw;
         if (options.onComment != null) onComment = options.onComment;
     }
 
@@ -40,10 +45,16 @@ function parseRoot(source: string, options: Options | void, context: Context) {
     return node;
 }
 
+/**
+ * Parse a script, optionally with various options.
+ */
 export function parseScript(source: string, options?: Options) {
     return parseRoot(source, options, Context.Empty);
 }
 
+/**
+ * Parse a module, optionally with various options.
+ */
 export function parseModule(source: string, options?: Options) {
     return parseRoot(source, options, Context.Strict | Context.Module);
 }

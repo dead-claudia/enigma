@@ -8,8 +8,11 @@ import {scan} from "./scan";
 
 // This only inserts semicolons before quotes (which could mean more directives), because the parser
 // is reset anyways.
-//
-// Returns `true` iff a semicolon was consumed or inserted.
+/**
+ * Attempt to consume a semicolon for directive preparsing.
+ *
+ * @return `true` if and only if a semicolon was consumed or inserted.
+ */
 export function consumeDirectiveSemicolon(parser: Parser, context: Context): boolean {
     const result = seek(parser, context);
 
@@ -27,6 +30,9 @@ export function consumeDirectiveSemicolon(parser: Parser, context: Context): boo
     }
 }
 
+/**
+ * Consume a semicolon between tokens, optionally inserting it if necessary.
+ */
 export function consumeSemicolon(parser: Parser, context: Context) {
     const result = seek(parser, context);
 

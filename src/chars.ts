@@ -1,3 +1,6 @@
+/**
+ * A list of character constants with much more human-readable names.
+ */
 export const enum Chars {
     Backspace      = 0x08,
     Tab            = 0x09,

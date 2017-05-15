@@ -1,19 +1,276 @@
-import {Parser, Context, unimplemented} from "../common";
+import {Parser, Context, report, unimplemented} from "../common";
 import {Token} from "../token";
 import {Chars} from "../chars";
-import {hasNext, nextChar, advanceOne, consumeOpt, rewindOne} from "./common";
+import * as Errors from "../errors";
+import {
+    hasNext, nextChar, nextUnicodeChar,
+    advance, advanceOne,
+    consumeOpt, rewindOne,
+} from "./common";
+
+// Avoid 90% of the ceremony of String.fromCodePoint
+function fromCodePoint(code: number): string {
+    if (code & 0x10000) {
+        return String.fromCharCode(code >>> 10) +
+            String.fromCharCode(code & 0x3ff);
+    } else {
+        return String.fromCharCode(code);
+    }
+}
+
+function toHex(code: number): number {
+    if (code < Chars.Zero) return -1;
+    if (code <= Chars.Nine) return code - Chars.Zero;
+    if (code < Chars.UpperA) return -1;
+    if (code <= Chars.UpperF) return code - Chars.UpperA + 10;
+    if (code < Chars.LowerA) return -1;
+    if (code <= Chars.LowerF) return code - Chars.LowerA + 10;
+    return -1;
+}
+
+function storeRaw(parser: Parser, start: number) {
+    parser.tokenRaw = parser.source.slice(start, parser.index);
+}
+
+/*
+ * The string parsing works this way:
+ *
+ * - Template parts are double-parsed, once string-like for normal and a faster version for raw.
+ * - String and template characters (for the initial parse) are handled via common logic.
+ * - Raw characters are just a raw source slice, since the revised semantics effectively dictate
+ *   ignoring all escapes except for not terminating on '\`' or `\${` (it's a bit obscure due to the
+ *   indirection, but that's because the normal and raw values are derived from reading the same
+ *   grammar). Way faster and better memory-wise.
+ */
+
+// Intentionally negative
+const enum Escape {
+    Empty = -1,
+    Unterminated = -2,
+    StrictOctal = -3,
+    EightOrNine = -4,
+    InvalidHex = -5,
+    OutOfRange = -6,
+}
+
+// This actually handles all normal string character parsing, including both strings and templates.
+// It returns a number to avoid prematurely allocating a string, and so I can return some signaling
+// negatives in case of atypical conditions (e.g. errors, escaped line terminators).
+//
+// This wouldn't be so ugly and monolithic if I had macros.
+function scanStringCode(parser: Parser, context: Context): number {
+    if (nextChar(parser) !== Chars.Backslash) {
+        const ch = nextUnicodeChar(parser);
+        advance(parser, ch);
+        return ch;
+    }
+
+    advanceOne(parser);
+    if (!hasNext(parser)) return Escape.Unterminated;
+    const ch = nextChar(parser);
+    switch (ch) {
+        // Magic escapes
+        case Chars.LowerB: advanceOne(parser); return Chars.Backspace;
+        case Chars.LowerF: advanceOne(parser); return Chars.FormFeed;
+        case Chars.LowerR: advanceOne(parser); return Chars.CarriageReturn;
+        case Chars.LowerN: advanceOne(parser); return Chars.LineFeed;
+        case Chars.LowerT: advanceOne(parser); return Chars.Tab;
+        case Chars.LowerV: advanceOne(parser); return Chars.VerticalTab;
+
+        // Line continuations
+        case Chars.CarriageReturn:
+            advanceOne(parser);
+            consumeOpt(parser, Chars.LineFeed);
+            return Escape.Empty;
+        case Chars.LineFeed: case Chars.LineSeparator: case Chars.ParagraphSeparator:
+            advanceOne(parser);
+            return Escape.Empty;
+
+        // Null character, octals
+        case Chars.Zero:
+            if (context & Context.Strict) {
+                advanceOne(parser);
+                if (!hasNext(parser)) return Escape.Unterminated;
+                const ch = nextChar(parser);
+                if (ch < Chars.Zero || ch > Chars.Nine) return 0;
+                rewindOne(parser);
+            }
+            // falls through
+        case Chars.One: case Chars.Two: case Chars.Three: {
+            if (context & Context.Strict) return Escape.StrictOctal;
+            let code = ch - Chars.Zero;
+            advanceOne(parser);
+            if (!hasNext(parser)) return code;
+
+            let next = nextChar(parser);
+            if (next < Chars.Zero || next > Chars.Seven) return code;
+            code = (code << 3) | (next - Chars.Zero);
+            advanceOne(parser);
+
+            if (!hasNext(parser)) return code;
+            next = nextChar(parser);
+            if (next < Chars.Zero || next > Chars.Seven) return code;
+            code = (code << 3) | (next - Chars.Zero);
+            advanceOne(parser);
+
+            return code;
+        }
+
+        case Chars.Four: case Chars.Five: case Chars.Six: case Chars.Seven: {
+            if (context & Context.Strict) return Escape.StrictOctal;
+            let code = ch - Chars.Zero;
+            advanceOne(parser);
+            if (!hasNext(parser)) return code;
+
+            const next = nextChar(parser);
+            if (next < Chars.Zero || next > Chars.Seven) return code;
+            code = (code << 3) | (next - Chars.Zero);
+            advanceOne(parser);
+
+            return code;
+        }
+
+        // `8`, `9` (invalid escapes)
+        case Chars.Eight: case Chars.Nine:
+            return Escape.EightOrNine;
+
+        // ASCII escapes
+        case Chars.LowerX: {
+            // Get the backslash position.
+            const index = parser.index - 1;
+            const line = parser.line;
+            const column = parser.column - 1;
+
+            advanceOne(parser);
+            if (!hasNext(parser)) return Escape.Unterminated;
+            const ch1 = nextChar(parser);
+            const first = toHex(ch1);
+            if (first < 0) return Escape.InvalidHex;
+
+            advanceOne(parser);
+            if (!hasNext(parser)) return Escape.Unterminated;
+            const ch2 = nextChar(parser);
+            const second = toHex(ch2);
+            if (second < 0) return Escape.InvalidHex;
+
+            return second << 8 | first;
+        }
+
+        // UCS-2/Unicode escapes
+        case Chars.LowerU: {
+            // Get the backslash position.
+            const index = parser.index - 1;
+            const line = parser.line;
+            const column = parser.column - 1;
+
+            advanceOne(parser);
+            if (!hasNext(parser)) return Escape.Unterminated;
+
+            let ch = nextChar(parser);
+            if (ch === Chars.LeftBrace) {
+                // \u{N}
+                advanceOne(parser);
+                if (!hasNext(parser)) return Escape.Unterminated;
+
+                // The first digit is required, so handle it *out* of the loop.
+                ch = nextChar(parser);
+                let code = toHex(ch);
+                if (code < 0) return Escape.InvalidHex;
+                advanceOne(parser);
+                if (!hasNext(parser)) return Escape.Unterminated;
+
+                ch = nextChar(parser);
+                while (ch !== Chars.RightBrace) {
+                    // Now handle successive digits.
+                    ch = toHex(ch);
+                    if (ch < 0) return Escape.InvalidHex;
+                    code = code << 8 | ch;
+
+                    advanceOne(parser);
+                    if (!hasNext(parser)) return Escape.Unterminated;
+
+                    ch = nextChar(parser);
+                }
+
+                if (code <= 0x10fff) return code;
+                return Escape.OutOfRange;
+            } else {
+                // \uNNNN
+                let code = toHex(ch);
+                if (code < 0) return Escape.InvalidHex;
+
+                advanceOne(parser);
+                if (!hasNext(parser)) return Escape.Unterminated;
+
+                for (let i = 0; i < 3; i++) {
+                    ch = nextChar(parser);
+                    const digit = toHex(ch);
+                    if (digit < 0) return Escape.InvalidHex;
+
+                    advanceOne(parser);
+                    if (!hasNext(parser)) return Escape.Unterminated;
+                    code = code << 8 | digit;
+                }
+
+                return code;
+            }
+        }
+
+        // Everything else evaluates to the escaped character.
+        default: {
+            const ch = nextUnicodeChar(parser);
+            advance(parser, ch);
+            return ch;
+        }
+    }
+}
 
 function scanString(parser: Parser, context: Context, quote: number): string {
+    const start = parser.index;
+    let ret = "";
+
+    advanceOne(parser); // Consume the quote
+    if (!hasNext(parser)) return report(parser, Errors.unterminatedString());
+    while (nextChar(parser) !== quote) {
+        const {index, line, column} = parser;
+        const ch = scanStringCode(parser, context);
+
+        if (ch >= 0) {
+            ret += fromCodePoint(ch);
+        } else if (ch === Escape.Empty) {
+            // do nothing
+        } else if (ch === Escape.Unterminated) {
+            return report(parser, Errors.unterminatedString());
+        } else {
+            let message;
+            if (ch === Escape.StrictOctal) message = Errors.strictOctalEscape();
+            else if (ch === Escape.EightOrNine) message = Errors.invalidEightAndNine();
+            else if (ch === Escape.InvalidHex) message = Errors.invalidStringHex();
+            else /* if (ch === Escape.OutOfRange) */ message = Errors.unicodeOutOfRange();
+            return Errors.report(index, line, column, message);
+        }
+    }
+
+    advanceOne(parser); // Consume the quote
+    if (context & Context.OptionsRaw) storeRaw(parser, start);
+    return ret;
+}
+
+function scanTemplateChar(parser: Parser, context: Context): string {
+    const ch = scanStringCode(parser, context);
+
+    if (ch >= 0) return fromCodePoint(ch);
+    if (ch === Escape.Empty) return "";
+    if (ch === Escape.Unterminated) return report(parser, Errors.unterminatedString());
+    return "undefined";
+}
+
+function scanTemplateStart(parser: Parser, context: Context): boolean {
     // TODO
     return unimplemented();
 }
 
 function scanRegExp(parser: Parser, context: Context): RegExp {
-    // TODO
-    return unimplemented();
-}
-
-function scanTemplateStart(parser: Parser, context: Context): boolean {
     // TODO
     return unimplemented();
 }
@@ -28,6 +285,10 @@ function scanMaybeIdentifier(parser: Parser, context: Context): Token {
     return unimplemented();
 }
 
+/**
+ * Scan for a single token. You must seek first, because this assumes the current pointer is
+ * pointing to either the start of a token or the end of the source.
+ */
 export function scan(parser: Parser, context: Context): Token {
     if (!hasNext(parser)) return Token.EndOfSource;
     switch (nextChar(parser)) {
@@ -46,7 +307,6 @@ export function scan(parser: Parser, context: Context): Token {
 
         // `"string"`
         case Chars.DoubleQuote:
-            advanceOne(parser);
             parser.tokenValue = scanString(parser, context, Chars.DoubleQuote);
             return Token.StringLiteral;
 
@@ -78,7 +338,6 @@ export function scan(parser: Parser, context: Context): Token {
 
         // `'string'`
         case Chars.SingleQuote:
-            advanceOne(parser);
             parser.tokenValue = scanString(parser, context, Chars.SingleQuote);
             return Token.StringLiteral;
 
@@ -301,7 +560,7 @@ export function scan(parser: Parser, context: Context): Token {
                 return Token.BitwiseXor;
             }
 
-        // `\`
+        // ``string``
         case Chars.Backtick:
             advanceOne(parser);
             if (scanTemplateStart(parser, context)) {
@@ -310,6 +569,7 @@ export function scan(parser: Parser, context: Context): Token {
                 return Token.TemplateCont;
             }
 
+        // `{`
         case Chars.LeftBrace:
             advanceOne(parser);
             return Token.LeftBrace;
@@ -331,10 +591,12 @@ export function scan(parser: Parser, context: Context): Token {
 
             return Token.BitwiseOr;
 
+        // `}`
         case Chars.RightBrace:
             advanceOne(parser);
             return Token.RightBrace;
 
+        // `~`
         case Chars.Tilde:
             advanceOne(parser);
             return Token.Complement;

@@ -16,6 +16,7 @@ import {
  * everything else.
  */
 
+// The current escape state.
 const enum Escape {
     None, Any,
     LegacyOctal0,
@@ -25,6 +26,7 @@ const enum Escape {
     UnicodeSucc,
 }
 
+// The current bailout type, if applicable.
 const enum Bail {
     HexFail = Escape.UnicodeSucc + 1,
     OctalFail,
@@ -38,6 +40,9 @@ const enum Bail {
     LastIsCR = 1 << 4,
 }
 
+/**
+ * The directive result.
+ */
 export const enum Directive {
     None, Other, Strict,
 }
@@ -192,6 +197,10 @@ const Table = [
 
 // This is also intentionally monolithic, since it's quickly preparsing for a "use strict"
 // directive.
+/**
+ * Scan for and preparse a directive. It does *not* produce any nodes, but it *does* validate
+ * strings using non-strict semantics, so it can remain on track.
+ */
 export function scanDirective(parser: Parser, context: Context): Directive {
     seek(parser, context);
     const {index: start, line, column} = parser;
@@ -256,11 +265,11 @@ export function scanDirective(parser: Parser, context: Context): Directive {
                 /* escape start */
                 advanceOne(parser);
                 escape = Table[(escape & Bail.Mask) + TableStart.Backslash];
-            } else if (ch === Chars.UpperX || ch === Chars.LowerX) {
+            } else if (ch === Chars.LowerX) {
                 /* ASCII escape start */
                 advanceOne(parser);
                 escape = Table[(escape & Bail.Mask) + TableStart.X];
-            } else if (ch === Chars.UpperU || ch === Chars.LowerU) {
+            } else if (ch === Chars.LowerU) {
                 /* Unicode escape start */
                 advanceOne(parser);
                 escape = Table[(escape & Bail.Mask) + TableStart.U];
@@ -292,7 +301,7 @@ export function scanDirective(parser: Parser, context: Context): Directive {
                 return Errors.report(start, line, column, Errors.invalidStringOctal());
 
             default:
-                return Errors.report(start, line, column, Errors.unterminatedTokenString());
+                return Errors.report(start, line, column, Errors.unterminatedString());
         }
     }
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * The tokens are laid out and packed in an unconventional way. Here's how it's
  * all laid out:
  *
@@ -18,6 +18,9 @@
  * size invariant in V8.
  */
 
+/**
+ * The token types and attributes.
+ */
 export const enum Token {
     Type = 0xff,
 
@@ -213,6 +216,9 @@ const KeywordDescTable = [
     "as", "async", "await", "constructor", "get", "set", "from", "of",
 ];
 
+/**
+ * The conversion function between token and its string description/representation.
+ */
 export function tokenDesc(token: Token): string {
     if ((token & Token.Type) < KeywordDescTable.length) {
         return KeywordDescTable[token & Token.Type];

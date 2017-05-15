@@ -31,7 +31,9 @@ export function nextUnicodeChar(parser: Parser) {
     return (hi & 0x3ff) << 10 | lo & 0x3ff | 0x10000;
 }
 
-// It's an optimized equivalent of `advance(parser, nextUnicodeChar(parser))`.
+/**
+ * An optimized equivalent of `advance(parser, nextUnicodeChar(parser))`
+ */
 export function consumeAny(parser: Parser) {
     const hi = parser.source.charCodeAt(parser.index++);
 
@@ -70,6 +72,9 @@ export function consumeOptAstral(parser: Parser, code: number) {
     return true;
 }
 
+/**
+ * Use to consume a line feed instead of `advanceNewline`.
+ */
 export function consumeLineFeed(parser: Parser, lastIsCR: boolean) {
     parser.index++;
     if (!lastIsCR) {
@@ -87,9 +92,4 @@ export function advanceNewline(parser: Parser) {
 export function rewindOne(parser: Parser) {
     parser.index--;
     parser.column--;
-}
-
-export function rewind(parser: Parser, ch: number) {
-    rewindOne(parser);
-    if (ch & 0x10000) rewindOne(parser);
 }

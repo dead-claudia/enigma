@@ -30,6 +30,9 @@ export function skipMeta(parser: Parser) {
  * `seek()` is called between literally every token, so it must be fast.
  */
 
+/**
+ * The result of seeking, whether it skipped anything and whether it skipped whitespace.
+ */
 export const enum Seek {
     None, SameLine, NewLine,
 }
@@ -103,6 +106,10 @@ function skipBlockComment(parser: Parser): SeekState {
 
 // This is somewhat monolithic, and the main loop handles non-comment whitespace.
 // TODO: add HTML comment support (script code only)
+/**
+ * Seek past whitespace and comments to the next token start or the end of file, whichever comes
+ * first.
+ */
 export function seek(parser: Parser, context: Context): Seek {
     let state = SeekState.None;
 

@@ -8,6 +8,9 @@ import {
 } from "./scanner";
 import * as Errors from "./errors";
 
+/**
+ * Create a new parser instance.
+ */
 export function create(source: string, onComment: OnComment): Parser {
     return {
         source, onComment,
@@ -16,6 +19,7 @@ export function create(source: string, onComment: OnComment): Parser {
         line: 1,
         column: 0,
         tokenValue: undefined,
+        tokenRaw: "",
     };
 }
 
@@ -24,6 +28,9 @@ function parseStatementListItem(parser: Parser, context: Context): ESTree.Statem
     return unimplemented();
 }
 
+/**
+ * Parse a module body, function body, script body, etc.
+ */
 export function parseBody(parser: Parser, context: Context): ESTree.Statement[] {
     seek(parser, context);
     if (!hasNext(parser)) return [];
