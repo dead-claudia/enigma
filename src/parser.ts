@@ -30,9 +30,10 @@ function parseStatementListItem(parser: Parser, context: Context): ESTree.Statem
  * Parse a module body, function body, script body, etc.
  */
 export function parseBody(parser: Parser, context: Context): ESTree.Statement[] {
+    // Capture here so we can backtrack and accept HTML comments before the initial `"use strict"`.
+    const {index, line, column} = parser;
     seek(parser, context);
     if (!hasNext(parser)) return [];
-    const {index, line, column} = parser;
 
     // Preparse for directives, so we can set strict mode while still verifying
     // the other directives are still valid.
@@ -58,6 +59,7 @@ export function parseBody(parser: Parser, context: Context): ESTree.Statement[] 
     const statements: ESTree.Statement[] = [];
 
     while (hasNext(parser)) {
+        seek(parser, context);
         statements.push(parseStatementListItem(parser, context));
     }
 

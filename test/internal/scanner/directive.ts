@@ -17,16 +17,16 @@ describe("src/scanner/directive", () => {
 
                 for (const step of opts.steps) {
                     if (step.directive != null) {
-                        expect(scanDirective(parser, Context.Empty))
-                        .to.equal(step.directive);
+                        expect({
+                            directive: scanDirective(parser, Context.Empty),
+                            hasNext: hasNext(parser), line: parser.line, column: parser.column,
+                        }).to.eql(step);
                     } else {
-                        expect(consumeDirectiveSemicolon(parser, Context.Empty))
-                        .to.equal(step.semi);
+                        expect({
+                            semi: consumeDirectiveSemicolon(parser, Context.Empty),
+                            hasNext: hasNext(parser), line: parser.line, column: parser.column,
+                        }).to.eql(step);
                     }
-
-                    expect(hasNext(parser)).to.equal(step.hasNext);
-                    expect(parser.line).to.equal(step.line);
-                    expect(parser.column).to.equal(step.column);
                 }
             });
         }

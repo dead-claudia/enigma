@@ -14,13 +14,13 @@ export function skipMeta(parser: Parser) {
     if (parser.source.charCodeAt(parser.index) === Chars.ByteOrderMark) parser.index++;
     if (!consumeOpt(parser, Chars.Hash)) return;
     if (!consumeOpt(parser, Chars.Exclamation)) rewindOne(parser);
-    else skipToNewline(parser);
+    else skipToNewline(parser, SeekState.None);
 }
 
 /*
- * The token seeking mechanism is structured as a series of linked optimized finite state machines,
- * one for single line comments, one for block comments, and one for whitespace. It is designed that
- * way to ensure speed and maximize branch prediction.
+ * The token seeking mechanism is structured as a large finite state machine with three main groups,
+ * one for single line comments, one for block comments, and one for HTML and general whitespace.
+ * It is designed that way to ensure speed and maximize branch prediction.
  *
  * `seek()` is called between literally every token, so it must be fast.
  */
@@ -32,6 +32,9 @@ export const enum Seek {
     None, SameLine, NewLine,
 }
 
+/**
+ * A set of flags for maintaining the internal state machine.
+ */
 const enum SeekState {
     None = 0,
     NewLine = 1 << 0,
@@ -39,35 +42,33 @@ const enum SeekState {
     LastIsCR = 1 << 2,
 }
 
-function skipToNewline(parser: Parser): SeekState {
+function skipToNewline(parser: Parser, state: SeekState): SeekState {
     while (hasNext(parser)) {
         switch (nextChar(parser)) {
             case Chars.CarriageReturn:
                 advanceNewline(parser);
                 if (hasNext(parser) && nextChar(parser) === Chars.LineFeed) parser.index++;
-                return SeekState.NewLine;
+                return state | SeekState.NewLine;
 
             case Chars.LineFeed: case Chars.LineSeparator: case Chars.ParagraphSeparator:
                 advanceNewline(parser);
-                return SeekState.NewLine;
+                return state | SeekState.NewLine;
 
             default:
                 consumeAny(parser);
         }
     }
 
-    return SeekState.None;
+    return state;
 }
 
-function skipBlockComment(parser: Parser): SeekState {
-    let state = SeekState.None;
-
+function skipBlockComment(parser: Parser, state: SeekState): SeekState {
     while (hasNext(parser)) {
         switch (nextChar(parser)) {
             case Chars.Asterisk:
                 advanceOne(parser);
-                state &= SeekState.NewLine;
-                if (consumeOpt(parser, Chars.Slash)) return state & SeekState.NewLine;
+                state &= ~SeekState.LastIsCR;
+                if (consumeOpt(parser, Chars.Slash)) return state;
                 break;
 
             case Chars.CarriageReturn:
@@ -77,16 +78,16 @@ function skipBlockComment(parser: Parser): SeekState {
 
             case Chars.LineFeed:
                 consumeLineFeed(parser, (state & SeekState.LastIsCR) !== 0);
-                state = state & SeekState.SameLine | SeekState.NewLine;
+                state = state & ~SeekState.LastIsCR | SeekState.NewLine;
                 break;
 
             case Chars.LineSeparator: case Chars.ParagraphSeparator:
-                state = SeekState.NewLine;
+                state = state & ~SeekState.LastIsCR | SeekState.NewLine;
                 advanceNewline(parser);
                 break;
 
             default:
-                state &= SeekState.NewLine;
+                state &= ~SeekState.LastIsCR;
                 consumeAny(parser);
         }
     }
@@ -100,7 +101,6 @@ function skipBlockComment(parser: Parser): SeekState {
 }
 
 // This is somewhat monolithic, and the main loop handles non-comment whitespace.
-// TODO: add HTML comment support (script code only)
 /**
  * Seek past whitespace and comments to the next token start or the end of file, whichever comes
  * first.
@@ -119,11 +119,11 @@ export function seek(parser: Parser, context: Context): Seek {
 
             case Chars.LineFeed:
                 consumeLineFeed(parser, (state & SeekState.LastIsCR) !== 0);
-                state = state & SeekState.SameLine | SeekState.NewLine;
+                state = state & ~SeekState.LastIsCR | SeekState.NewLine;
                 break;
 
             case Chars.LineSeparator: case Chars.ParagraphSeparator:
-                state = state & SeekState.SameLine | SeekState.NewLine;
+                state = state & ~SeekState.LastIsCR | SeekState.NewLine;
                 advanceNewline(parser);
                 break;
 
@@ -139,7 +139,7 @@ export function seek(parser: Parser, context: Context): Seek {
                 advanceOne(parser);
                 break;
 
-            /* comments */
+            /* normal comments */
             case Chars.Slash: {
                 state |= SeekState.SameLine;
                 advanceOne(parser);
@@ -147,12 +147,42 @@ export function seek(parser: Parser, context: Context): Seek {
                 const next = nextChar(parser);
                 if (next === Chars.Slash) {
                     advanceOne(parser);
-                    state |= skipToNewline(parser);
+                    state = skipToNewline(parser, state);
                 } else if (next === Chars.Asterisk) {
                     advanceOne(parser);
-                    state |= skipBlockComment(parser);
+                    state = skipBlockComment(parser, state);
                 }
                 break;
+            }
+
+            /* HTML single line comment */
+            case Chars.LessThan: {
+                if (context & Context.Strict) break loop;
+                const {index} = parser;
+                advanceOne(parser); // skip `<`
+                if (consumeOpt(parser, Chars.Exclamation) &&
+                        consumeOpt(parser, Chars.Hyphen) &&
+                        consumeOpt(parser, Chars.Hyphen)) {
+                    state = skipToNewline(parser, state);
+                    break;
+                }
+                parser.index = index;
+                break loop;
+            }
+
+            /* HTML close */
+            case Chars.Hyphen: {
+                if (context & Context.Strict || !(state & SeekState.NewLine)) break loop;
+                const {index} = parser;
+                advanceOne(parser); // skip `-`
+                if (consumeOpt(parser, Chars.Hyphen) &&
+                        consumeOpt(parser, Chars.GreaterThan)) {
+                    state = skipToNewline(parser, state);
+                    break;
+                } else {
+                    parser.index = index;
+                    break loop;
+                }
             }
 
             default: break loop;

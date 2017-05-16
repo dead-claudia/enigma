@@ -11,7 +11,7 @@ import {scan} from "./scan";
 /**
  * Attempt to consume a semicolon for directive preparsing.
  *
- * @return `true` if and only if a semicolon was consumed or inserted.
+ * @return `true` if and only if a semicolon was consumed or inserted before the end.
  */
 export function consumeDirectiveSemicolon(parser: Parser, context: Context): boolean {
     const result = seek(parser, context);
@@ -33,7 +33,7 @@ export function consumeDirectiveSemicolon(parser: Parser, context: Context): boo
 /**
  * Consume a semicolon between tokens, optionally inserting it if necessary.
  */
-export function consumeSemicolon(parser: Parser, context: Context) {
+export function consumeSemicolon(parser: Parser, context: Context): void {
     const result = seek(parser, context);
 
     if (!hasNext(parser)) return;
