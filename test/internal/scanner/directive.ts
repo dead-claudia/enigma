@@ -408,6 +408,15 @@ describe("src/scanner/directive", () => {
             ],
         });
 
+        pass("scans a single 'sloppy\\012escape'; 'use strict';", {
+            source: "'sloppy\\012escape';\n'use strict';",
+            steps: [
+                {directive: Directive.Other, hasNext: true, line: 1, column: 18},
+                {semi: true, hasNext: true, line: 1, column: 19},
+                {directive: Directive.Strict, hasNext: true, line: 2, column: 12},
+            ],
+        });
+
         /* tslint:enable max-line-length */
     });
 });
