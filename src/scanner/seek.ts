@@ -157,7 +157,7 @@ export function seek(parser: Parser, context: Context): Seek {
 
             /* HTML single line comment */
             case Chars.LessThan: {
-                if (context & Context.Strict) break loop;
+                if (context & Context.Module) break loop;
                 const {index} = parser;
                 advanceOne(parser); // skip `<`
                 if (consumeOpt(parser, Chars.Exclamation) &&
@@ -172,7 +172,7 @@ export function seek(parser: Parser, context: Context): Seek {
 
             /* HTML close */
             case Chars.Hyphen: {
-                if (context & Context.Strict || !(state & SeekState.NewLine)) break loop;
+                if (context & Context.Module || !(state & SeekState.NewLine)) break loop;
                 const {index} = parser;
                 advanceOne(parser); // skip `-`
                 if (consumeOpt(parser, Chars.Hyphen) &&

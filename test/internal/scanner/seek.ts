@@ -312,13 +312,12 @@ describe("src/scanner/seek", () => {
     });
 
     describe("seek()", () => {
-        context("sloppy", () => run(false));
-        context("strict", () => run(true));
+        context("script", () => run(false));
+        context("module", () => run(true));
     });
 
-    function run(strict: boolean) {
-        interface PassOpts {
-            strict?: boolean;
+    function run(isModule: boolean) {
+        interface Opts {
             source: string;
             seek: Seek;
             hasNext: boolean;
@@ -326,13 +325,12 @@ describe("src/scanner/seek", () => {
             column: number;
         }
 
-        function pass(name: string, opts: PassOpts) {
-            if (opts.strict != null && opts.strict !== strict) return;
+        function pass(name: string, opts: Opts) {
             it(name, () => {
                 const parser = create(opts.source, undefined);
 
                 expect({
-                    seek: seek(parser, strict ? Context.Strict : Context.Empty),
+                    seek: seek(parser, isModule ? Context.Module : Context.Empty),
                     hasNext: hasNext(parser),
                     line: parser.line, column: parser.column,
                 }).to.eql({
@@ -342,15 +340,12 @@ describe("src/scanner/seek", () => {
             });
         }
 
-        function fail(name: string, source: string, strictOpt?: boolean) {
-            if (strictOpt != null && strictOpt !== strict) return;
-            it(name, () => {
-                const parser = create(source, undefined);
-
-                expect(() => {
-                    seek(parser, strict ? Context.Strict : Context.Empty);
-                }).to.throw(SyntaxError);
-            });
+        function passAll(name: (lt: string) => string, opts: (lt: string) => Opts) {
+            pass(name("line feed"), opts("\n"));
+            pass(name("carriage return"), opts("\r"));
+            pass(name("Windows newline"), opts("\r"));
+            pass(name("line separators"), opts("\u2028"));
+            pass(name("paragraph separators"), opts("\u2029"));
         }
 
         pass("skips nothing", {
@@ -381,40 +376,12 @@ describe("src/scanner/seek", () => {
             line: 1, column: 8,
         });
 
-        pass("skips line feeds", {
-            source: "\n\n\n\n\n\n\n\n",
+        passAll(lt => `skips ${lt}s`, lt => ({
+            source: `${lt}${lt}${lt}${lt}${lt}${lt}${lt}${lt}`,
             seek: Seek.NewLine,
             hasNext: false,
             line: 9, column: 0,
-        });
-
-        pass("skips carriage returns", {
-            source: "\r\r\r\r\r\r\r\r",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 9, column: 0,
-        });
-
-        pass("skips Windows newlines", {
-            source: "\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 9, column: 0,
-        });
-
-        pass("skips line separators", {
-            source: "\u2028\u2028\u2028\u2028\u2028\u2028\u2028\u2028",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 9, column: 0,
-        });
-
-        pass("skips paragraph separators", {
-            source: "\u2029\u2029\u2029\u2029\u2029\u2029\u2029\u2029",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 9, column: 0,
-        });
+        }));
 
         pass("skips mixed whitespace", {
             source: "    \t \r\n \n\r \v\f\t ",
@@ -423,75 +390,19 @@ describe("src/scanner/seek", () => {
             line: 4, column: 5,
         });
 
-        pass("skips single line comments with line feed", {
-            source: "  \t // foo bar\n  ",
+        passAll(lt => "skips single line comments with line feed", lt => ({
+            source: `  \t // foo bar${lt}  `,
             seek: Seek.NewLine,
             hasNext: false,
             line: 2, column: 2,
-        });
+        }));
 
-        pass("skips single line comments with carriage return", {
-            source: "  \t // foo bar\r  ",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 2, column: 2,
-        });
-
-        pass("skips single line comments with Windows newlines", {
-            source: "  \t // foo bar\r\n  ",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 2, column: 2,
-        });
-
-        pass("skips single line comments with line separators", {
-            source: "  \t // foo bar\u2028  ",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 2, column: 2,
-        });
-
-        pass("skips single line comments with paragraph separators", {
-            source: "  \t // foo bar\u2029  ",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 2, column: 2,
-        });
-
-        pass("skips multiple single line comments with line feed", {
-            source: "  \t // foo bar\n // baz \n //",
+        passAll(lt => `skips multiple single line comments with ${lt}`, lt => ({
+            source: `  \t // foo bar${lt} // baz ${lt} //`,
             seek: Seek.NewLine,
             hasNext: false,
             line: 3, column: 3,
-        });
-
-        pass("skips multiple single line comments with carriage return", {
-            source: "  \t // foo bar\r // baz \n //",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 3, column: 3,
-        });
-
-        pass("skips multiple single line comments with Windows newlines", {
-            source: "  \t // foo bar\r\n // baz \n //",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 3, column: 3,
-        });
-
-        pass("skips multiple single line comments with line separators", {
-            source: "  \t // foo bar\u2028 // baz \n //",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 3, column: 3,
-        });
-
-        pass("skips multiple single line comments with paragraph separators", {
-            source: "  \t // foo bar\u2029 // baz \n //",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 3, column: 3,
-        });
+        }));
 
         pass("skips multiline comments with nothing", {
             source: "  \t /* foo * /* bar */  ",
@@ -500,1176 +411,216 @@ describe("src/scanner/seek", () => {
             line: 1, column: 24,
         });
 
-        pass("skips multiline comments with line feed", {
-            source: "  \t /* foo * /* bar \n */  ",
+        passAll(lt => `skips multiline comments with ${lt}`, lt => ({
+            source: `  \t /* foo * /* bar ${lt} */  `,
             seek: Seek.NewLine,
             hasNext: false,
             line: 2, column: 5,
-        });
+        }));
 
-        pass("skips multiline comments with carriage return", {
-            source: "  \t /* foo * /* bar \r */  ",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 2, column: 5,
-        });
-
-        pass("skips multiline comments with Windows newlines", {
-            source: "  \t /* foo * /* bar \r\n */  ",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 2, column: 5,
-        });
-
-        pass("skips multiline comments with line separators", {
-            source: "  \t /* foo * /* bar \u2028 */  ",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 2, column: 5,
-        });
-
-        pass("skips multiline comments with paragraph separators", {
-            source: "  \t /* foo * /* bar\u2029 */  ",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 2, column: 5,
-        });
-
-        pass("skips multiple multiline comments with line feed", {
-            source: "  \t /* foo bar\n *//* baz*/ \n /**/",
+        passAll(lt => `skips multiple multiline comments with ${lt}`, lt => ({
+            source: `  \t /* foo bar${lt} *//* baz*/ ${lt} /**/`,
             seek: Seek.NewLine,
             hasNext: false,
             line: 3, column: 5,
-        });
+        }));
 
-        pass("skips multiple multiline comments with carriage return", {
-            source: "  \t /* foo bar\r *//* baz*/ \n /**/",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 3, column: 5,
-        });
-
-        pass("skips multiple multiline comments with Windows newlines", {
-            source: "  \t /* foo bar\r\n *//* baz*/ \n /**/",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 3, column: 5,
-        });
-
-        pass("skips multiple multiline comments with line separators", {
-            source: "  \t /* foo bar\u2028 *//* baz*/ \n /**/",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 3, column: 5,
-        });
-
-        pass("skips multiple multiline comments with paragraph separators", {
-            source: "  \t /* foo bar\u2029 *//* baz*/ \n /**/",
-            seek: Seek.NewLine,
-            hasNext: false,
-            line: 3, column: 5,
-        });
-
-        if (strict) {
-            pass("avoids HTML single line comments with line feed", {
-                strict: false,
-                source: "  \t <!-- foo bar\n  ",
-                seek: Seek.NewLine,
-                hasNext: false,
+        if (isModule) {
+            passAll(lt => `avoids HTML single line comments with ${lt}`, lt => ({
+                source: `  \t <!-- foo bar${lt}  `,
+                seek: Seek.SameLine,
+                hasNext: true,
                 line: 1, column: 4,
-            });
+            }));
 
-            pass("avoids HTML single line comments with carriage return", {
-                strict: false,
-                source: "  \t <!-- foo bar\r  ",
-                seek: Seek.NewLine,
-                hasNext: false,
+            passAll(lt => `avoids multiple HTML single line comments with ${lt}`, lt => ({
+                source: `  \t <!-- foo bar${lt} <!-- baz ${lt} <!--`,
+                seek: Seek.SameLine,
+                hasNext: true,
                 line: 1, column: 4,
-            });
+            }));
 
-            pass("avoids HTML single line comments with Windows newlines", {
-                strict: false,
-                source: "  \t <!-- foo bar\r\n  ",
+            passAll(lt => `avoids single HTML close comment after ${lt}`, lt => ({
+                source: `  \t ${lt}-->  `,
                 seek: Seek.NewLine,
-                hasNext: false,
-                line: 1, column: 4,
-            });
-
-            pass("avoids HTML single line comments with line separators", {
-                strict: false,
-                source: "  \t <!-- foo bar\u2028  ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 1, column: 4,
-            });
-
-            pass("avoids HTML single line comments with paragraph separators", {
-                strict: false,
-                source: "  \t <!-- foo bar\u2029  ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 1, column: 4,
-            });
-
-            pass("avoids multiple HTML single line comments with line feed", {
-                strict: false,
-                source: "  \t <!-- foo bar\n <!-- baz \n <!--",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 1, column: 4,
-            });
-
-            pass("avoids multiple HTML single line comments with carriage return", {
-                strict: false,
-                source: "  \t <!-- foo bar\r <!-- baz \n <!--",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 1, column: 4,
-            });
-
-            pass("avoids multiple HTML single line comments with Windows newlines", {
-                strict: false,
-                source: "  \t <!-- foo bar\r\n <!-- baz \n <!--",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 1, column: 4,
-            });
-
-            pass("avoids multiple HTML single line comments with line separators", {
-                strict: false,
-                source: "  \t <!-- foo bar\u2028 <!-- baz \n <!--",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 1, column: 4,
-            });
-
-            pass("avoids multiple HTML single line comments with paragraph separators", {
-                strict: false,
-                source: "  \t <!-- foo bar\u2029 <!-- baz \n <!--",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 1, column: 4,
-            });
-
-            pass("avoids single HTML close comment after line feed", {
-                strict: false,
-                source: "  \t \n-->  ",
-                seek: Seek.NewLine,
-                hasNext: false,
+                hasNext: true,
                 line: 2, column: 0,
-            });
+            }));
 
-            pass("avoids single HTML close comment after carriage return", {
-                strict: false,
-                source: "  \t \r-->  ",
+            passAll(lt => `avoids line of single HTML close comment after ${lt}`, lt => ({
+                source: `  \t ${lt}--> the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
-                hasNext: false,
+                hasNext: true,
                 line: 2, column: 0,
-            });
+            }));
 
-            pass("avoids single HTML close comment after Windows newlines", {
-                strict: false,
-                source: "  \t \r\n-->  ",
+            passAll(lt => `allows HTML close comment after ${lt} + WS`, lt => ({
+                source: `  \t ${lt}   --> the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 0,
-            });
-
-            pass("avoids single HTML close comment after line separators", {
-                strict: false,
-                source: "  \t \u2028-->  ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 0,
-            });
-
-            pass("avoids single HTML close comment after paragraph separators", {
-                strict: false,
-                source: "  \t \u2029-->  ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 0,
-            });
-
-            pass("avoids line of single HTML close comment after line feed", {
-                strict: false,
-                source: "  \t \n--> the comment extends to these characters\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 0,
-            });
-
-            pass("avoids line of single HTML close comment after carriage return", {
-                strict: false,
-                source: "  \t \r--> the comment extends to these characters\r ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 0,
-            });
-
-            pass("avoids line of single HTML close comment after Windows newlines", {
-                strict: false,
-                source: "  \t \r\n--> the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 0,
-            });
-
-            pass("avoids line of single HTML close comment after line separators", {
-                strict: false,
-                source: "  \t \u2028--> the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 0,
-            });
-
-            pass("avoids line of single HTML close comment after paragraph separators", {
-                strict: false,
-                source: "  \t \u2029--> the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 0,
-            });
-
-            pass("allows HTML close comment after line feed + WS", {
-                strict: false,
-                source: "  \t \n   --> the comment extends to these characters\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
+                hasNext: true,
                 line: 2, column: 3,
-            });
+            }));
 
-            pass("allows HTML close comment after carriage return + WS", {
-                strict: false,
-                source: "  \t \r   --> the comment extends to these characters\r ",
+            passAll(lt => `avoids single-line block on line of HTML close after ${lt}`, lt => ({
+                source: `  \t /*${lt}*/ /* optional SingleLineDelimitedCommentSequence */    ${""
+                    }--> the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 3,
-            });
-
-            pass("allows HTML close comment after Windows newlines + WS", {
-                strict: false,
-                source: "  \t \r\n   --> the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 3,
-            });
-
-            pass("allows HTML close comment after line separators + WS", {
-                strict: false,
-                source: "  \t \u2028   --> the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 3,
-            });
-
-            pass("allows HTML close comment after paragraph separators + WS", {
-                strict: false,
-                source: "  \t \u2029   --> the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 3,
-            });
-
-            pass("avoids single-line block on line of HTML close after line feed", {
-                strict: false,
-                source: "  \t /*\n*/ /* optional SingleLineDelimitedCommentSequence */ " +
-                    "   --> the comment extends to these characters\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
+                hasNext: true,
                 line: 2, column: 56,
-            });
+            }));
 
-            pass("avoids single-line block on line of HTML close after carriage return", {
-                strict: false,
-                source: "  \t /*\r*/ /* optional SingleLineDelimitedCommentSequence */ " +
-                    "   --> the comment extends to these characters\r ",
+            passAll(lt => `avoids 2 single-line block on line of HTML close after ${lt}`, lt => ({
+                source: `  \t /*${lt}*/ /**/ /* second optional ${""
+                    }SingleLineDelimitedCommentSequence */    ${""
+                    }--> the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 56,
-            });
+                hasNext: true,
+                line: 2, column: 68,
+            }));
 
-            pass("avoids single-line block on line of HTML close after Windows newlines", {
-                strict: false,
-                source: "  \t /*\r\n*/ /* optional SingleLineDelimitedCommentSequence */ " +
-                    "   --> the comment extends to these characters\r\n ",
+            passAll(lt => `avoids block HTML close with ${lt} + empty line`, lt => ({
+                source: `  \t /*${lt}*/  -->${lt} `,
                 seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 56,
-            });
-
-            pass("avoids single-line block on line of HTML close after line separators", {
-                strict: false,
-                source: "  \t /*\u2028*/ /* optional SingleLineDelimitedCommentSequence */ " +
-                    "   --> the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 56,
-            });
-
-            pass("avoids single-line block on line of HTML close after paragraph separators", {
-                strict: false,
-                source: "  \t /*\u2029*/ /* optional SingleLineDelimitedCommentSequence */ " +
-                    "   --> the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 56,
-            });
-
-            pass("avoids 2 single-line block on line of HTML close after line feed", {
-                strict: false,
-                source: "  \t /*\n*/ /**/ /* second optional SingleLineDelimitedCommentSequence */ " + // tslint:disable-line max-line-length
-                    "   --> the comment extends to these characters\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 69,
-            });
-
-            pass("avoids 2 single-line block on line of HTML close after carriage return", {
-                strict: false,
-                source: "  \t /*\r*/ /**/ /* second optional SingleLineDelimitedCommentSequence */ " + // tslint:disable-line max-line-length
-                    "   --> the comment extends to these characters\r ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 69,
-            });
-
-            pass("avoids 2 single-line block on line of HTML close after Windows newlines", {
-                strict: false,
-                source: "  \t /*\r\n*/ /**/ /* second optional SingleLineDelimitedCommentSequence */ " + // tslint:disable-line max-line-length
-                    "   --> the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 69,
-            });
-
-            pass("avoids 2 single-line block on line of HTML close after line separators", {
-                strict: false,
-                source: "  \t /*\u2028*/ /**/ /* second optional SingleLineDelimitedCommentSequence */ " + // tslint:disable-line max-line-length
-                    "   --> the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 69,
-            });
-
-            pass("avoids 2 single-line block on line of HTML close after paragraph separators", {
-                strict: false,
-                source: "  \t /*\u2029*/ /**/ /* second optional SingleLineDelimitedCommentSequence */ " + // tslint:disable-line max-line-length
-                    "   --> the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 69,
-            });
-
-            pass("avoids block HTML close with line feed + empty line", {
-                strict: false,
-                source: "  \t /*\n*/  -->\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
+                hasNext: true,
                 line: 2, column: 4,
-            });
+            }));
 
-            pass("avoids block HTML close with carriage return + empty line", {
-                strict: false,
-                source: "  \t /*\r*/  -->\r ",
+            passAll(lt => `avoids block HTML close with ${lt}`, lt => ({
+                source: `  \t /*${lt}*/  --> the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
-                hasNext: false,
+                hasNext: true,
                 line: 2, column: 4,
-            });
+            }));
 
-            pass("avoids block HTML close with Windows newlines + empty line", {
-                strict: false,
-                source: "  \t /*\r\n*/  -->\r\n ",
+            passAll(lt => `avoids first line block HTML close with ${lt}`, lt => ({
+                source: `  \t /* optional FirstCommentLine ${lt}*/  --> ` +
+                    `the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
-                hasNext: false,
+                hasNext: true,
                 line: 2, column: 4,
-            });
+            }));
 
-            pass("avoids block HTML close with line separators + empty line", {
-                strict: false,
-                source: "  \t /*\u2028*/  -->\u2028 ",
+            passAll(lt => `avoids multi block + HTML close with ${lt}`, lt => ({
+                source: `  \t /*${lt}optional${lt}MultiLineCommentChars ${lt}*/  --> ` +
+                    `the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 4,
-            });
-
-            pass("avoids block HTML close with paragraph separators + empty line", {
-                strict: false,
-                source: "  \t /*\u2029*/  -->\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 4,
-            });
-
-            pass("avoids block HTML close with line feed", {
-                strict: false,
-                source: "  \t /*\n*/  --> the comment extends to these characters\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 4,
-            });
-
-            pass("avoids block HTML close with carriage return", {
-                strict: false,
-                source: "  \t /*\r*/  --> the comment extends to these characters\r ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 4,
-            });
-
-            pass("avoids block HTML close with Windows newlines", {
-                strict: false,
-                source: "  \t /*\r\n*/  --> the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 4,
-            });
-
-            pass("avoids block HTML close with line separators", {
-                strict: false,
-                source: "  \t /*\u2028*/  --> the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 4,
-            });
-
-            pass("avoids block HTML close with paragraph separators", {
-                strict: false,
-                source: "  \t /*\u2029*/  --> the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 4,
-            });
-
-            pass("avoids first line block HTML close with line feed", {
-                strict: false,
-                source: "  \t /* optional FirstCommentLine \n*/  --> " +
-                    "the comment extends to these characters\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 4,
-            });
-
-            pass("avoids first line block HTML close with carriage return", {
-                strict: false,
-                source: "  \t /* optional FirstCommentLine \r*/  --> " +
-                    "the comment extends to these characters\r ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 4,
-            });
-
-            pass("avoids first line block HTML close with Windows newlines", {
-                strict: false,
-                source: "  \t /* optional FirstCommentLine \r\n*/  --> " +
-                    "the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 4,
-            });
-
-            pass("avoids first line block HTML close with line separators", {
-                strict: false,
-                source: "  \t /* optional FirstCommentLine \u2028*/  --> " +
-                    "the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 4,
-            });
-
-            pass("avoids first line block HTML close with paragraph separators", {
-                strict: false,
-                source: "  \t /* optional FirstCommentLine \u2029*/  --> " +
-                    "the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 4,
-            });
-
-            pass("avoids multi block + HTML close with line feed", {
-                strict: false,
-                source: "  \t /*\noptional\nMultiLineCommentChars \n*/  --> " +
-                    "the comment extends to these characters\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
+                hasNext: true,
                 line: 4, column: 4,
-            });
+            }));
 
-            pass("avoids multi block + HTML close with carriage return", {
-                strict: false,
-                source: "  \t /*\roptional\rMultiLineCommentChars \r*/  --> " +
-                    "the comment extends to these characters\r ",
+            passAll(lt => `avoids multi block + single block + HTML close with ${lt}`, lt => ({
+                source: `  \t /*${lt}*/ /* optional SingleLineDelimitedCommentSequence ${lt
+                    }*/  --> the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
-                hasNext: false,
-                line: 4, column: 4,
-            });
-
-            pass("avoids multi block + HTML close with Windows newlines", {
-                strict: false,
-                source: "  \t /*\r\noptional\r\nMultiLineCommentChars \r\n*/  --> " +
-                    "the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 4, column: 4,
-            });
-
-            pass("avoids multi block + HTML close with line separators", {
-                strict: false,
-                source: "  \t /*\u2028optional\u2028MultiLineCommentChars \u2028*/  --> " +
-                    "the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 4, column: 4,
-            });
-
-            pass("avoids multi block + HTML close with paragraph separators", {
-                strict: false,
-                source: "  \t /*\u2029optional\u2029MultiLineCommentChars \u2029*/  --> " +
-                    "the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 4, column: 4,
-            });
-
-            pass("avoids multi block + single block + HTML close with line feed", {
-                strict: false,
-                source: "  \t /*\n*/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\n*/  --> the comment extends to these characters\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
+                hasNext: true,
                 line: 3, column: 4,
-            });
+            }));
 
-            pass("avoids multi block + single block + HTML close with carriage return", {
-                strict: false,
-                source: "  \t /*\r*/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\r*/  --> the comment extends to these characters\r ",
+            passAll(lt => `avoids multi block + 2 single block + HTML close with ${lt}`, lt => ({
+                source: `  \t /*${lt}*/ /**/ /* optional SingleLineDelimitedCommentSequence ${lt
+                    }*/  --> the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
-                hasNext: false,
+                hasNext: true,
                 line: 3, column: 4,
-            });
-
-            pass("avoids multi block + single block + HTML close with Windows newlines", {
-                strict: false,
-                source: "  \t /*\r\n*/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\r\n*/  --> the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 4,
-            });
-
-            pass("avoids multi block + single block + HTML close with line separators", {
-                strict: false,
-                source: "  \t /*\u2028*/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\u2028*/  --> the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 4,
-            });
-
-            pass("avoids multi block + single block + HTML close with paragraph separators", {
-                strict: false,
-                source: "  \t /*\u2029*/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\u2029*/  --> the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 4,
-            });
-
-            pass("avoids multi block + 2 single block + HTML close with line feed", {
-                strict: false,
-                source: "  \t /*\n*/ /**/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\n*/  --> the comment extends to these characters\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 4,
-            });
-
-            pass("avoids multi block + 2 single block + HTML close with carriage return", {
-                strict: false,
-                source: "  \t /*\r*/ /**/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\r*/  --> the comment extends to these characters\r ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 4,
-            });
-
-            pass("avoids multi block + 2 single block + HTML close with Windows newlines", {
-                strict: false,
-                source: "  \t /*\r\n*/ /**/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\r\n*/  --> the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 4,
-            });
-
-            pass("avoids multi block + 2 single block + HTML close with line separators", {
-                strict: false,
-                source: "  \t /*\u2028*/ /**/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\u2028*/  --> the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 4,
-            });
-
-            pass("avoids multi block + 2 single block + HTML close with paragraph separators", {
-                strict: false,
-                source: "  \t /*\u2029*/ /**/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\u2029*/  --> the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 4,
-            });
+            }));
         } else {
-            pass("skips HTML single line comments with line feed", {
-                strict: false,
-                source: "  \t <!-- foo bar\n  ",
+            passAll(lt => `skips HTML single line comments with ${lt}`, lt => ({
+                source: `  \t <!-- foo bar${lt}  `,
                 seek: Seek.NewLine,
                 hasNext: false,
                 line: 2, column: 2,
-            });
+            }));
 
-            pass("skips HTML single line comments with carriage return", {
-                strict: false,
-                source: "  \t <!-- foo bar\r  ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 2,
-            });
-
-            pass("skips HTML single line comments with Windows newlines", {
-                strict: false,
-                source: "  \t <!-- foo bar\r\n  ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 2,
-            });
-
-            pass("skips HTML single line comments with line separators", {
-                strict: false,
-                source: "  \t <!-- foo bar\u2028  ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 2,
-            });
-
-            pass("skips HTML single line comments with paragraph separators", {
-                strict: false,
-                source: "  \t <!-- foo bar\u2029  ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 2,
-            });
-
-            pass("skips multiple HTML single line comments with line feed", {
-                strict: false,
-                source: "  \t <!-- foo bar\n <!-- baz \n <!--",
+            passAll(lt => `skips multiple HTML single line comments with ${lt}`, lt => ({
+                source: `  \t <!-- foo bar${lt} <!-- baz ${lt} <!--`,
                 seek: Seek.NewLine,
                 hasNext: false,
                 line: 3, column: 5,
-            });
+            }));
 
-            pass("skips multiple HTML single line comments with carriage return", {
-                strict: false,
-                source: "  \t <!-- foo bar\r <!-- baz \n <!--",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 5,
-            });
-
-            pass("skips multiple HTML single line comments with Windows newlines", {
-                strict: false,
-                source: "  \t <!-- foo bar\r\n <!-- baz \n <!--",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 5,
-            });
-
-            pass("skips multiple HTML single line comments with line separators", {
-                strict: false,
-                source: "  \t <!-- foo bar\u2028 <!-- baz \n <!--",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 5,
-            });
-
-            pass("skips multiple HTML single line comments with paragraph separators", {
-                strict: false,
-                source: "  \t <!-- foo bar\u2029 <!-- baz \n <!--",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 5,
-            });
-
-            pass("skips single HTML close comment after line feed", {
-                strict: false,
-                source: "  \t \n-->  ",
+            passAll(lt => `skips single HTML close comment after ${lt}`, lt => ({
+                source: `  \t ${lt}-->  `,
                 seek: Seek.NewLine,
                 hasNext: false,
                 line: 2, column: 5,
-            });
+            }));
 
-            pass("skips single HTML close comment after carriage return", {
-                strict: false,
-                source: "  \t \r-->  ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 5,
-            });
-
-            pass("skips single HTML close comment after Windows newlines", {
-                strict: false,
-                source: "  \t \r\n-->  ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 5,
-            });
-
-            pass("skips single HTML close comment after line separators", {
-                strict: false,
-                source: "  \t \u2028-->  ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 5,
-            });
-
-            pass("skips single HTML close comment after paragraph separators", {
-                strict: false,
-                source: "  \t \u2029-->  ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 2, column: 5,
-            });
-
-            pass("skips line of single HTML close comment after line feed", {
-                strict: false,
-                source: "  \t \n--> the comment extends to these characters\n ",
+            passAll(lt => `skips line of single HTML close comment after ${lt}`, lt => ({
+                source: `  \t ${lt}--> the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
                 hasNext: false,
                 line: 3, column: 1,
-            });
+            }));
 
-            pass("skips line of single HTML close comment after carriage return", {
-                strict: false,
-                source: "  \t \r--> the comment extends to these characters\r ",
+            passAll(lt => `allows HTML close comment after ${lt} + WS`, lt => ({
+                source: `  \t ${lt}   --> the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
                 hasNext: false,
                 line: 3, column: 1,
-            });
+            }));
 
-            pass("skips line of single HTML close comment after Windows newlines", {
-                strict: false,
-                source: "  \t \r\n--> the comment extends to these characters\r\n ",
+            passAll(lt => `skips single-line block on line of HTML close after ${lt}`, lt => ({
+                source: `  \t /*${lt}*/ /* optional SingleLineDelimitedCommentSequence */    ${""
+                    }--> the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
                 hasNext: false,
                 line: 3, column: 1,
-            });
+            }));
 
-            pass("skips line of single HTML close comment after line separators", {
-                strict: false,
-                source: "  \t \u2028--> the comment extends to these characters\u2028 ",
+            passAll(lt => `skips 2 single-line block on line of HTML close after ${lt}`, lt => ({
+                source: `  \t /*${lt}*/ /**/ /* second optional ${""
+                    }SingleLineDelimitedCommentSequence */    ${""
+                    }--> the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
                 hasNext: false,
                 line: 3, column: 1,
-            });
+            }));
 
-            pass("skips line of single HTML close comment after paragraph separators", {
-                strict: false,
-                source: "  \t \u2029--> the comment extends to these characters\u2029 ",
+            passAll(lt => `skips block HTML close with ${lt} + empty line`, lt => ({
+                source: `  \t /*${lt}*/  -->${lt} `,
                 seek: Seek.NewLine,
                 hasNext: false,
                 line: 3, column: 1,
-            });
+            }));
 
-            pass("allows HTML close comment after line feed + WS", {
-                strict: false,
-                source: "  \t \n   --> the comment extends to these characters\n ",
+            passAll(lt => `skips block HTML close with ${lt}`, lt => ({
+                source: `  \t /*${lt}*/  --> the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
                 hasNext: false,
                 line: 3, column: 1,
-            });
+            }));
 
-            pass("allows HTML close comment after carriage return + WS", {
-                strict: false,
-                source: "  \t \r   --> the comment extends to these characters\r ",
+            passAll(lt => `skips first line block HTML close with ${lt}`, lt => ({
+                source: `  \t /* optional FirstCommentLine ${lt}*/  --> ` +
+                    `the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
                 hasNext: false,
                 line: 3, column: 1,
-            });
+            }));
 
-            pass("allows HTML close comment after Windows newlines + WS", {
-                strict: false,
-                source: "  \t \r\n   --> the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("allows HTML close comment after line separators + WS", {
-                strict: false,
-                source: "  \t \u2028   --> the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("allows HTML close comment after paragraph separators + WS", {
-                strict: false,
-                source: "  \t \u2029   --> the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips single-line block on line of HTML close after line feed", {
-                strict: false,
-                source: "  \t /*\n*/ /* optional SingleLineDelimitedCommentSequence */ " +
-                    "   --> the comment extends to these characters\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips single-line block on line of HTML close after carriage return", {
-                strict: false,
-                source: "  \t /*\r*/ /* optional SingleLineDelimitedCommentSequence */ " +
-                    "   --> the comment extends to these characters\r ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips single-line block on line of HTML close after Windows newlines", {
-                strict: false,
-                source: "  \t /*\r\n*/ /* optional SingleLineDelimitedCommentSequence */ " +
-                    "   --> the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips single-line block on line of HTML close after line separators", {
-                strict: false,
-                source: "  \t /*\u2028*/ /* optional SingleLineDelimitedCommentSequence */ " +
-                    "   --> the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips single-line block on line of HTML close after paragraph separators", {
-                strict: false,
-                source: "  \t /*\u2029*/ /* optional SingleLineDelimitedCommentSequence */ " +
-                    "   --> the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips 2 single-line block on line of HTML close after line feed", {
-                strict: false,
-                source: "  \t /*\n*/ /**/ /* second optional SingleLineDelimitedCommentSequence */ " + // tslint:disable-line max-line-length
-                    "   --> the comment extends to these characters\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips 2 single-line block on line of HTML close after carriage return", {
-                strict: false,
-                source: "  \t /*\r*/ /**/ /* second optional SingleLineDelimitedCommentSequence */ " + // tslint:disable-line max-line-length
-                    "   --> the comment extends to these characters\r ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips 2 single-line block on line of HTML close after Windows newlines", {
-                strict: false,
-                source: "  \t /*\r\n*/ /**/ /* second optional SingleLineDelimitedCommentSequence */ " + // tslint:disable-line max-line-length
-                    "   --> the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips 2 single-line block on line of HTML close after line separators", {
-                strict: false,
-                source: "  \t /*\u2028*/ /**/ /* second optional SingleLineDelimitedCommentSequence */ " + // tslint:disable-line max-line-length
-                    "   --> the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips 2 single-line block on line of HTML close after paragraph separators", {
-                strict: false,
-                source: "  \t /*\u2029*/ /**/ /* second optional SingleLineDelimitedCommentSequence */ " + // tslint:disable-line max-line-length
-                    "   --> the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips block HTML close with line feed + empty line", {
-                strict: false,
-                source: "  \t /*\n*/  -->\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips block HTML close with carriage return + empty line", {
-                strict: false,
-                source: "  \t /*\r*/  -->\r ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips block HTML close with Windows newlines + empty line", {
-                strict: false,
-                source: "  \t /*\r\n*/  -->\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips block HTML close with line separators + empty line", {
-                strict: false,
-                source: "  \t /*\u2028*/  -->\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips block HTML close with paragraph separators + empty line", {
-                strict: false,
-                source: "  \t /*\u2029*/  -->\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips block HTML close with line feed", {
-                strict: false,
-                source: "  \t /*\n*/  --> the comment extends to these characters\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips block HTML close with carriage return", {
-                strict: false,
-                source: "  \t /*\r*/  --> the comment extends to these characters\r ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips block HTML close with Windows newlines", {
-                strict: false,
-                source: "  \t /*\r\n*/  --> the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips block HTML close with line separators", {
-                strict: false,
-                source: "  \t /*\u2028*/  --> the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips block HTML close with paragraph separators", {
-                strict: false,
-                source: "  \t /*\u2029*/  --> the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips first line block HTML close with line feed", {
-                strict: false,
-                source: "  \t /* optional FirstCommentLine \n*/  --> " +
-                    "the comment extends to these characters\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips first line block HTML close with carriage return", {
-                strict: false,
-                source: "  \t /* optional FirstCommentLine \r*/  --> " +
-                    "the comment extends to these characters\r ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips first line block HTML close with Windows newlines", {
-                strict: false,
-                source: "  \t /* optional FirstCommentLine \r\n*/  --> " +
-                    "the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips first line block HTML close with line separators", {
-                strict: false,
-                source: "  \t /* optional FirstCommentLine \u2028*/  --> " +
-                    "the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips first line block HTML close with paragraph separators", {
-                strict: false,
-                source: "  \t /* optional FirstCommentLine \u2029*/  --> " +
-                    "the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 3, column: 1,
-            });
-
-            pass("skips multi block + HTML close with line feed", {
-                strict: false,
-                source: "  \t /*\noptional\nMultiLineCommentChars \n*/  --> " +
-                    "the comment extends to these characters\n ",
+            passAll(lt => `skips multi block + HTML close with ${lt}`, lt => ({
+                source: `  \t /*${lt}optional${lt}MultiLineCommentChars ${lt
+                    }*/  --> the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
                 hasNext: false,
                 line: 5, column: 1,
-            });
+            }));
 
-            pass("skips multi block + HTML close with carriage return", {
-                strict: false,
-                source: "  \t /*\roptional\rMultiLineCommentChars \r*/  --> " +
-                    "the comment extends to these characters\r ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 5, column: 1,
-            });
-
-            pass("skips multi block + HTML close with Windows newlines", {
-                strict: false,
-                source: "  \t /*\r\noptional\r\nMultiLineCommentChars \r\n*/  --> " +
-                    "the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 5, column: 1,
-            });
-
-            pass("skips multi block + HTML close with line separators", {
-                strict: false,
-                source: "  \t /*\u2028optional\u2028MultiLineCommentChars \u2028*/  --> " +
-                    "the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 5, column: 1,
-            });
-
-            pass("skips multi block + HTML close with paragraph separators", {
-                strict: false,
-                source: "  \t /*\u2029optional\u2029MultiLineCommentChars \u2029*/  --> " +
-                    "the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 5, column: 1,
-            });
-
-            pass("skips multi block + single block + HTML close with line feed", {
-                strict: false,
-                source: "  \t /*\n*/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\n*/  --> the comment extends to these characters\n ",
+            passAll(lt => `skips multi block + single block + HTML close with ${lt}`, lt => ({
+                source: `  \t /*${lt}*/ /* optional SingleLineDelimitedCommentSequence ${lt
+                    }*/  --> the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
                 hasNext: false,
                 line: 4, column: 1,
-            });
+            }));
 
-            pass("skips multi block + single block + HTML close with carriage return", {
-                strict: false,
-                source: "  \t /*\r*/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\r*/  --> the comment extends to these characters\r ",
+            passAll(lt => `skips multi block + 2 single block + HTML close with ${lt}`, lt => ({
+                source: `  \t /*${lt}*/ /**/ /* optional SingleLineDelimitedCommentSequence ${lt
+                    }*/  --> the comment extends to these characters${lt} `,
                 seek: Seek.NewLine,
                 hasNext: false,
                 line: 4, column: 1,
-            });
-
-            pass("skips multi block + single block + HTML close with Windows newlines", {
-                strict: false,
-                source: "  \t /*\r\n*/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\r\n*/  --> the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 4, column: 1,
-            });
-
-            pass("skips multi block + single block + HTML close with line separators", {
-                strict: false,
-                source: "  \t /*\u2028*/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\u2028*/  --> the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 4, column: 1,
-            });
-
-            pass("skips multi block + single block + HTML close with paragraph separators", {
-                strict: false,
-                source: "  \t /*\u2029*/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\u2029*/  --> the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 4, column: 1,
-            });
-
-            pass("skips multi block + 2 single block + HTML close with line feed", {
-                strict: false,
-                source: "  \t /*\n*/ /**/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\n*/  --> the comment extends to these characters\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 4, column: 1,
-            });
-
-            pass("skips multi block + 2 single block + HTML close with carriage return", {
-                strict: false,
-                source: "  \t /*\r*/ /**/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\r*/  --> the comment extends to these characters\r ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 4, column: 1,
-            });
-
-            pass("skips multi block + 2 single block + HTML close with Windows newlines", {
-                strict: false,
-                source: "  \t /*\r\n*/ /**/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\r\n*/  --> the comment extends to these characters\r\n ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 4, column: 1,
-            });
-
-            pass("skips multi block + 2 single block + HTML close with line separators", {
-                strict: false,
-                source: "  \t /*\u2028*/ /**/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\u2028*/  --> the comment extends to these characters\u2028 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 4, column: 1,
-            });
-
-            pass("skips multi block + 2 single block + HTML close with paragraph separators", {
-                strict: false,
-                source: "  \t /*\u2029*/ /**/ /* optional SingleLineDelimitedCommentSequence " +
-                    "\u2029*/  --> the comment extends to these characters\u2029 ",
-                seek: Seek.NewLine,
-                hasNext: false,
-                line: 4, column: 1,
-            });
+            }));
         }
 
         pass("avoids single HTML close comment w/o line terminator", {
@@ -1680,7 +631,7 @@ describe("src/scanner/seek", () => {
         });
 
         pass("avoids line of single HTML close comment w/o line terminator", {
-            source: "  \t --> the comment extends to these characters\n ",
+            source: "  \t --> the comment doesn't extend to these characters\n ",
             seek: Seek.SameLine,
             hasNext: true,
             line: 1, column: 4,
@@ -1688,7 +639,7 @@ describe("src/scanner/seek", () => {
 
         pass("avoids single-line block on line of HTML close w/o line terminator", {
             source: "  \t /* optional SingleLineDelimitedCommentSequence */ " +
-                "   --> the comment extends to these characters\n ",
+                "   --> the comment doesn't extend to these characters\n ",
             seek: Seek.SameLine,
             hasNext: true,
             line: 1, column: 57,
@@ -1696,7 +647,7 @@ describe("src/scanner/seek", () => {
 
         pass("avoids 2 single-line block on line of HTML close w/o line terminator", {
             source: "  \t /**/ /* second optional SingleLineDelimitedCommentSequence */ " +
-                "   --> the comment extends to these characters\n ",
+                "   --> the comment doesn't extend to these characters\n ",
             seek: Seek.SameLine,
             hasNext: true,
             line: 1, column: 69,
@@ -1710,7 +661,7 @@ describe("src/scanner/seek", () => {
         });
 
         pass("avoids block HTML close with chars w/o line terminator", {
-            source: "  \t /**/  --> the comment extends to these characters\n ",
+            source: "  \t /**/  --> the comment doesn't extend to these characters\n ",
             seek: Seek.SameLine,
             hasNext: true,
             line: 1, column: 10,
@@ -1718,7 +669,7 @@ describe("src/scanner/seek", () => {
 
         pass("avoids first line block HTML close w/o line terminator", {
             source: "  \t /* optional FirstCommentLine */  --> " +
-                "the comment extends to these characters\n ",
+                "the comment doesn't extend to these characters\n ",
             seek: Seek.SameLine,
             hasNext: true,
             line: 1, column: 37,
@@ -1726,7 +677,7 @@ describe("src/scanner/seek", () => {
 
         pass("avoids 2 single block + HTML close w/o line terminator", {
             source: "  \t /**/ /* optional second SingleLineDelimitedCommentSequence */" +
-                "  --> the comment extends to these characters\n ",
+                "  --> the comment doesn't extend to these characters\n ",
             seek: Seek.SameLine,
             hasNext: true,
             line: 1, column: 67,
