@@ -1,5 +1,6 @@
-import {Parser} from "../common";
+import {Parser, report, unimplemented} from "../common";
 import {Chars} from "../chars";
+import * as Errors from "../errors";
 
 export function hasNext(parser: Parser) {
     return parser.index < parser.source.length;

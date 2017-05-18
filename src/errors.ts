@@ -130,7 +130,7 @@ export const invalidLHSInForLoop = () => (
 );
 
 export const invalidModuleSpecifier = () => (
-    "Unexpected token"
+    "Invalid module specifier"
 );
 
 export const invalidOctalDigit = () => (
@@ -247,6 +247,10 @@ export const strictVarName = (name: string) => (
 
 export const unexpected = () => (
     "Unexpected token"
+);
+
+export const unexpectedChar = (ch: string) => (
+    `Unexpected character ${ch}`
 );
 
 export const unexpectedEOS = () => (

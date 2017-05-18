@@ -2,6 +2,8 @@
  * A list of character constants with much more human-readable names.
  */
 export const enum Chars {
+    Null = 0x00,
+
     Backspace      = 0x08,
     Tab            = 0x09,
     LineFeed       = 0x0a,
@@ -108,6 +110,7 @@ export const enum Chars {
     VerticalBar = 0x7c,
     RightBrace  = 0x7d,
     Tilde       = 0x7e,
+    Delete      = 0x7f,
 
     NextLine         = 0x85,
     NonBreakingSpace = 0xa0,

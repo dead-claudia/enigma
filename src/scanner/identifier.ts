@@ -9,6 +9,11 @@ import {isIDStart, isIDContinue} from "../unicode-generated";
 // - Check the resulting codes for `isIDStart` and `isIDContinue` for raw characters and escapes
 //   identically.
 
+export function scanKnownIdentifier(parser: Parser, context: Context): Token {
+    // TODO
+    return unimplemented();
+}
+
 export function scanMaybeIdentifier(parser: Parser, context: Context): Token {
     // TODO
     return unimplemented();

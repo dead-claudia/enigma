@@ -1,5 +1,6 @@
 import {Parser, Context, report, unimplemented} from "../common";
 import {Chars} from "../chars";
+import {Token} from "../token";
 import * as Errors from "../errors";
 import {
     advance, advanceOne,
@@ -233,14 +234,15 @@ export function scanString(parser: Parser, context: Context, quote: number) {
     advanceOne(parser); // Consume the quote
     if (context & Context.OptionsRaw) storeRaw(parser, start);
     parser.tokenValue = ret;
+    return Token.StringLiteral;
 }
 
 /**
  * Scan a template section. It can start either from the quote or closing brace.
  */
-export function scanTemplate(parser: Parser, context: Context): boolean {
+export function scanTemplate(parser: Parser, context: Context): Token {
     const start = parser.index;
-    let isTail = true;
+    let token = Token.TemplateTail;
     let ret = "";
 
     advanceOne(parser); // Consume the quote or closing brace
@@ -252,7 +254,7 @@ export function scanTemplate(parser: Parser, context: Context): boolean {
             advanceOne(parser);
             if (!hasNext(parser)) return report(parser, Errors.unterminatedString());
             ch = nextChar(parser);
-            if (ch === Chars.LeftBrace) { isTail = false; break; }
+            if (ch === Chars.LeftBrace) { token = Token.TemplateCont; break; }
             ret += "$";
         } else {
             ch = scanStringCode(parser, context);
@@ -274,5 +276,5 @@ export function scanTemplate(parser: Parser, context: Context): boolean {
     advanceOne(parser); // Consume the quote or opening brace
     parser.tokenValue = ret;
     storeRaw(parser, start);
-    return isTail;
+    return token;
 }

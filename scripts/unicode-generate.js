@@ -20,7 +20,8 @@
 // - `eval` - (optional) boolean, `true` if this should emit a JS body
 // - `tables` - (optional) mapping of name + stored table
 // - `write` - promise-returning function called on each written string
-// - `exports` - mapping of name + list of functions returning only *positive* code points
+// - `exports` - mapping of name + list of functions returning only *positive* code points (use
+//   `{not: factory}` to negate)
 //
 // To use this, you do something like this:
 //
@@ -164,12 +165,13 @@ ${opts.eval ? "return" : "export"} {${Object.keys(opts.exports)}};
 
 if (require.main === module) {
     const path = require("path")
-    const load = name => () => {
+    const load = (name, offset) => () => {
         const mod = require.resolve(`unicode-9.0.0/${name}/code-points`)
         const list = require(mod)
 
         // Keep this out of persistent memory
         delete require.cache[mod]
+        if (offset) list.splice(0, offset)
         return list
     }
 
@@ -184,6 +186,8 @@ if (require.main === module) {
         exports: {
             isIDContinue: [load("Binary_Property/ID_Continue")],
             isIDStart: [load("Binary_Property/ID_Start")],
+            // The `offset = 1` is so that the null byte is removed.
+            mustEscape: [load("General_Category/Other", 1), load("General_Category/Separator")],
         },
     })
     // Node only started exiting on collected rejections in v8

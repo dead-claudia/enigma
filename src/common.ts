@@ -16,7 +16,7 @@ export const enum Context {
     Strict = 1 << 8,
     Module = 1 << 9,
 
-    Expression = 1 << 10,
+    ExpressionStart = 1 << 10,
 }
 
 /**
