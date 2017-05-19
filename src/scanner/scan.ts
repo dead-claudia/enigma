@@ -6,7 +6,7 @@ import * as Errors from "../errors";
 import {
     advanceOne, consumeOpt,
     hasNext, nextChar, nextUnicodeChar,
-    rewindOne, fromCodePoint,
+    fromCodePoint,
 } from "./common";
 import {scanString, scanTemplate} from "./string";
 import {scanRegExp} from "./regexp";
@@ -175,23 +175,26 @@ table[Chars.Hyphen] = parser => {
 
 // `.`, `...`, `.123` (numeric literal)
 table[Chars.Period] = (parser, context) => {
-    advanceOne(parser);
-    if (hasNext(parser)) {
-        const next = nextChar(parser);
+    let index = parser.index + 1;
+    if (index < parser.source.length) {
+        const next = parser.source.charCodeAt(index);
 
         if (next === Chars.Period) {
-            advanceOne(parser);
-            if (consumeOpt(parser, Chars.Period)) return Token.Ellipsis;
-            parser.index -= 2;
-            parser.column -= 2;
+            index++;
+            if (index < parser.source.length &&
+                    parser.source.charCodeAt(index) === Chars.Period) {
+                parser.index = index + 1;
+                parser.column += 3;
+                return Token.Ellipsis;
+            }
         } else if (next >= Chars.Zero && next <= Chars.Nine) {
             // Rewind the initial token.
-            rewindOne(parser);
             scanNumeric(parser, context);
             return Token.NumericLiteral;
         }
     }
 
+    advanceOne(parser);
     return Token.Period;
 };
 
@@ -248,21 +251,19 @@ table[Chars.LessThan] = (parser, context) => {
                 advanceOne(parser);
                 return Token.LessThanOrEqual;
 
-            case Chars.Slash:
+            case Chars.Slash: {
                 if (!(context & Context.OptionsJSX)) break;
-                advanceOne(parser);
+                const index = parser.index + 1;
 
                 // Check that it's not a comment start.
-                if (hasNext(parser)) {
-                    const next = nextChar(parser);
-
-                    if (next === Chars.Asterisk || next === Chars.Slash) {
-                        rewindOne(parser); // Don't consume the slash.
-                        break;
-                    }
+                if (index < parser.source.length) {
+                    const next = parser.source.charCodeAt(index);
+                    if (next === Chars.Asterisk || next === Chars.Slash) break;
                 }
 
+                advanceOne(parser);
                 return Token.JSXClose;
+            }
 
             default: // ignore
         }

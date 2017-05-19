@@ -33,17 +33,22 @@ export function nextUnicodeChar(parser: Parser) {
 }
 
 /**
- * An optimized equivalent of `advance(parser, nextUnicodeChar(parser))`
+ * An optimized equivalent of `advance(parser, nextUnicodeChar(parser))` that returns its result.
  */
 export function consumeAny(parser: Parser) {
     const hi = parser.source.charCodeAt(parser.index++);
+    let code = hi;
 
     if (hi >= 0xd800 && hi <= 0xdbff && hasNext(parser)) {
         const lo = parser.source.charCodeAt(parser.index);
-        if (lo >= 0xdc00 && lo <= 0xdfff) parser.index++;
+        if (lo >= 0xdc00 && lo <= 0xdfff) {
+            code = (hi & 0x3ff) << 10 | lo & 0x3ff | 0x10000;
+            parser.index++;
+        }
     }
 
     parser.column++;
+    return code;
 }
 
 export function consumeOpt(parser: Parser, code: number) {
@@ -88,11 +93,6 @@ export function advanceNewline(parser: Parser) {
     parser.index++;
     parser.column = 0;
     parser.line++;
-}
-
-export function rewindOne(parser: Parser) {
-    parser.index--;
-    parser.column--;
 }
 
 // Avoid 90% of the ceremony of String.fromCodePoint

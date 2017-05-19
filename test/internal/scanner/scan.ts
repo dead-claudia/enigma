@@ -120,6 +120,16 @@ describe("src/scanner/scan", () => {
             });
         }
 
+        it("scans '.' in '..'", () => {
+            const parser = create("..", undefined);
+            const found = scan(parser, Context.Empty);
+
+            expect(found).to.equal(Token.Period, `'${tokenDesc(found)}' === '.'`);
+            expect(hasNext(parser)).to.equal(true);
+            expect(parser.line).to.equal(1);
+            expect(parser.column).to.equal(1);
+        });
+
         // TODO
     });
 });

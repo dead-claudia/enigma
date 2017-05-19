@@ -4,17 +4,28 @@ import * as Errors from "../errors";
 import {
     advanceNewline, advanceOne,
     consumeAny, consumeLineFeed, consumeOpt,
-    hasNext, nextChar, rewindOne,
+    hasNext, nextChar,
 } from "./common";
 import {isIDStart} from "../unicode-generated";
 
 // Skip initial BOM and/or shebang.
 export function skipMeta(parser: Parser) {
-    if (!hasNext(parser)) return;
-    if (parser.source.charCodeAt(parser.index) === Chars.ByteOrderMark) parser.index++;
-    if (!consumeOpt(parser, Chars.Hash)) return;
-    if (!consumeOpt(parser, Chars.Exclamation)) rewindOne(parser);
-    else skipToNewline(parser, SeekState.None);
+    let index = parser.index;
+    if (index === parser.source.length) return;
+    if (parser.source.charCodeAt(index) === Chars.ByteOrderMark) {
+        index++;
+        parser.index = index;
+    }
+
+    if (index < parser.source.length &&
+            parser.source.charCodeAt(index) === Chars.Hash) {
+        index++;
+        if (index < parser.source.length &&
+                parser.source.charCodeAt(index) === Chars.Exclamation) {
+            parser.index = index + 1;
+            skipToNewline(parser, SeekState.None);
+        }
+    }
 }
 
 /*
