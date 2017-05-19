@@ -144,51 +144,81 @@ describe("src/scanner/string", () => {
                 Nine = 0x39,
             }
 
-            function range(first: number, last: number, func: (i: number) => void) {
-                for (let i = first; i <= last; i++) {
-                    func(i);
+            function attemptPart(
+                message: string, raw: string, value: string,
+                source: string, isEnd: boolean, context: Context, strict?: boolean,
+            ) {
+                if (strict !== true) {
+                    const parser = create(source, undefined);
+                    expect(scan(parser, context)).to.eql(Token.StringLiteral, message);
+                    expect(hasNext(parser)).to.eql(!isEnd, message);
+                    expect(parser.tokenValue).to.eql(value, message);
+                    if (context & Context.OptionsRaw) expect(parser.tokenRaw).to.eql(raw, message);
+                    expect(parser.line).to.eql(1, message);
+                    expect(parser.column).to.eql(raw.length, message);
+                }
+
+                if (strict !== false) {
+                    const parser = create(source, undefined);
+                    expect(scan(parser, context | Context.Strict))
+                    .to.eql(Token.StringLiteral, message);
+                    expect(hasNext(parser)).to.eql(!isEnd, message);
+                    expect(parser.tokenValue).to.eql(value, message);
+                    if (context & Context.OptionsRaw) expect(parser.tokenRaw).to.eql(raw, message);
+                    expect(parser.line).to.eql(1, message);
+                    expect(parser.column).to.eql(raw.length, message);
                 }
             }
 
-            function attemptPart(
-                desc: string, raw: string, value: string, part: string,
-                source: string, isEnd: boolean, context: Context,
+            function attemptFailPart(
+                message: string, source: string, context: Context, strict?: boolean,
             ) {
-                const message = `${desc} (${part})`;
+                if (strict !== true) {
+                    const parser = create(source, undefined);
+                    expect(() => {
+                        scan(parser, context);
+                    }).to.throw(SyntaxError, undefined, message);
+                }
 
-                let parser = create(source, undefined);
-                expect(scan(parser, context)).to.eql(Token.StringLiteral, message);
-                expect(hasNext(parser)).to.eql(!isEnd, message);
-                expect(parser.tokenValue).to.eql(value, message);
-                if (context & Context.OptionsRaw) expect(parser.tokenRaw).to.eql(raw, message);
-                expect(parser.line).to.eql(1, message);
-                expect(parser.column).to.eql(raw.length, message);
-
-                parser = create(source, undefined);
-                expect(scan(parser, context | Context.Strict)).to.eql(Token.StringLiteral, message);
-                expect(hasNext(parser)).to.eql(!isEnd, message);
-                expect(parser.tokenValue).to.eql(value, message);
-                if (context & Context.OptionsRaw) expect(parser.tokenRaw).to.eql(raw, message);
-                expect(parser.line).to.eql(1, message);
-                expect(parser.column).to.eql(raw.length, message);
+                if (strict !== false) {
+                    const parser = create(source, undefined);
+                    expect(() => {
+                        scan(parser, context | Context.Strict);
+                    }).to.throw(SyntaxError, undefined, message);
+                }
             }
 
-            function testCharPart(desc: string, raw: string, value: string) {
+            function testCharPart(desc: string, raw: string, value: string, strict?: boolean) {
                 attemptPart(
-                    desc, raw, value, "normal, has next",
-                    `${raw} `, false, Context.Empty,
+                    `${desc} (normal, has next)`, raw, value,
+                    `${raw} `, false, Context.Empty, strict,
                 );
                 attemptPart(
-                    desc, raw, value, "with raw, has next",
-                    `${raw} `, false, Context.OptionsRaw,
+                    `${desc} (with raw, has next)`, raw, value,
+                    `${raw} `, false, Context.OptionsRaw, strict,
                 );
                 attemptPart(
-                    desc, raw, value, "normal, end",
-                    raw, true, Context.Empty,
+                    `${desc} (normal, end)`, raw, value,
+                    raw, true, Context.Empty, strict,
                 );
                 attemptPart(
-                    desc, raw, value, "with raw, end",
-                    raw, true, Context.OptionsRaw,
+                    `${desc} (with raw, end)`, raw, value,
+                    raw, true, Context.OptionsRaw, strict,
+                );
+            }
+
+            function failCharPart(desc: string, raw: string, value: string, strict?: boolean) {
+                attemptFailPart(
+                    `${desc} (normal, has next)`, `${raw} `, Context.Empty, strict,
+                );
+                attemptFailPart(
+                    `${desc} (with raw, has next)`, `${raw} `, Context.OptionsRaw, strict,
+                );
+                attemptFailPart(
+                    `${desc} (normal, end)`, raw, Context.Empty, strict,
+                );
+                attemptFailPart(
+                    `${desc} (with raw, end)`, raw, Context.OptionsRaw, strict,
                 );
             }
 
@@ -200,52 +230,66 @@ describe("src/scanner/string", () => {
             }
 
             it("scans English capitals", () => {
-                range(Chars.EnglishUpperA, Chars.EnglishUpperZ, testChar);
+                for (let code = Chars.EnglishUpperA; code <= Chars.EnglishUpperZ; code++) {
+                    testChar(code);
+                }
             });
 
             it("scans English small", () => {
-                range(Chars.EnglishLowerA, Chars.EnglishLowerZ, testChar);
+                for (let code = Chars.EnglishLowerA; code <= Chars.EnglishLowerZ; code++) {
+                    testChar(code);
+                }
             });
 
             it("scans Russian capitals", () => {
-                range(Chars.RussianUpperА, Chars.RussianUpperЯ, testChar);
+                for (let code = Chars.RussianUpperА; code <= Chars.RussianUpperЯ; code++) {
+                    testChar(code);
+                }
                 testChar(Chars.RussianUpperЁ);
             });
 
             it("scans Russian small", () => {
-                range(Chars.RussianLowerА, Chars.RussianLowerЯ, testChar);
+                for (let code = Chars.RussianLowerА; code <= Chars.RussianLowerЯ; code++) {
+                    testChar(code);
+                }
                 testChar(Chars.RussianLowerЁ);
             });
 
             it("scans digits", () => {
-                range(Chars.Zero, Chars.Nine, testChar);
+                for (let code = Chars.Zero; code < Chars.Nine; code++) {
+                    testChar(code);
+                }
             });
 
-            const magicSmall = [..."bfnrtvxu"].map(c => c.charCodeAt(0));
-
             function testEscapedChar(code: number): void {
-                if (magicSmall.indexOf(code) >= 0) return;
                 const letter = String.fromCharCode(code);
                 testCharPart(`'\\${letter}'`, `'\\${letter}'`, letter);
             }
 
             it("scans redundantly escaped English capitals", () => {
-                range(Chars.EnglishUpperA, Chars.EnglishUpperZ, testEscapedChar);
+                for (let code = Chars.EnglishUpperA; code < Chars.EnglishUpperZ; code++) {
+                    testEscapedChar(code);
+                }
             });
 
             it("scans redundantly escaped English small", () => {
                 const magicSmall = [..."bfnrtvxu"].map(c => c.charCodeAt(0));
-
-                range(Chars.EnglishLowerA, Chars.EnglishLowerZ, testEscapedChar);
+                for (let code = Chars.EnglishLowerA; code < Chars.EnglishLowerZ; code++) {
+                    if (magicSmall.indexOf(code) < 0) testEscapedChar(code);
+                }
             });
 
             it("scans redundantly escaped Russian capitals", () => {
-                range(Chars.RussianUpperА, Chars.RussianUpperЯ, testEscapedChar);
+                for (let code = Chars.RussianUpperА; code < Chars.RussianUpperЯ; code++) {
+                    testEscapedChar(code);
+                }
                 testEscapedChar(Chars.RussianUpperЁ);
             });
 
             it("scans redundantly escaped Russian small", () => {
-                range(Chars.RussianLowerА, Chars.RussianLowerЯ, testEscapedChar);
+                for (let code = Chars.RussianLowerА; code < Chars.RussianLowerЯ; code++) {
+                    testEscapedChar(code);
+                }
                 testEscapedChar(Chars.RussianLowerЁ);
             });
 
@@ -256,21 +300,21 @@ describe("src/scanner/string", () => {
                 }
 
                 it("scans \\x00 - \\xff", () => {
-                    range(0x00, 0xff, code => {
+                    for (let code = 0x00; code < 0xff; code++) {
                         const ch = String.fromCharCode(code);
                         const escape = `\\x${getHex(code)}`;
                         testCharPart(`'${escape}'`, `'${escape}'`, ch);
                         testCharPart(`"${escape}"`, `"${escape}"`, ch);
-                    });
+                    }
                 });
 
                 it("scans \\x00 - \\xFF", () => {
-                    range(0x00, 0xff, code => {
+                    for (let code = 0x00; code < 0xff; code++) {
                         const ch = String.fromCharCode(code);
                         const escape = `\\x${getHex(code).toUpperCase()}`;
                         testCharPart(`'${escape}'`, `'${escape}'`, ch);
                         testCharPart(`"${escape}"`, `"${escape}"`, ch);
-                    });
+                    }
                 });
 
                 fail("doesn't scan '\\x0g'", "'\\x0g'");
@@ -287,13 +331,6 @@ describe("src/scanner/string", () => {
                     return `\\u${code.toString(16)}`;
                 }
 
-                function testUnicodeEscape(code: number) {
-                    const ch = String.fromCharCode(code);
-                    const escape = readEscape(code);
-                    testCharPart(`'${escape}'`, `'${escape}'`, ch);
-                    testCharPart(`"${escape}"`, `"${escape}"`, ch);
-                }
-
                 for (let i = 0; i <= 0xff; i++) {
                     const start = i << 8;
                     const end = start | 0xff;
@@ -302,7 +339,12 @@ describe("src/scanner/string", () => {
                     const endStr = readEscape(end);
 
                     it(`scans ${startStr} - ${endStr}`, () => {
-                        range(start, end, testUnicodeEscape);
+                        for (let code = start; code < end; code++) {
+                            const ch = String.fromCharCode(code);
+                            const escape = readEscape(code);
+                            testCharPart(`'${escape}'`, `'${escape}'`, ch);
+                            testCharPart(`"${escape}"`, `"${escape}"`, ch);
+                        }
                     });
                 }
 
@@ -321,33 +363,6 @@ describe("src/scanner/string", () => {
 
                 fail("doesn't scan '\\u111'", "'\\u111'");
                 fail("doesn't scan '\\uAAA'", "'\\uAAA'");
-            });
-
-            context("Unicode brace escapes", () => {
-                function testVariadicEscape(code: number) {
-                    const ch = fromCodePoint(code);
-                    const escape = `\\u{${code.toString(16)}}`;
-                    testCharPart(`'${escape}'`, `'${escape}'`, ch);
-                    testCharPart(`"${escape}"`, `"${escape}"`, ch);
-                }
-
-                for (let i = 0x101; i <= 0x10f; i++) {
-                    const start = i << 8;
-                    const end = start | 0xff;
-
-                    const startStr = `\\u{${start.toString(16)}}`;
-                    const endStr = `\\u{${end.toString(16)}}`;
-
-                    it(`scans ${startStr} - ${endStr}`, () => {
-                        range(start, end, testVariadicEscape);
-                    });
-                }
-
-                fail("doesn't scan '\\u{g}'", "'\\u{g}'");
-                fail("doesn't scan '\\u{g0}'", "'\\u{g0}'");
-                fail("doesn't scan '\\u{0g}'", "'\\u{0g}'");
-                fail("doesn't scan '\\u{0g0}'", "'\\u{0g0}'");
-                fail("doesn't scan '\\u{g0g}'", "'\\u{g0g}'");
 
                 function checkNot5(source: string, code: number, letter: string) {
                     pass(`scans ${source}`, {
@@ -388,6 +403,98 @@ describe("src/scanner/string", () => {
                 checkNot5("\"\\u000E2\"", 14, "2");
                 checkNot5("'\\u000F1'", 15, "1");
                 checkNot5("\"\\u000F1\"", 15, "1");
+            });
+
+            context("Unicode brace escapes", () => {
+                for (let i = 0x101; i <= 0x10f; i++) {
+                    const start = i << 8;
+                    const end = start | 0xff;
+
+                    const startStr = `\\u{${start.toString(16)}}`;
+                    const endStr = `\\u{${end.toString(16)}}`;
+
+                    it(`scans ${startStr} - ${endStr}`, function () {
+                        this.slow(100);
+                        for (let code = start; code <= end; code++) {
+                            const ch = fromCodePoint(code);
+                            const escape = `\\u{${code.toString(16)}}`;
+                            testCharPart(`'${escape}'`, `'${escape}'`, ch);
+                            testCharPart(`"${escape}"`, `"${escape}"`, ch);
+
+                            const extra0 = `\\u{0${code.toString(16)}}`;
+                            testCharPart(`'${extra0}'`, `'${extra0}'`, ch);
+                            testCharPart(`"${extra0}"`, `"${extra0}"`, ch);
+
+                            const extra000 = `\\u{000${code.toString(16)}}`;
+                            testCharPart(`'${extra000}'`, `'${extra000}'`, ch);
+                            testCharPart(`"${extra000}"`, `"${extra000}"`, ch);
+                        }
+                    });
+                }
+
+                fail("doesn't scan '\\u{g}'", "'\\u{g}'");
+                fail("doesn't scan '\\u{g0}'", "'\\u{g0}'");
+                fail("doesn't scan '\\u{0g}'", "'\\u{0g}'");
+                fail("doesn't scan '\\u{0g0}'", "'\\u{0g0}'");
+                fail("doesn't scan '\\u{g0g}'", "'\\u{g0g}'");
+                fail("doesn't scan '\\u{11000}'", "'\\u{11000}'");
+                fail("doesn't scan '\\u{11fff}'", "'\\u{11fff}'");
+            });
+
+            context("legacy octal", () => {
+                it("scans \\0 - \\7 (with possible leading zeroes)", () => {
+                    for (let code = 0; code <= 6; code++) {
+                        const ch = fromCodePoint(code);
+
+                        const escape0 = `\\${code}`;
+                        testCharPart(`'${escape0}'`, `'${escape0}'`, ch, false);
+                        testCharPart(`"${escape0}"`, `"${escape0}"`, ch, false);
+                        if (code !== 0) {
+                            failCharPart(`'${escape0}'`, `'${escape0}'`, ch, true);
+                            failCharPart(`"${escape0}"`, `"${escape0}"`, ch, true);
+                        }
+
+                        const escape1 = `\\0${code}`;
+                        testCharPart(`'${escape1}'`, `'${escape1}'`, ch, false);
+                        testCharPart(`"${escape1}"`, `"${escape1}"`, ch, false);
+                        failCharPart(`'${escape1}'`, `'${escape1}'`, ch, true);
+                        failCharPart(`"${escape1}"`, `"${escape1}"`, ch, true);
+
+                        const escape2 = `\\00${code}`;
+                        testCharPart(`'${escape2}'`, `'${escape2}'`, ch, false);
+                        testCharPart(`"${escape2}"`, `"${escape2}"`, ch, false);
+                        failCharPart(`'${escape2}'`, `'${escape2}'`, ch, true);
+                        failCharPart(`"${escape2}"`, `"${escape2}"`, ch, true);
+                    }
+                });
+
+                it("scans \\10 - \\77 (with possible leading zeroes)", () => {
+                    for (let code = 0o10; code <= 0o77; code++) {
+                        const ch = fromCodePoint(code);
+                        const escape0 = `\\${code.toString(8)}`;
+                        testCharPart(`'${escape0}'`, `'${escape0}'`, ch, false);
+                        testCharPart(`"${escape0}"`, `"${escape0}"`, ch, false);
+                        failCharPart(`'${escape0}'`, `'${escape0}'`, ch, true);
+                        failCharPart(`"${escape0}"`, `"${escape0}"`, ch, true);
+
+                        const escape1 = `\\0${code.toString(8)}`;
+                        testCharPart(`'${escape1}'`, `'${escape1}'`, ch, false);
+                        testCharPart(`"${escape1}"`, `"${escape1}"`, ch, false);
+                        failCharPart(`'${escape1}'`, `'${escape1}'`, ch, true);
+                        failCharPart(`"${escape1}"`, `"${escape1}"`, ch, true);
+                    }
+                });
+
+                it("scans \\100 - \\377 (with possible leading zeroes)", () => {
+                    for (let code = 0o100; code <= 0o377; code++) {
+                        const ch = fromCodePoint(code);
+                        const escape0 = `\\${code.toString(8)}`;
+                        testCharPart(`'${escape0}'`, `'${escape0}'`, ch, false);
+                        testCharPart(`"${escape0}"`, `"${escape0}"`, ch, false);
+                        failCharPart(`'${escape0}'`, `'${escape0}'`, ch, true);
+                        failCharPart(`"${escape0}"`, `"${escape0}"`, ch, true);
+                    }
+                });
             });
         })();
 
@@ -543,6 +650,18 @@ describe("src/scanner/string", () => {
             line: 1, column: 4,
         });
 
-        // TODO
+        pass("should scan '\\u180E'", {
+            source: "'\u180E'",
+            value: "\u180E",
+            raw: "'\u180E'",
+            line: 1, column: 3,
+        });
+
+        pass("should scan \"\\u180E\"", {
+            source: "\"\u180E\"",
+            value: "\u180E",
+            raw: "\"\u180E\"",
+            line: 1, column: 3,
+        });
     });
 });

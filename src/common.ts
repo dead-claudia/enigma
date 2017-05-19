@@ -47,6 +47,9 @@ export interface Parser {
 
     tokenValue: any;
     tokenRaw: string;
+
+    // For the scanner to work around lack of multiple return.
+    lastChar: number;
 }
 
 /**
