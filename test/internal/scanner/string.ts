@@ -292,7 +292,7 @@ describe("src/scanner/string", () => {
                 testEscapedChar(Chars.RussianLowerЁ);
             });
 
-            context("scans ASCII control escapes", () => {
+            context("scans ASCII escapes", () => {
                 function getHex(code: number): string {
                     if (code < 0x10) return `0${code.toString(16)}`;
                     return code.toString(16);
