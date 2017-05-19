@@ -363,10 +363,7 @@ table[Chars.Caret] = parser => {
 table[Chars.Underscore] = scanKnownIdentifier;
 
 // ``string``
-table[Chars.Backtick] = (parser, context) => {
-    advanceOne(parser);
-    return scanTemplate(parser, context);
-};
+table[Chars.Backtick] = scanTemplate;
 
 // `a`...`z`
 for (let i = Chars.LowerA; i < Chars.LowerZ; i++) {

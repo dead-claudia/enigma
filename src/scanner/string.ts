@@ -278,43 +278,129 @@ export function scanString(parser: Parser, context: Context, quote: number): Tok
     return Token.StringLiteral;
 }
 
+// Fallback for looser template segment validation (no actual parsing).
+// It returns `ch` as negative iff the segment ends with `${`
+function scanBadTemplate(parser: Parser, ch: number): number {
+    while (ch !== Chars.Backtick) {
+        // Break after a literal `${` (thus the dedicated code path).
+        switch (ch) {
+            case Chars.Dollar: {
+                const index = parser.index + 1;
+                if (index < parser.source.length &&
+                        parser.source.charCodeAt(index) === Chars.LeftBrace) {
+                    parser.index = index;
+                    parser.column++;
+                    return -ch;
+                }
+                break;
+            }
+
+            case Chars.Backslash:
+                ch = readNext(parser, ch);
+                break;
+
+            case Chars.CarriageReturn:
+                if (hasNext(parser) && nextChar(parser) === Chars.LineFeed) {
+                    ch = nextChar(parser);
+                    parser.index++;
+                }
+                // falls through
+
+            case Chars.LineFeed: case Chars.LineSeparator: case Chars.ParagraphSeparator:
+                parser.column = -1;
+                parser.line++;
+                // falls through
+
+            default:
+                // do nothing
+        }
+
+        ch = readNext(parser, ch);
+    }
+
+    return ch;
+}
+
 /**
  * Scan a template section. It can start either from the quote or closing brace.
  */
-export function scanTemplate(parser: Parser, context: Context): Token {
+export function scanTemplate(parser: Parser, context: Context, first: number): Token {
     const {index: start, lastChar} = parser;
-    let token = Token.TemplateTail;
-    let ret = "";
+    let tail = true;
+    let ret: string | void = "";
 
-    let ch = readNext(parser, Chars.Backtick);
+    let ch = readNext(parser, first);
+
+    loop:
     while (ch !== Chars.Backtick) {
-        // Check for a literal `${` (thus the dedicated code path).
-        if (ch === Chars.Dollar) {
-            if (consumeOpt(parser, Chars.LeftBrace)) { token = Token.TemplateCont; break; }
-            ret += "$";
-        } else if (ch === Chars.Backslash) {
-            ch = readNext(parser, ch);
-
-            if (ch >= Constants.Size) {
-                ret += fromCodePoint(ch);
-            } else {
-                parser.lastChar = ch;
-                const code = table[ch](parser, context, ch);
-
-                if (code >= 0) ret += fromCodePoint(code);
-                else if (code !== Escape.Empty) ret += "undefined";
-                ch = parser.lastChar;
+        const {index, line, column} = parser;
+        switch (ch) {
+            // Break after a literal `${` (thus the dedicated code path).
+            case Chars.Dollar: {
+                const index = parser.index + 1;
+                if (index < parser.source.length &&
+                        parser.source.charCodeAt(index) === Chars.LeftBrace) {
+                    parser.index = index;
+                    parser.column++;
+                    tail = false;
+                    break loop;
+                }
+                ret += "$";
+                break;
             }
-        } else {
-            ret += fromCodePoint(ch);
+
+            case Chars.Backslash:
+                ch = readNext(parser, ch);
+
+                if (ch >= Constants.Size) {
+                    ret += fromCodePoint(ch);
+                } else {
+                    parser.lastChar = ch;
+                    const code = table[ch](parser, context, ch);
+
+                    if (code >= 0) {
+                        ret += fromCodePoint(code);
+                    } else if (code !== Escape.Empty && context & Context.TaggedTemplate) {
+                        ret = undefined;
+                        ch = scanBadTemplate(parser, parser.lastChar);
+                        if (ch < 0) { ch = -ch; tail = false; }
+                        break loop;
+                    } else {
+                        handleStringError(parser, code as Escape, index, line, column);
+                    }
+                    ch = parser.lastChar;
+                }
+
+                break;
+
+            case Chars.CarriageReturn:
+                if (hasNext(parser) && nextChar(parser) === Chars.LineFeed) {
+                    if (ret != null) ret += fromCodePoint(ch);
+                    ch = nextChar(parser);
+                    parser.index++;
+                }
+                // falls through
+
+            case Chars.LineFeed: case Chars.LineSeparator: case Chars.ParagraphSeparator:
+                parser.column = -1;
+                parser.line++;
+                // falls through
+
+            default:
+                if (ret != null) ret += fromCodePoint(ch);
         }
 
         ch = readNext(parser, ch);
     }
 
     advance(parser, ch); // Consume the quote or opening brace
-    storeRaw(parser, start);
     parser.tokenValue = ret;
     parser.lastChar = lastChar;
-    return token;
+    if (tail) {
+        parser.tokenRaw = parser.source.slice(start + 1, parser.index - 1);
+        return Token.TemplateTail;
+    } else {
+        parser.tokenRaw = parser.source.slice(start + 1, parser.index - 2);
+        return Token.TemplateCont;
+    }
 }

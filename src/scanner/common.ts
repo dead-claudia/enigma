@@ -52,9 +52,7 @@ export function consumeAny(parser: Parser) {
 }
 
 export function consumeOpt(parser: Parser, code: number) {
-    const hi = parser.source.charCodeAt(parser.index);
-
-    if (hi !== code) return false;
+    if (parser.source.charCodeAt(parser.index) !== code) return false;
     parser.index++;
     parser.column++;
     return true;

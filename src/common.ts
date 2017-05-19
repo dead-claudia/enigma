@@ -17,6 +17,7 @@ export const enum Context {
     Module = 1 << 9,
 
     ExpressionStart = 1 << 10,
+    TaggedTemplate  = 1 << 11,
 }
 
 /**
