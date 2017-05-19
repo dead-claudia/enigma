@@ -1,7 +1,7 @@
 import {generate, GenerateOpts} from "../../scripts/unicode-generate";
 import {expect} from "chai";
 
-describe("scripts/unicode-generate", () => {
+describe("(slow) scripts/unicode-generate", () => {
     const methods = {
         empty: [() => []],
         singleItem: [() => [1]],

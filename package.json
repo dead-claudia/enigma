@@ -4,8 +4,9 @@
   "description": "A very fast, stable parser",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc src/*.ts --outDir dest",
-    "test": "mocha test/specs"
+    "build": "tsc src/*.ts --outDir dist",
+    "test": "mocha",
+    "test:fast": "mocha --grep '\\(slow\\)' --invert"
   },
   "author": "Isiah Meadows",
   "license": "ISC",

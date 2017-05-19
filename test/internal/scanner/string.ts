@@ -330,7 +330,7 @@ describe("src/scanner/string", () => {
                     return `\\u${code.toString(16)}`;
                 }
 
-                for (let i = 0; i <= 0xff; i++) {
+                for (let i = 0; i < 4; i++) {
                     const start = i << 8;
                     const end = start | 0xff;
 
@@ -338,6 +338,23 @@ describe("src/scanner/string", () => {
                     const endStr = readEscape(end);
 
                     it(`scans ${startStr} - ${endStr}`, () => {
+                        for (let code = start; code < end; code++) {
+                            const ch = String.fromCharCode(code);
+                            const escape = readEscape(code);
+                            testCharPart(`'${escape}'`, `'${escape}'`, ch);
+                            testCharPart(`"${escape}"`, `"${escape}"`, ch);
+                        }
+                    });
+                }
+
+                for (let i = 4; i <= 0xff; i++) {
+                    const start = i << 8;
+                    const end = start | 0xff;
+
+                    const startStr = readEscape(start);
+                    const endStr = readEscape(end);
+
+                    it(`(slow) scans ${startStr} - ${endStr}`, () => {
                         for (let code = start; code < end; code++) {
                             const ch = String.fromCharCode(code);
                             const escape = readEscape(code);
@@ -397,7 +414,33 @@ describe("src/scanner/string", () => {
             });
 
             context("Unicode brace escapes", () => {
-                for (let i = 0; i <= 0x10f; i++) {
+                for (let i = 0; i < 0x10c; i++) {
+                    const start = i << 8;
+                    const end = start | 0xff;
+
+                    const startStr = `\\u{${start.toString(16)}}`;
+                    const endStr = `\\u{${end.toString(16)}}`;
+
+                    it(`(slow) scans ${startStr} - ${endStr}`, function () {
+                        this.slow(150);
+                        for (let code = start; code <= end; code++) {
+                            const ch = fromCodePoint(code);
+                            const escape = `\\u{${code.toString(16)}}`;
+                            testCharPart(`'${escape}'`, `'${escape}'`, ch);
+                            testCharPart(`"${escape}"`, `"${escape}"`, ch);
+
+                            const extra0 = `\\u{0${code.toString(16)}}`;
+                            testCharPart(`'${extra0}'`, `'${extra0}'`, ch);
+                            testCharPart(`"${extra0}"`, `"${extra0}"`, ch);
+
+                            const extra000 = `\\u{000${code.toString(16)}}`;
+                            testCharPart(`'${extra000}'`, `'${extra000}'`, ch);
+                            testCharPart(`"${extra000}"`, `"${extra000}"`, ch);
+                        }
+                    });
+                }
+
+                for (let i = 0x10c; i <= 0x10f; i++) {
                     const start = i << 8;
                     const end = start | 0xff;
 
@@ -1074,7 +1117,7 @@ describe("src/scanner/string", () => {
                     return `\\u${code.toString(16)}`;
                 }
 
-                for (let i = 0; i <= 0xff; i++) {
+                for (let i = 0; i < 4; i++) {
                     const start = i << 8;
                     const end = start | 0xff;
 
@@ -1082,6 +1125,23 @@ describe("src/scanner/string", () => {
                     const endStr = readEscape(end);
 
                     it(`scans ${startStr} - ${endStr}`, () => {
+                        for (let code = start; code < end; code++) {
+                            const ch = String.fromCharCode(code);
+                            const escape = readEscape(code);
+                            testCharPart(`\`${escape}\``, `\`${escape}\``, ch, escape);
+                            testCharPart(`\`${escape}\${`, `\`${escape}\${`, ch, escape);
+                        }
+                    });
+                }
+
+                for (let i = 4; i <= 0xff; i++) {
+                    const start = i << 8;
+                    const end = start | 0xff;
+
+                    const startStr = readEscape(start);
+                    const endStr = readEscape(end);
+
+                    it(`(slow) scans ${startStr} - ${endStr}`, () => {
                         for (let code = start; code < end; code++) {
                             const ch = String.fromCharCode(code);
                             const escape = readEscape(code);
@@ -1269,7 +1329,33 @@ describe("src/scanner/string", () => {
             });
 
             context("Unicode brace escapes", () => {
-                for (let i = 0; i <= 0x10f; i++) {
+                for (let i = 0; i < 0x10c; i++) {
+                    const start = i << 8;
+                    const end = start | 0xff;
+
+                    const startStr = `\\u{${start.toString(16)}}`;
+                    const endStr = `\\u{${end.toString(16)}}`;
+
+                    it(`(slow) scans ${startStr} - ${endStr}`, function () {
+                        this.slow(100);
+                        for (let code = start; code <= end; code++) {
+                            const ch = fromCodePoint(code);
+                            const escape = `\\u{${code.toString(16)}}`;
+                            testCharPart(`\`${escape}\``, `\`${escape}\``, ch, escape);
+                            testCharPart(`\`${escape}\${`, `\`${escape}\${`, ch, escape);
+
+                            const extra0 = `\\u{0${code.toString(16)}}`;
+                            testCharPart(`\`${extra0}\``, `\`${extra0}\``, ch, extra0);
+                            testCharPart(`\`${extra0}\${`, `\`${extra0}\${`, ch, extra0);
+
+                            const extra000 = `\\u{000${code.toString(16)}}`;
+                            testCharPart(`\`${extra000}\``, `\`${extra000}\``, ch, extra000);
+                            testCharPart(`\`${extra000}\${`, `\`${extra000}\${`, ch, extra000);
+                        }
+                    });
+                }
+
+                for (let i = 0x10c; i <= 0x10f; i++) {
                     const start = i << 8;
                     const end = start | 0xff;
 
