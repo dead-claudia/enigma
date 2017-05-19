@@ -101,9 +101,10 @@ table[Chars.Three] = (parser, context, first) => {
         const next = parser.source.charCodeAt(index);
 
         if (next < Chars.Zero || next > Chars.Seven) {
-            // Verify that it's `\0` and not `\1`, `\2`, or `\3` if we're in strict mode.
+            // Verify that it's `\0` if we're in strict mode.
             if (code !== 0 && context & Context.Strict) return Escape.StrictOctal;
         } else if (context & Context.Strict) {
+            // This happens in cases like `\00` in strict mode.
             return Escape.StrictOctal;
         } else {
             parser.lastChar = next;
