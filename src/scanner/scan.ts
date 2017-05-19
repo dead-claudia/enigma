@@ -410,3 +410,11 @@ export function scan(parser: Parser, context: Context): Token {
     if (first < Constants.Size) return table[first](parser, context, first);
     return scanMaybeIdentifier(parser, context);
 }
+
+export function scanTemplateNext(parser: Parser, context: Context): Token {
+    if (!hasNext(parser)) return report(parser, Errors.unterminatedString());
+    // Rewind it so the template parser can consume the closing `}`
+    parser.index--;
+    parser.column--;
+    return scanTemplate(parser, context, Chars.RightBrace);
+}
