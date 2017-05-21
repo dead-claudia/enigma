@@ -36,20 +36,25 @@ export function parseBody(parser: Parser, context: Context): ESTree.Statement[] 
     seek(parser, context);
     if (!hasNext(parser)) return [];
 
-    // Preparse for directives, so we can set strict mode while still verifying
-    // the other directives are still valid.
-    let directive = scanDirective(parser, context);
+    // Avoid this if we're already in strict mode, to speed things up. This is likely to be the case
+    // if we're not at the top level, considering the prevalence of strict mode and the fact modules
+    // are already in strict mode.
+    if (!(context & Context.Strict)) {
+        // Preparse for directives, so we can set strict mode while still verifying
+        // the other directives are still valid.
+        let directive = scanDirective(parser, context);
 
-    if (directive === Directive.Strict) {
-        context |= Context.Strict;
-    } else if (directive === Directive.Other) {
-        while (consumeDirectiveSemicolon(parser, context) && hasNext(parser)) {
-            directive = scanDirective(parser, context);
+        if (directive === Directive.Strict) {
+            context |= Context.Strict;
+        } else if (directive === Directive.Other) {
+            while (consumeDirectiveSemicolon(parser, context) && hasNext(parser)) {
+                directive = scanDirective(parser, context);
 
-            if (directive === Directive.None) break;
-            if (directive === Directive.Strict) {
-                context |= Context.Strict;
-                break;
+                if (directive === Directive.None) break;
+                if (directive === Directive.Strict) {
+                    context |= Context.Strict;
+                    break;
+                }
             }
         }
     }
