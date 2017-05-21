@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Statements - `with`", () => {
-
-    it("should handle With statement", () => {
-        expect(parseScript(`with(1);`)).to.eql({
+    it("should parse \"with(1);\"", () => {
+        assert.match<Program>(parseScript(`with(1);`), {
             body: [
                 {
                     body: {
@@ -20,8 +20,10 @@ describe.skip("Statements - `with`", () => {
             sourceType: "script",
             type: "Program",
         });
+    });
 
-        expect(parseScript(`with (x) foo`)).to.eql({
+    it("should parse \"with (x) foo\"", () => {
+        assert.match<Program>(parseScript(`with (x) foo`), {
             body: [
                 {
                     body: {
@@ -41,8 +43,10 @@ describe.skip("Statements - `with`", () => {
             sourceType: "script",
             type: "Program",
         });
+    });
 
-        expect(parseScript(`with (x) foo;`)).to.eql({
+    it("should parse \"with (x) foo;\"", () => {
+        assert.match<Program>(parseScript(`with (x) foo;`), {
             body: [
                 {
                     body: {
@@ -62,8 +66,10 @@ describe.skip("Statements - `with`", () => {
             sourceType: "script",
             type: "Program",
         });
+    });
 
-        expect(parseScript(`with (x) { foo = bar }`)).to.eql({
+    it("should parse \"with (x) { foo = bar }\"", () => {
+        assert.match<Program>(parseScript(`with (x) { foo = bar }`), {
             type: "Program",
             body: [
                 {

@@ -1,20 +1,21 @@
-import { parseScript, parseModule } from "../../../src";
-import {expect} from "chai";
+import {parseScript, parseModule} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2015 - Unicode Escapes", () => {
 
     it("should fail", () => {
-        expect(() => { parseScript("x\\"); }).to.throw();
-        expect(() => { parseScript("x\\u005c"); }).to.throw();
-        expect(() => { parseScript("x\\u002a"); }).to.throw();
-        expect(() => { parseScript("var x = /[a-z]/\\ux"); }).to.throw();
-        expect(() => { parseScript("/test"); }).to.throw();
-        expect(() => { parseScript("\uD83B\uDE00"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("x\\"); });
+        assert.throws(SyntaxError, () => { parseScript("x\\u005c"); });
+        assert.throws(SyntaxError, () => { parseScript("x\\u002a"); });
+        assert.throws(SyntaxError, () => { parseScript("var x = /[a-z]/\\ux"); });
+        assert.throws(SyntaxError, () => { parseScript("/test"); });
+        assert.throws(SyntaxError, () => { parseScript("\uD83B\uDE00"); });
     });
 
     it("should parse \"\u{1EE00}\"", () => {
 
-        expect(parseScript("\u{1EE00}")).to.eql({
+        assert.match<Program>(parseScript("\u{1EE00}"), {
             type: "Program",
             body: [
                 {
@@ -31,7 +32,7 @@ describe.skip("ES2015 - Unicode Escapes", () => {
 
     it("should parse \"var 𞸀\"", () => {
 
-        expect(parseScript("var 𞸀")).to.eql({
+        assert.match<Program>(parseScript("var 𞸀"), {
             type: "Program",
             body: [
                 {
@@ -55,7 +56,7 @@ describe.skip("ES2015 - Unicode Escapes", () => {
 
     it("should pass", () => {
 
-        expect(parseScript("var \u{41};")).to.eql({
+        assert.match<Program>(parseScript("var \u{41};"), {
             body: [
                 {
                     declarations: [
@@ -76,7 +77,7 @@ describe.skip("ES2015 - Unicode Escapes", () => {
             type: "Program",
         });
 
-        expect(parseScript("\"\u{20BB7}\u{10FFFF}\u{1}\";")).to.eql({
+        assert.match<Program>(parseScript("\"\u{20BB7}\u{10FFFF}\u{1}\";"), {
             body: [
                 {
                     expression: {
@@ -90,7 +91,7 @@ describe.skip("ES2015 - Unicode Escapes", () => {
             type: "Program",
         });
 
-        expect(parseScript("\"y\uD83D\uDE80x\"")).to.eql({
+        assert.match<Program>(parseScript("\"y\uD83D\uDE80x\""), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -104,7 +105,7 @@ describe.skip("ES2015 - Unicode Escapes", () => {
             ],
         });
 
-        expect(parseScript("\"x\uD83D\uDE80y\"")).to.eql({
+        assert.match<Program>(parseScript("\"x\uD83D\uDE80y\""), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -118,7 +119,7 @@ describe.skip("ES2015 - Unicode Escapes", () => {
             ],
         });
 
-        expect(parseScript("\"/\u{1D306}/u\"")).to.eql({
+        assert.match<Program>(parseScript("\"/\u{1D306}/u\""), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -132,7 +133,7 @@ describe.skip("ES2015 - Unicode Escapes", () => {
             ],
         });
 
-        expect(parseScript("\"/\u{1D306}/u\"")).to.eql({
+        assert.match<Program>(parseScript("\"/\u{1D306}/u\""), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -146,7 +147,7 @@ describe.skip("ES2015 - Unicode Escapes", () => {
             ],
         });
 
-        expect(parseScript("\"\uD842\uDFB7\"")).to.eql({
+        assert.match<Program>(parseScript("\"\uD842\uDFB7\""), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -160,7 +161,7 @@ describe.skip("ES2015 - Unicode Escapes", () => {
             ],
         });
 
-        expect(parseScript("var source = \"\u{714E}\u{8336}\";")).to.eql({
+        assert.match<Program>(parseScript("var source = \"\u{714E}\u{8336}\";"), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -184,7 +185,7 @@ describe.skip("ES2015 - Unicode Escapes", () => {
             ],
         });
 
-        expect(parseScript("var source = \"\u{20BB7}\u{91CE}\u{5BB6}\";")).to.eql({
+        assert.match<Program>(parseScript("var source = \"\u{20BB7}\u{91CE}\u{5BB6}\";"), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -208,7 +209,7 @@ describe.skip("ES2015 - Unicode Escapes", () => {
             ],
         });
 
-        expect(parseScript("var source = \"\u{00000000034}\";")).to.eql({
+        assert.match<Program>(parseScript("var source = \"\u{00000000034}\";"), {
             type: "Program",
             sourceType: "script",
             body: [

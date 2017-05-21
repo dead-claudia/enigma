@@ -1,77 +1,77 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Multiplication", () => {
-
     it("should parse \"x * y\"", () => {
-        expect(parseScript("x * y")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ExpressionStatement",
-            expression: {
-                type: "BinaryExpression",
-                operator: "*",
-                left: {
-                    type: "Identifier",
-                    name: "x",
+        assert.match<Program>(parseScript("x * y"), {
+            type: "Program",
+            body: [
+                {
+                    type: "ExpressionStatement",
+                    expression: {
+                        type: "BinaryExpression",
+                        operator: "*",
+                        left: {
+                            type: "Identifier",
+                            name: "x",
+                        },
+                        right: {
+                            type: "Identifier",
+                            name: "y",
+                        },
+                    },
                 },
-                right: {
-                    type: "Identifier",
-                    name: "y",
-                },
-            },
-        },
-    ],
-    sourceType: "script",
-});
+            ],
+            sourceType: "script",
+        });
     });
 
     it("should parse \"x / y\"", () => {
-        expect(parseScript("x / y")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ExpressionStatement",
-            expression: {
-                type: "BinaryExpression",
-                operator: "/",
-                left: {
-                    type: "Identifier",
-                    name: "x",
+        assert.match<Program>(parseScript("x / y"), {
+            type: "Program",
+            body: [
+                {
+                    type: "ExpressionStatement",
+                    expression: {
+                        type: "BinaryExpression",
+                        operator: "/",
+                        left: {
+                            type: "Identifier",
+                            name: "x",
+                        },
+                        right: {
+                            type: "Identifier",
+                            name: "y",
+                        },
+                    },
                 },
-                right: {
-                    type: "Identifier",
-                    name: "y",
-                },
-            },
-        },
-    ],
-    sourceType: "script",
-});
-   });
+            ],
+            sourceType: "script",
+        });
+    });
 
     it("should parse \"x % y\"", () => {
-        expect(parseScript("x % y")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ExpressionStatement",
-            expression: {
-                type: "BinaryExpression",
-                operator: "%",
-                left: {
-                    type: "Identifier",
-                    name: "x",
+        assert.match<Program>(parseScript("x % y"), {
+            type: "Program",
+            body: [
+                {
+                    type: "ExpressionStatement",
+                    expression: {
+                        type: "BinaryExpression",
+                        operator: "%",
+                        left: {
+                            type: "Identifier",
+                            name: "x",
+                        },
+                        right: {
+                            type: "Identifier",
+                            name: "y",
+                        },
+                    },
                 },
-                right: {
-                    type: "Identifier",
-                    name: "y",
-                },
-            },
-        },
-    ],
-    sourceType: "script",
-});
-   });
+            ],
+            sourceType: "script",
+        });
+    });
 });

@@ -1,9 +1,11 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
+
 describe.skip("Expressions - Primary", () => {
     describe("Array", () => {
         it("should parse x = []", () => {
-            expect(parseScript("x = []")).to.eql({
+            assert.match<Program>(parseScript("x = []"), {
                 type: "Program",
                 body: [
                     {
@@ -25,8 +27,9 @@ describe.skip("Expressions - Primary", () => {
                 sourceType: "script",
             });
         });
+
         it("should parse x = [ ]", () => {
-            expect(parseScript("x = [ ]")).to.eql({
+            assert.match<Program>(parseScript("x = [ ]"), {
                 type: "Program",
                 body: [
                     {
@@ -48,8 +51,9 @@ describe.skip("Expressions - Primary", () => {
                 sourceType: "script",
             });
         });
+
         it("should parse x = [ 42 ]", () => {
-            expect(parseScript("x = [ 42 ]")).to.eql({
+            assert.match<Program>(parseScript("x = [ 42 ]"), {
                 type: "Program",
                 body: [
                     {
@@ -78,7 +82,7 @@ describe.skip("Expressions - Primary", () => {
         });
 
         it("should parse x = [ ,, 42 ]", () => {
-            expect(parseScript("x = [ ,, 42 ]")).to.eql({
+            assert.match<Program>(parseScript("x = [ ,, 42 ]"), {
                 type: "Program",
                 body: [
                     {
@@ -109,7 +113,7 @@ describe.skip("Expressions - Primary", () => {
         });
 
         it("should parse 日本語 = []", () => {
-            expect(parseScript("日本語 = []")).to.eql({
+            assert.match<Program>(parseScript("日本語 = []"), {
                 type: "Program",
                 body: [
                     {
@@ -133,7 +137,7 @@ describe.skip("Expressions - Primary", () => {
         });
 
         it("should parse \"var source = T\u203F = []", () => {
-            expect(parseScript("var source = \"T\u203F = []\";")).to.eql({
+            assert.match<Program>(parseScript("var source = \"T\u203F = []\";"), {
                 type: "Program",
                 body: [
                     {
@@ -161,7 +165,7 @@ describe.skip("Expressions - Primary", () => {
     });
     describe("Keywords", () => {
         it("should parse ++x", () => {
-            expect(parseScript("++x")).to.eql({
+            assert.match<Program>(parseScript("++x"), {
                 type: "Program",
                 body: [
                     {
@@ -184,7 +188,7 @@ describe.skip("Expressions - Primary", () => {
     describe("Literal", () => {
         describe("string", () => {
             it("should parse \"Hello\"", () => {
-                expect(parseScript("\"Hello\"")).to.eql({
+                assert.match<Program>(parseScript("\"Hello\""), {
                     type: "Program",
                     body: [
                         {
@@ -200,9 +204,9 @@ describe.skip("Expressions - Primary", () => {
                     sourceType: "script",
                 });
             });
-            it("should parse \"HelloWorld\"", () => {
-                expect(parseScript(`"Hello\
-world"`)).to.eql({
+
+            it("should parse \"Hello\\\\nWorld\"", () => {
+                assert.match<Program>(parseScript(`"Hello\nworld"`), {
                     type: "Program",
                     body: [
                         {
@@ -218,9 +222,10 @@ world"`)).to.eql({
                 });
             });
         });
+
         describe("Numeric", () => {
             it("should parse 0", () => {
-                expect(parseScript("0")).to.eql({
+                assert.match<Program>(parseScript("0"), {
                     type: "Program",
                     body: [
                         {
@@ -234,8 +239,9 @@ world"`)).to.eql({
                     sourceType: "script",
                 });
             });
+
             it("should parse 42", () => {
-                expect(parseScript("42")).to.eql({
+                assert.match<Program>(parseScript("42"), {
                     type: "Program",
                     body: [
                         {
@@ -249,8 +255,9 @@ world"`)).to.eql({
                     sourceType: "script",
                 });
             });
+
             it("should parse 1.492417830e-10", () => {
-                expect(parseScript("1.492417830e-10")).to.eql({
+                assert.match<Program>(parseScript("1.492417830e-10"), {
                     type: "Program",
                     body: [
                         {
@@ -264,8 +271,9 @@ world"`)).to.eql({
                     sourceType: "script",
                 });
             });
+
             it("should parse .14", () => {
-                expect(parseScript(".14")).to.eql({
+                assert.match<Program>(parseScript(".14"), {
                     type: "Program",
                     body: [
                         {

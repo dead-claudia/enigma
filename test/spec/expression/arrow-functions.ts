@@ -1,12 +1,11 @@
 import { parseModule, parseScript } from "../../../src";
-import {expect} from "chai";
+import {Program, Pattern, ArrayPattern} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Arrow Functions", () => {
-
     describe("Array binding pattern", () => {
-
         it("should parse \"([a]) => [0];\"", () => {
-            expect(parseScript("([a]) => [0];")).to.eql({
+            assert.match<Program>(parseScript("([a]) => [0];"), {
                 type: "Program",
                 body: [
                     {
@@ -45,7 +44,7 @@ describe.skip("Expressions - Arrow Functions", () => {
         });
 
         it("should parse \"([a,b])=>0;\"", () => {
-            expect(parseScript("([a,b])=>0;")).to.eql({
+            assert.match<Program>(parseScript("([a,b])=>0;"), {
                 type: "Program",
                 body: [
                     {
@@ -83,7 +82,7 @@ describe.skip("Expressions - Arrow Functions", () => {
         });
 
         it("should parse \"([a,...b])=>0;\"", () => {
-            expect(parseScript("([a,...b])=>0;")).to.eql({
+            assert.match<Program>(parseScript("([a,...b])=>0;"), {
                 type: "Program",
                 body: [
                     {
@@ -124,7 +123,7 @@ describe.skip("Expressions - Arrow Functions", () => {
         });
 
         it("should parse \"([])=>0;\"", () => {
-            expect(parseScript("([])=>0;")).to.eql({
+            assert.match<Program>(parseScript("([])=>0;"), {
                 type: "Program",
                 body: [
                     {
@@ -153,7 +152,7 @@ describe.skip("Expressions - Arrow Functions", () => {
         });
 
         it("should parse \"([,,])=>0\"", () => {
-            expect(parseScript("([,,])=>0")).to.eql({
+            assert.match<Program>(parseScript("([,,])=>0"), {
                 type: "Program",
                 body: [
                     {
@@ -187,63 +186,71 @@ describe.skip("Expressions - Arrow Functions", () => {
 
     describe("Object binding pattern", () => {
 
-        it("should parse \"({a,b=b,a:c,[a]:[d]})=>0;\"", () => {
-            const array = (elem: any) => ({type: "ArrayPattern", elements: [elem]});
-            expect(parseScript("([[[[[[[[[[[[[[[[[[[[{a=b}]]]]]]]]]]]]]]]]]]]])=>0;")).to.eql({
-                type: "Program",
-                body: [
-                    {
-                        type: "ExpressionStatement",
-                        expression: {
-                            type: "ArrowFunctionExpression",
-                            id: null,
-                            params: [
-                                array(array(array(array(array(array(array(array(array(array(
-                                    array(array(array(array(array(array(array(array(array(array({
-                                        type: "ObjectPattern",
-                                        properties: [
-                                            {
-                                                type: "Property",
-                                                key: {
-                                                    type: "Identifier",
-                                                    name: "a",
-                                                },
-                                                computed: false,
-                                                value: {
-                                                    type: "AssignmentPattern",
-                                                    left: {
-                                                        type: "Identifier",
-                                                        name: "a",
+        it("should parse \"([[[[[[[[[[[[[[[[[[[[{a=b}]]]]]]]]]]]]]]]]]]]])=>0;\"", () => {
+            function array(elem: Pattern): ArrayPattern {
+                return {type: "ArrayPattern", elements: [elem]};
+            }
+
+            assert.match<Program>(
+                parseScript("([[[[[[[[[[[[[[[[[[[[{a=b}]]]]]]]]]]]]]]]]]]]])=>0;"),
+                {
+                    type: "Program",
+                    body: [
+                        {
+                            type: "ExpressionStatement",
+                            expression: {
+                                type: "ArrowFunctionExpression",
+                                id: null,
+                                params: [
+                                    array(array(array(array(array(array(array(
+                                        array(array(array(array(array(array(array(
+                                            array(array(array(array(array(array({
+                                                type: "ObjectPattern",
+                                                properties: [
+                                                    {
+                                                        type: "Property",
+                                                        key: {
+                                                            type: "Identifier",
+                                                            name: "a",
+                                                        },
+                                                        computed: false,
+                                                        value: {
+                                                            type: "AssignmentPattern",
+                                                            left: {
+                                                                type: "Identifier",
+                                                                name: "a",
+                                                            },
+                                                            right: {
+                                                                type: "Identifier",
+                                                                name: "b",
+                                                            },
+                                                        },
+                                                        kind: "init",
+                                                        method: false,
+                                                        shorthand: true,
                                                     },
-                                                    right: {
-                                                        type: "Identifier",
-                                                        name: "b",
-                                                    },
-                                                },
-                                                kind: "init",
-                                                method: false,
-                                                shorthand: true,
-                                            },
-                                        ],
-                                    })))))))))),
-                                )))))))))),
-                            ],
-                            body: {
-                                type: "Literal",
-                                value: 0,
+                                                ],
+                                            })))))),
+                                        ))))))),
+                                    ))))))),
+                                ],
+                                body: {
+                                    type: "Literal",
+                                    value: 0,
+                                },
+                                generator: false,
+                                expression: true,
+                                async: false,
                             },
-                            generator: false,
-                            expression: true,
-                            async: false,
                         },
-                    },
-                ],
-                sourceType: "script",
-            });
+                    ],
+                    sourceType: "script",
+                },
+            );
         });
 
         it("should parse \"({a,b=b,a:c,[a]:[d]})=>0;\"", () => {
-            expect(parseScript("({a,b=b,a:c,[a]:[d]})=>0;")).to.eql({
+            assert.match<Program>(parseScript("({a,b=b,a:c,[a]:[d]})=>0;"), {
                 type: "Program",
                 body: [
                     {
@@ -345,7 +352,7 @@ describe.skip("Expressions - Arrow Functions", () => {
         });
 
         it("should parse \"({})=>0;\"", () => {
-            expect(parseScript("({})=>0;")).to.eql({
+            assert.match<Program>(parseScript("({})=>0;"), {
                 type: "Program",
                 body: [
                     {
@@ -375,7 +382,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"({x = 0}, {y = 0}, {z = 0})=>0\"", () => {
-        expect(parseScript("({x = 0}, {y = 0}, {z = 0})=>0")).to.eql({
+        assert.match<Program>(parseScript("({x = 0}, {y = 0}, {z = 0})=>0"), {
             type: "Program",
             body: [
                 {
@@ -481,7 +488,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(a, {x = 0})=>0\"", () => {
-        expect(parseScript("(a, {x = 0})=>0")).to.eql({
+        assert.match<Program>(parseScript("(a, {x = 0})=>0"), {
             type: "Program",
             body: [
                 {
@@ -537,7 +544,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse arrow with multiple arguments and rest", () => {
-        expect(parseScript("(a,b,...c) => 0;")).to.eql({
+        assert.match<Program>(parseScript("(a,b,...c) => 0;"), {
             type: "Program",
             body: [
                 {
@@ -577,7 +584,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse arrow with only rest", () => {
-        expect(parseScript("(...a) => 0")).to.eql({
+        assert.match<Program>(parseScript("(...a) => 0"), {
             type: "Program",
             body: [
                 {
@@ -609,7 +616,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse arrow concise body in", () => {
-        expect(parseScript("for (() => { x in y };;);")).to.eql({
+        assert.match<Program>(parseScript("for (() => { x in y };;);"), {
             type: "Program",
             body: [
                 {
@@ -654,7 +661,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"() => \"test\"\"", () => {
-        expect(parseScript("() => \"test\"")).to.eql({
+        assert.match<Program>(parseScript("() => \"test\""), {
             type: "Program",
             body: [
                 {
@@ -678,7 +685,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"e => \"test\"\"", () => {
-        expect(parseScript("e => \"test\"")).to.eql({
+        assert.match<Program>(parseScript("e => \"test\""), {
             type: "Program",
             body: [
                 {
@@ -707,7 +714,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(e) => \"test\"\"", () => {
-        expect(parseScript("(e) => \"test\"")).to.eql({
+        assert.match<Program>(parseScript("(e) => \"test\""), {
             type: "Program",
             body: [
                 {
@@ -736,7 +743,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(a, b) => \"test\"\"", () => {
-        expect(parseScript("(a, b) => \"test\"")).to.eql({
+        assert.match<Program>(parseScript("(a, b) => \"test\""), {
             type: "Program",
             body: [
                 {
@@ -769,7 +776,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"e => { 42; }\"", () => {
-        expect(parseScript("e => { 42; }")).to.eql({
+        assert.match<Program>(parseScript("e => { 42; }"), {
             type: "Program",
             body: [
                 {
@@ -806,7 +813,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"e => { label: 42 }\"", () => {
-        expect(parseScript("e => { label: 42 }")).to.eql({
+        assert.match<Program>(parseScript("e => { label: 42 }"), {
             type: "Program",
             body: [
                 {
@@ -850,7 +857,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(a, b) => { 42; }\"", () => {
-        expect(parseScript("(a, b) => { 42; }")).to.eql({
+        assert.match<Program>(parseScript("(a, b) => { 42; }"), {
             type: "Program",
             body: [
                 {
@@ -891,7 +898,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(x=1) => x * x\"", () => {
-        expect(parseScript("(x=1) => x * x")).to.eql({
+        assert.match<Program>(parseScript("(x=1) => x * x"), {
             type: "Program",
             body: [
                 {
@@ -935,7 +942,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"eval => 42\"", () => {
-        expect(parseScript("eval => 42")).to.eql({
+        assert.match<Program>(parseScript("eval => 42"), {
             type: "Program",
             body: [
                 {
@@ -964,7 +971,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"arguments => 42\"", () => {
-        expect(parseScript("arguments => 42")).to.eql({
+        assert.match<Program>(parseScript("arguments => 42"), {
             type: "Program",
             body: [
                 {
@@ -993,7 +1000,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(a) => 00\"", () => {
-        expect(parseScript("(a) => 00")).to.eql({
+        assert.match<Program>(parseScript("(a) => 00"), {
             type: "Program",
             body: [
                 {
@@ -1022,7 +1029,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(eval, a) => 42\"", () => {
-        expect(parseScript("(eval, a) => 42")).to.eql({
+        assert.match<Program>(parseScript("(eval, a) => 42"), {
             type: "Program",
             body: [
                 {
@@ -1055,7 +1062,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(eval = 10) => 42\"", () => {
-        expect(parseScript("(eval = 10) => 42")).to.eql({
+        assert.match<Program>(parseScript("(eval = 10) => 42"), {
             type: "Program",
             body: [
                 {
@@ -1091,7 +1098,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(eval, a = 10) => 42\"", () => {
-        expect(parseScript("(eval, a = 10) => 42")).to.eql({
+        assert.match<Program>(parseScript("(eval, a = 10) => 42"), {
             type: "Program",
             body: [
                 {
@@ -1131,7 +1138,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(x => x)\"", () => {
-        expect(parseScript("(x => x)")).to.eql({
+        assert.match<Program>(parseScript("(x => x)"), {
             type: "Program",
             body: [
                 {
@@ -1160,7 +1167,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"x => y => 42\"", () => {
-        expect(parseScript("x => y => 42")).to.eql({
+        assert.match<Program>(parseScript("x => y => 42"), {
             type: "Program",
             body: [
                 {
@@ -1202,7 +1209,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(x) => ((y, z) => (x, y, z))\"", () => {
-        expect(parseScript("(x) => ((y, z) => (x, y, z))")).to.eql({
+        assert.match<Program>(parseScript("(x) => ((y, z) => (x, y, z))"), {
             type: "Program",
             body: [
                 {
@@ -1261,7 +1268,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"foo(() => {})\"", () => {
-        expect(parseScript("foo(() => {})")).to.eql({
+        assert.match<Program>(parseScript("foo(() => {})"), {
             type: "Program",
             body: [
                 {
@@ -1294,7 +1301,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"foo((x, y) => {})\"", () => {
-        expect(parseScript("foo((x, y) => {})")).to.eql({
+        assert.match<Program>(parseScript("foo((x, y) => {})"), {
             type: "Program",
             body: [
                 {
@@ -1336,7 +1343,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(sun) => earth\"", () => {
-        expect(parseScript("(sun) => earth")).to.eql({
+        assert.match<Program>(parseScript("(sun) => earth"), {
             type: "Program",
             body: [
                 {
@@ -1365,7 +1372,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(...[]) => 0\"", () => {
-        expect(parseScript("(...[]) => 0")).to.eql({
+        assert.match<Program>(parseScript("(...[]) => 0"), {
             type: "Program",
             body: [
                 {
@@ -1397,7 +1404,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(a, ...[]) => 0\"", () => {
-        expect(parseScript("(a, ...[]) => 0")).to.eql({
+        assert.match<Program>(parseScript("(a, ...[]) => 0"), {
             type: "Program",
             body: [
                 {
@@ -1433,7 +1440,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"() => () => 0\"", () => {
-        expect(parseScript("() => () => 0")).to.eql({
+        assert.match<Program>(parseScript("() => () => 0"), {
             type: "Program",
             body: [
                 {
@@ -1465,7 +1472,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"() => 0, 1\"", () => {
-        expect(parseScript("() => 0, 1")).to.eql({
+        assert.match<Program>(parseScript("() => 0, 1"), {
             type: "Program",
             body: [
                 {
@@ -1498,7 +1505,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"() => 0 + 1\"", () => {
-        expect(parseScript("() => 0 + 1")).to.eql({
+        assert.match<Program>(parseScript("() => 0 + 1"), {
             type: "Program",
             body: [
                 {
@@ -1530,7 +1537,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(a,b) => 0 + 1\"", () => {
-        expect(parseScript("(a,b) => 0 + 1")).to.eql({
+        assert.match<Program>(parseScript("(a,b) => 0 + 1"), {
             type: "Program",
             body: [
                 {
@@ -1571,7 +1578,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(a,b,...c) => 0 + 1\"", () => {
-        expect(parseScript("(a,b,...c) => 0 + 1")).to.eql({
+        assert.match<Program>(parseScript("(a,b,...c) => 0 + 1"), {
             type: "Program",
             body: [
                 {
@@ -1619,7 +1626,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"() => (a) = 0\"", () => {
-        expect(parseScript("() => (a) = 0")).to.eql({
+        assert.match<Program>(parseScript("() => (a) = 0"), {
             type: "Program",
             body: [
                 {
@@ -1651,7 +1658,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse (x)=>{'use strict';}", () => {
-        expect(parseScript("(x)=>{'use strict';}")).to.eql({
+        assert.match<Program>(parseScript("(x)=>{'use strict';}"), {
             type: "Program",
             body: [
                 {
@@ -1688,7 +1695,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"eval => 'use strict'\"", () => {
-        expect(parseScript("eval => 'use strict'")).to.eql({
+        assert.match<Program>(parseScript("eval => 'use strict'"), {
             type: "Program",
             body: [
                 {
@@ -1716,7 +1723,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"([x=0], [])=>0\"", () => {
-        expect(parseScript("([x=0], [])=>0")).to.eql({
+        assert.match<Program>(parseScript("([x=0], [])=>0"), {
             type: "Program",
             body: [
                 {
@@ -1761,7 +1768,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"yield => 0", () => {
-        expect(parseScript("yield => 0")).to.eql({
+        assert.match<Program>(parseScript("yield => 0"), {
             type: "Program",
             body: [
                 {
@@ -1790,7 +1797,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(x=1) => x * x\"", () => {
-        expect(parseScript("(eval, a) => 42")).to.eql({
+        assert.match<Program>(parseScript("(eval, a) => 42"), {
             type: "Program",
             body: [
                 {
@@ -1823,7 +1830,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(sun) => earth\"", () => {
-        expect(parseScript("([a]) => [0];")).to.eql({
+        assert.match<Program>(parseScript("([a]) => [0];"), {
             type: "Program",
             body: [
                 {
@@ -1862,7 +1869,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"([a,b])=>0;\"", () => {
-        expect(parseScript("([a,b])=>0;")).to.eql({
+        assert.match<Program>(parseScript("([a,b])=>0;"), {
             type: "Program",
             body: [
                 {
@@ -1900,7 +1907,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"([,,])=>0\"", () => {
-        expect(parseScript("(...a) => 0")).to.eql({
+        assert.match<Program>(parseScript("(...a) => 0"), {
             type: "Program",
             body: [
                 {
@@ -1932,7 +1939,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"e => ({ property: 42 })\"", () => {
-        expect(parseScript("e => ({ property: 42 })")).to.eql({
+        assert.match<Program>(parseScript("e => ({ property: 42 })"), {
             type: "Program",
             body: [
                 {
@@ -1977,7 +1984,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(eval = 10) => 42\"", () => {
-        expect(parseScript("(eval = 10) => 42")).to.eql({
+        assert.match<Program>(parseScript("(eval = 10) => 42"), {
             type: "Program",
             body: [
                 {
@@ -2013,7 +2020,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(x => x)\"", () => {
-        expect(parseScript("(x => x)")).to.eql({
+        assert.match<Program>(parseScript("(x => x)"), {
             type: "Program",
             body: [
                 {
@@ -2042,7 +2049,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"foo(() => {})", () => {
-        expect(parseScript("foo(() => {})")).to.eql({
+        assert.match<Program>(parseScript("foo(() => {})"), {
             type: "Program",
             body: [
                 {
@@ -2075,7 +2082,7 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should parse \"(sun) => earth\"", () => {
-        expect(parseScript("(sun) => earth")).to.eql({
+        assert.match<Program>(parseScript("(sun) => earth"), {
             type: "Program",
             body: [
                 {
@@ -2104,47 +2111,46 @@ describe.skip("Expressions - Arrow Functions", () => {
     });
 
     it("should throw on \"(a)\n=> 0\"", () => {
-        expect(() => { parseScript("(a)\n=> 0"); }).to.not.throw();
+        parseScript("(a)\n=> 0");
     });
 
     it("should throw on \"a\n=> 0\"", () => {
-        expect(() => { parseScript("a\n=> 0"); }).to.not.throw();
+        parseScript("a\n=> 0");
     });
 
     it("should throw on \"((a)) => 1\"", () => {
-        expect(() => { parseScript("((a)) => 1"); }).to.not.throw();
+        parseScript("((a)) => 1");
     });
 
     it("should throw on \"((a),...a) => 1\"", () => {
-        expect(() => { parseScript("((a),...a) => 1"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("((a),...a) => 1"); });
     });
 
     it("should throw on \"(a,...a)\"", () => {
-        expect(() => { parseScript("(a,...a)"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(a,...a)"); });
     });
 
     it("should throw on \"(a,...a)\n\"", () => {
-        expect(() => { parseScript("(a,...a)\n"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(a,...a)\n"); });
     });
 
     it("should throw on \"(a,...a)/*\n*/ => 0\"", () => {
-        expect(() => { parseScript("(a,...a)/*\n*/ => 0"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(a,...a)/*\n*/ => 0"); });
     });
 
     it("should throw on \"[]=>0\"", () => {
-        expect(() => { parseScript("1 + ()"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("1 + ()"); });
     });
 
     it("should throw on \"(10, 20) => 0\"", () => {
-        expect(() => { parseScript("1 + ()"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("1 + ()"); });
     });
 
     it("should throw on \"() ? 0\"", () => {
-        expect(() => { parseScript("() ? 0"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("() ? 0"); });
     });
 
     it("should throw on \"() <= 0\"", () => {
-        expect(() => { parseScript("() <= 0"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("() <= 0"); });
     });
-
 });

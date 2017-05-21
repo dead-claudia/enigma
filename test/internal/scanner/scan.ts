@@ -2,7 +2,7 @@ import {hasNext, scan} from "../../../src/scanner";
 import {Context} from "../../../src/common";
 import {create} from "../../../src/parser";
 import {Token, tokenDesc} from "../../../src/token";
-import {expect} from "chai";
+import * as assert from "clean-assert";
 
 describe("src/scanner/scan", () => {
     describe("scan()", () => {
@@ -19,10 +19,17 @@ describe("src/scanner/scan", () => {
             it(name, () => {
                 const parser = create(opts.source, undefined);
 
-                expect(scan(parser, opts.context)).to.equal(opts.token);
-                expect(hasNext(parser)).to.equal(opts.hasNext);
-                expect(parser.line).to.equal(opts.line);
-                expect(parser.column).to.equal(opts.column);
+                assert.match({
+                    token: scan(parser, opts.context),
+                    hasNext: hasNext(parser),
+                    line: parser.line,
+                    column: parser.column,
+                }, {
+                    token: opts.token,
+                    hasNext: opts.hasNext,
+                    line: opts.line,
+                    column: opts.column,
+                });
             });
         }
 
@@ -103,20 +110,34 @@ describe("src/scanner/scan", () => {
                 const parser = create(op, undefined);
                 const found = scan(parser, ctx);
 
-                expect(found).to.equal(token, `'${tokenDesc(found)}' === '${tokenDesc(token)}'`);
-                expect(hasNext(parser)).to.equal(false);
-                expect(parser.line).to.equal(1);
-                expect(parser.column).to.equal(op.length);
+                assert.match({
+                    token: tokenDesc(found),
+                    hasNext: hasNext(parser),
+                    line: parser.line,
+                    column: parser.column,
+                }, {
+                    token: tokenDesc(token),
+                    hasNext: false,
+                    line: 1,
+                    column: op.length,
+                });
             });
 
             it(`scans '${op}' with more to go`, () => {
                 const parser = create(`${op} rest`, undefined);
                 const found = scan(parser, ctx);
 
-                expect(found).to.equal(token, `'${tokenDesc(found)}' === '${tokenDesc(token)}'`);
-                expect(hasNext(parser)).to.equal(true);
-                expect(parser.line).to.equal(1);
-                expect(parser.column).to.equal(op.length);
+                assert.match({
+                    token: tokenDesc(found),
+                    hasNext: hasNext(parser),
+                    line: parser.line,
+                    column: parser.column,
+                }, {
+                    token: tokenDesc(token),
+                    hasNext: true,
+                    line: 1,
+                    column: op.length,
+                });
             });
         }
 
@@ -124,10 +145,16 @@ describe("src/scanner/scan", () => {
             const parser = create("..", undefined);
             const found = scan(parser, Context.Empty);
 
-            expect(found).to.equal(Token.Period, `'${tokenDesc(found)}' === '.'`);
-            expect(hasNext(parser)).to.equal(true);
-            expect(parser.line).to.equal(1);
-            expect(parser.column).to.equal(1);
+            assert.match({
+                token: tokenDesc(found),
+                hasNext: hasNext(parser),
+                line: parser.line,
+                column: parser.column,
+            }, {
+                token: tokenDesc(Token.Period),
+                hasNext: true,
+                line: 1, column: 1,
+            });
         });
 
         // TODO

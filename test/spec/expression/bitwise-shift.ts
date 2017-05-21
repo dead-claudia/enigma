@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Bitwise Shift", () => {
-
     it("should parse \"x | (x = 1)\"", () => {
-        expect(parseScript("x | (x = 1)")).to.eql({
+        assert.match<Program>(parseScript("x | (x = 1)"), {
             type: "Program",
             body: [
                 {
@@ -36,7 +36,7 @@ describe.skip("Expressions - Bitwise Shift", () => {
     });
 
     it("should parse \"({} | {})\"", () => {
-        expect(parseScript("({} | {})")).to.eql({
+        assert.match<Program>(parseScript("({} | {})"), {
             body: [
                 {
                     expression: {
@@ -60,7 +60,7 @@ describe.skip("Expressions - Bitwise Shift", () => {
     });
 
     it("should parse \"( 1 | 1)\"", () => {
-        expect(parseScript("( 1 | 1)")).to.eql({
+        assert.match<Program>(parseScript("( 1 | 1)"), {
             type: "Program",
             body: [
                 {
@@ -84,7 +84,7 @@ describe.skip("Expressions - Bitwise Shift", () => {
     });
 
     it("should parse \"(true | null) === 1\"", () => {
-        expect(parseScript("(true | null) === 1")).to.eql({
+        assert.match<Program>(parseScript("(true | null) === 1"), {
             type: "Program",
             body: [
                 {

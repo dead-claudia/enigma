@@ -1,13 +1,14 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2015 - Meta Properties", () => {
 
     it("should parse new new target\"", () => {
 
-        expect(parseScript(`function f() {
+        assert.match<Program>(parseScript(`function f() {
     new new.target;
-}`)).to.eql({
+}`), {
             type: "Program",
             body: [
                 {
@@ -51,9 +52,9 @@ describe.skip("ES2015 - Meta Properties", () => {
 
     it("should parse assign new target\"", () => {
 
-        expect(parseScript(`function f() {
+        assert.match<Program>(parseScript(`function f() {
     let x = new.target;
-}`)).to.eql({
+}`), {
             type: "Program",
             body: [
                 {
@@ -103,9 +104,9 @@ describe.skip("ES2015 - Meta Properties", () => {
 
     it("should parse new target precedence\"", () => {
 
-        expect(parseScript(`function f() {
+        assert.match<Program>(parseScript(`function f() {
     new new.target()();
-}`)).to.eql({
+}`), {
             type: "Program",
             body: [
                 {
@@ -153,7 +154,7 @@ describe.skip("ES2015 - Meta Properties", () => {
 
     it("should parse new target expression\"", () => {
 
-        expect(parseScript(`var f = function() { new.target; }`)).to.eql({
+        assert.match<Program>(parseScript(`var f = function() { new.target; }`), {
             type: "Program",
             body: [
                 {
@@ -203,9 +204,9 @@ describe.skip("ES2015 - Meta Properties", () => {
 
     it("should parse new target invoke\"", () => {
 
-        expect(parseScript(`function f() {
+        assert.match<Program>(parseScript(`function f() {
     new.target();
-}`)).to.eql({
+}`), {
             type: "Program",
             body: [
                 {

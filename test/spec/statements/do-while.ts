@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Statements - `do ... while`", () => {
-
     it("should parse \"while ( \"\" );\"", () => {
-        expect(parseScript(`while ( "" );`)).to.eql({
+        assert.match<Program>(parseScript(`while ( "" );`), {
             type: "Program",
             body: [
                 {
@@ -23,7 +23,7 @@ describe.skip("Statements - `do ... while`", () => {
     });
 
     it("should parse \"do break; while false;\"", () => {
-        expect(parseScript(`do continue; while(1);`)).to.eql({
+        assert.match<Program>(parseScript(`do continue; while(1);`), {
             type: "Program",
             body: [
                 {
@@ -43,7 +43,7 @@ describe.skip("Statements - `do ... while`", () => {
     });
 
     it("should parse \"do label1: label2: function f() {} while (false)\"", () => {
-        expect(parseScript(`do label1: label2: function f() {} while (false)`)).to.eql({
+        assert.match<Program>(parseScript(`do label1: label2: function f() {} while (false)`), {
             type: "Program",
             body: [
                 {
@@ -88,7 +88,7 @@ describe.skip("Statements - `do ... while`", () => {
     });
 
     it("should parse \"do continue; while(1);\"", () => {
-        expect(parseScript(`do continue; while(1);`)).to.eql({
+        assert.match<Program>(parseScript(`do continue; while(1);`), {
             type: "Program",
             body: [
                 {
@@ -108,7 +108,7 @@ describe.skip("Statements - `do ... while`", () => {
     });
 
     it("should parse \"do {} while (true)\"", () => {
-        expect(parseScript(`do {} while (true)`)).to.eql({
+        assert.match<Program>(parseScript(`do {} while (true)`), {
             type: "Program",
             body: [
                 {
@@ -128,7 +128,7 @@ describe.skip("Statements - `do ... while`", () => {
     });
 
     it("should parse \"{do ; while(false); false}\"", () => {
-        expect(parseScript(`{do ; while(false); false}`)).to.eql({
+        assert.match<Program>(parseScript(`{do ; while(false); false}`), {
             type: "Program",
             body: [
                 {
@@ -159,7 +159,7 @@ describe.skip("Statements - `do ... while`", () => {
     });
 
     it("should parse \"{do ; while(false) false}\"", () => {
-        expect(parseScript(`{do ; while(false) false}`)).to.eql({
+        assert.match<Program>(parseScript(`{do ; while(false) false}`), {
             type: "Program",
             body: [
                 {
@@ -190,7 +190,7 @@ describe.skip("Statements - `do ... while`", () => {
     });
 
     it("should parse \"do ; while (true)\"", () => {
-        expect(parseScript(`do ; while (true)`)).to.eql({
+        assert.match<Program>(parseScript(`do ; while (true)`), {
             type: "Program",
             body: [
                 {
@@ -209,18 +209,18 @@ describe.skip("Statements - `do ... while`", () => {
     });
 
     it("should parse \"do break; while false;\"", () => {
-        expect(() => { parseScript(`do break; while false;`); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`do break; while false;`); });
     });
 
     it("should parse \"do const x = null; while (false)\"", () => {
-        expect(() => { parseScript(`do const x = null; while (false)`); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`do const x = null; while (false)`); });
     });
 
     it("should parse \"do function* g() {} while (false)\"", () => {
-        expect(() => { parseScript(`do function* g() {} while (false)`); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`do function* g() {} while (false)`); });
     });
 
     it("should parse \"do break; while false;\"", () => {
-        expect(() => { parseScript(`do break; while false;`); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`do break; while false;`); });
     });
 });

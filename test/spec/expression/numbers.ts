@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Numbers", () => {
-
     it("should parse \"\n    0\n\n\"", () => {
-        expect(parseScript("\n    0\n\n")).to.eql({
+        assert.match<Program>(parseScript("\n    0\n\n"), {
             body: [
                 {
                     expression: {
@@ -20,7 +20,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0012\"", () => {
-        expect(parseScript("0012")).to.eql({
+        assert.match<Program>(parseScript("0012"), {
             type: "Program",
             body: [
                 {
@@ -36,7 +36,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0b0\"", () => {
-        expect(parseScript("0b0")).to.eql({
+        assert.match<Program>(parseScript("0b0"), {
             type: "Program",
             body: [
                 {
@@ -52,7 +52,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0b1\"", () => {
-        expect(parseScript("0b1")).to.eql({
+        assert.match<Program>(parseScript("0b1"), {
             type: "Program",
             body: [
                 {
@@ -68,7 +68,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0b10\"", () => {
-        expect(parseScript("0b10")).to.eql({
+        assert.match<Program>(parseScript("0b10"), {
             type: "Program",
             body: [
                 {
@@ -84,7 +84,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0B0\"", () => {
-        expect(parseScript("0B0")).to.eql({
+        assert.match<Program>(parseScript("0B0"), {
             type: "Program",
             body: [
                 {
@@ -100,7 +100,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0b0\"", () => {
-        expect(parseScript("'use strict'; 0b0")).to.eql({
+        assert.match<Program>(parseScript("'use strict'; 0b0"), {
             body: [
                 {
                     expression: {
@@ -123,7 +123,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"(0o0)\"", () => {
-        expect(parseScript("(0o0)")).to.eql({
+        assert.match<Program>(parseScript("(0o0)"), {
             type: "Program",
             body: [
                 {
@@ -139,7 +139,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0o1\"", () => {
-        expect(parseScript("0o1")).to.eql({
+        assert.match<Program>(parseScript("0o1"), {
             type: "Program",
             body: [
                 {
@@ -155,7 +155,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0o10\"", () => {
-        expect(parseScript("0o10")).to.eql({
+        assert.match<Program>(parseScript("0o10"), {
             type: "Program",
             body: [
                 {
@@ -171,7 +171,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"09\"", () => {
-        expect(parseScript("09")).to.eql({
+        assert.match<Program>(parseScript("09"), {
             type: "Program",
             body: [
                 {
@@ -187,7 +187,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"018\"", () => {
-        expect(parseScript("018")).to.eql({
+        assert.match<Program>(parseScript("018"), {
             type: "Program",
             body: [
                 {
@@ -203,7 +203,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0b0\"", () => {
-        expect(parseScript("'use strict'; 0o0")).to.eql({
+        assert.match<Program>(parseScript("'use strict'; 0o0"), {
             body: [
                 {
                     expression: {
@@ -226,7 +226,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0X1A\"", () => {
-        expect(parseScript("0X1A")).to.eql({
+        assert.match<Program>(parseScript("0X1A"), {
             type: "Program",
             body: [
                 {
@@ -242,7 +242,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0x10\"", () => {
-        expect(parseScript("0x10")).to.eql({
+        assert.match<Program>(parseScript("0x10"), {
             type: "Program",
             body: [
                 {
@@ -258,7 +258,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0x100\"", () => {
-        expect(parseScript("0x100")).to.eql({
+        assert.match<Program>(parseScript("0x100"), {
             type: "Program",
             body: [
                 {
@@ -274,7 +274,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0X04\"", () => {
-        expect(parseScript("0X04")).to.eql({
+        assert.match<Program>(parseScript("0X04"), {
             type: "Program",
             body: [
                 {
@@ -290,7 +290,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \".14\"", () => {
-        expect(parseScript(".14")).to.eql({
+        assert.match<Program>(parseScript(".14"), {
             type: "Program",
             body: [
                 {
@@ -306,7 +306,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"6.\"", () => {
-        expect(parseScript("6.")).to.eql({
+        assert.match<Program>(parseScript("6."), {
             type: "Program",
             body: [
                 {
@@ -322,7 +322,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0.\"", () => {
-        expect(parseScript("0.")).to.eql({
+        assert.match<Program>(parseScript("0."), {
             type: "Program",
             body: [
                 {
@@ -338,7 +338,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"3.14159\"", () => {
-        expect(parseScript("3.14159")).to.eql({
+        assert.match<Program>(parseScript("3.14159"), {
             type: "Program",
             body: [
                 {
@@ -354,7 +354,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"6.02214179e+23\"", () => {
-        expect(parseScript("6.02214179e+23")).to.eql({
+        assert.match<Program>(parseScript("6.02214179e+23"), {
             type: "Program",
             body: [
                 {
@@ -370,7 +370,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"1.492417830e-10\"", () => {
-        expect(parseScript("1.492417830e-10")).to.eql({
+        assert.match<Program>(parseScript("1.492417830e-10"), {
             type: "Program",
             body: [
                 {
@@ -386,7 +386,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0.10100100010000100000100\"", () => {
-        expect(parseScript("0.10100100010000100000100")).to.eql({
+        assert.match<Program>(parseScript("0.10100100010000100000100"), {
             type: "Program",
             body: [
                 {
@@ -402,7 +402,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"110011000111100111001100011110011100110001111001110\"", () => {
-        expect(parseScript("110011000111100111001100011110011100110001111001110")).to.eql({
+        assert.match<Program>(parseScript("110011000111100111001100011110011100110001111001110"), {
             type: "Program",
             body: [
                 {
@@ -418,7 +418,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0b0\"", () => {
-        expect(parseScript("0b0")).to.eql({
+        assert.match<Program>(parseScript("0b0"), {
             type: "Program",
             body: [
                 {
@@ -434,7 +434,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"1.492417830e-10\"", () => {
-        expect(parseScript("1.492417830e-10")).to.eql({
+        assert.match<Program>(parseScript("1.492417830e-10"), {
             type: "Program",
             body: [
                 {
@@ -450,7 +450,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"6.02214179e+23\"", () => {
-        expect(parseScript("6.02214179e+23")).to.eql({
+        assert.match<Program>(parseScript("6.02214179e+23"), {
             type: "Program",
             body: [
                 {
@@ -466,7 +466,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"1.492417830e-10\"", () => {
-        expect(parseScript("1.492417830e-10")).to.eql({
+        assert.match<Program>(parseScript("1.492417830e-10"), {
             type: "Program",
             body: [
                 {
@@ -482,7 +482,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0x0\"", () => {
-        expect(parseScript("0x0")).to.eql({
+        assert.match<Program>(parseScript("0x0"), {
             type: "Program",
             body: [
                 {
@@ -498,7 +498,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0xabc\"", () => {
-        expect(parseScript("0xabc")).to.eql({
+        assert.match<Program>(parseScript("0xabc"), {
             type: "Program",
             body: [
                 {
@@ -514,7 +514,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0xdef\"", () => {
-        expect(parseScript("0xdef")).to.eql({
+        assert.match<Program>(parseScript("0xdef"), {
             type: "Program",
             body: [
                 {
@@ -530,7 +530,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"012\"", () => {
-        expect(parseScript("012")).to.eql({
+        assert.match<Program>(parseScript("012"), {
             type: "Program",
             body: [
                 {
@@ -546,7 +546,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"02\"", () => {
-        expect(parseScript("02")).to.eql({
+        assert.match<Program>(parseScript("02"), {
             type: "Program",
             body: [
                 {
@@ -562,7 +562,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"012\"", () => {
-        expect(parseScript("012")).to.eql({
+        assert.match<Program>(parseScript("012"), {
             type: "Program",
             body: [
                 {
@@ -578,7 +578,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"08\"", () => {
-        expect(parseScript("08")).to.eql({
+        assert.match<Program>(parseScript("08"), {
             type: "Program",
             body: [
                 {
@@ -594,7 +594,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"09\"", () => {
-        expect(parseScript("09")).to.eql({
+        assert.match<Program>(parseScript("09"), {
             type: "Program",
             body: [
                 {
@@ -610,7 +610,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"09.5\"", () => {
-        expect(parseScript("09.5")).to.eql({
+        assert.match<Program>(parseScript("09.5"), {
             type: "Program",
             body: [
                 {
@@ -626,7 +626,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0e+100\"", () => {
-        expect(parseScript("0e+100")).to.eql({
+        assert.match<Program>(parseScript("0e+100"), {
             type: "Program",
             body: [
                 {
@@ -642,7 +642,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0x0;\"", () => {
-        expect(parseScript("0x0;")).to.eql({
+        assert.match<Program>(parseScript("0x0;"), {
             type: "Program",
             body: [
                 {
@@ -658,7 +658,7 @@ describe.skip("Expressions - Numbers", () => {
     });
 
     it("should parse \"0x100\"", () => {
-        expect(parseScript("0x100")).to.eql({
+        assert.match<Program>(parseScript("0x100"), {
             type: "Program",
             body: [
                 {
@@ -673,105 +673,81 @@ describe.skip("Expressions - Numbers", () => {
         });
     });
 
-    it("expect 0b\" to throw", () => {
-        expect(() => {
+    it("expect \"0b\" to throw", () => {
+        assert.throws(SyntaxError, () => {
             parseScript("0b");
-        }).to.not.throw();
+        });
     });
 
     it("expect \"0b1a\" to throw", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("0b1a");
-        }).to.throw();
+        });
     });
 
     it("expect \"0b9\" to throw", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("0b9");
-        }).to.throw();
+        });
     });
 
     it("expect \"0b18", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("0b18");
-        }).to.throw();
+        });
     });
 
     it("expect \"0b12\" to throw", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("0b12");
-        }).to.throw();
+        });
     });
 
     it("expect \"0B1a\" to throw", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("0B1a");
-        }).to.throw();
+        });
     });
 
     it("expect \"0o1a\" to throw", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("0o1a");
-        }).to.throw();
+        });
     });
 
     it("expect \"0o9\" to throw", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("0o9");
-        }).to.throw();
+        });
     });
 
     it("expect \"0o18\" to throw", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("0o18");
-        }).to.throw();
+        });
     });
 
     it("expect \"0O\" to throw", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("0O");
-        }).to.not.throw();
+        });
     });
 
     it("expect \"0O1a\" to throw", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("0O1a");
-        }).to.throw();
+        });
     });
 
     it("expect \"09.x\" to throw", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("09.x");
-        }).to.not.throw();
+        });
     });
 
     it("expect \"0O18\" to throw", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("0O18");
-        }).to.throw();
-    });
-
-    it("expect \"0xdef\" to throw", () => {
-        expect(() => {
-            parseScript("0xdef");
-        }).to.not.throw();
-    });
-
-    it("expect \"0x0\" to throw", () => {
-        expect(() => {
-            parseScript("0x0");
-        }).to.not.throw();
-    });
-
-    it("expect \"0x100\" to throw", () => {
-        expect(() => {
-            parseScript("0x100");
-        }).to.not.throw();
-    });
-
-    it("expect \"0x100\" to throw", () => {
-        expect(() => {
-            parseScript("'use strict'; 0o0");
-        }).to.throw();
+        });
     });
 });

@@ -3,7 +3,7 @@ import {fromCodePoint} from "../../../src/scanner/common";
 import {Context} from "../../../src/common";
 import {create} from "../../../src/parser";
 import {Token} from "../../../src/token";
-import {expect} from "chai";
+import * as assert from "clean-assert";
 
 describe("src/scanner/string", () => {
     describe("scanString()", () => {
@@ -22,14 +22,14 @@ describe("src/scanner/string", () => {
                     if (opts.strict !== true) {
                         const parser = create(isEnd ? opts.source : `${opts.source} `, undefined);
 
-                        expect({
+                        assert.match({
                             token: scan(parser, context),
                             hasNext: hasNext(parser),
                             value: parser.tokenValue,
                             raw: context & Context.OptionsRaw ? parser.tokenRaw : undefined,
                             line: parser.line,
                             column: parser.column,
-                        }).to.eql({
+                        }, {
                             token: Token.StringLiteral,
                             hasNext: !isEnd,
                             value: opts.value,
@@ -42,14 +42,14 @@ describe("src/scanner/string", () => {
                     if (opts.strict !== false) {
                         const parser = create(isEnd ? opts.source : `${opts.source} `, undefined);
 
-                        expect({
+                        assert.match({
                             token: scan(parser, context | Context.Strict),
                             hasNext: hasNext(parser),
                             value: parser.tokenValue,
                             raw: context & Context.OptionsRaw ? parser.tokenRaw : undefined,
                             line: parser.line,
                             column: parser.column,
-                        }).to.eql({
+                        }, {
                             token: Token.StringLiteral,
                             hasNext: !isEnd,
                             value: opts.value,
@@ -72,16 +72,16 @@ describe("src/scanner/string", () => {
                 it(name, () => {
                     if (strict !== true) {
                         const parser = create(isEnd ? source : `${source} `, undefined);
-                        expect(() => {
+                        assert.throws(SyntaxError, () => {
                             scan(parser, context);
-                        }).to.throw(SyntaxError);
+                        });
                     }
 
                     if (strict !== false) {
                         const parser = create(isEnd ? source : `${source} `, undefined);
-                        expect(() => {
+                        assert.throws(SyntaxError, () => {
                             scan(parser, context | Context.Strict);
-                        }).to.throw(SyntaxError);
+                        });
                     }
                 });
             }
@@ -164,14 +164,14 @@ describe("src/scanner/string", () => {
                 if (strict !== true) {
                     const parser = create(source, undefined);
 
-                    expect({
+                    assert.match({
                         token: scan(parser, context),
                         hasNext: hasNext(parser),
                         value: parser.tokenValue,
                         raw: context & Context.OptionsRaw ? parser.tokenRaw : undefined,
                         line: parser.line,
                         column: parser.column,
-                    }).to.eql({
+                    }, {
                         token: Token.StringLiteral,
                         hasNext: !isEnd,
                         value,
@@ -184,14 +184,14 @@ describe("src/scanner/string", () => {
                 if (strict !== false) {
                     const parser = create(source, undefined);
 
-                    expect({
+                    assert.match({
                         token: scan(parser, context | Context.Strict),
                         hasNext: hasNext(parser),
                         value: parser.tokenValue,
                         raw: context & Context.OptionsRaw ? parser.tokenRaw : undefined,
                         line: parser.line,
                         column: parser.column,
-                    }).to.eql({
+                    }, {
                         token: Token.StringLiteral,
                         hasNext: !isEnd,
                         value,
@@ -476,21 +476,34 @@ describe("src/scanner/string", () => {
             });
 
             context("legacy octal", () => {
+                function assertError(message: string, func: () => void) {
+                    try {
+                        func();
+                    } catch (e) {
+                        if (!(e instanceof SyntaxError)) {
+                            assert.fail(
+                                "{message}: Expected {actual} to be a SyntaxError",
+                                {message, actual: e, expected: SyntaxError},
+                            );
+                        }
+                    }
+                }
+
                 function attemptFailPart(
                     message: string, source: string, context: Context, strict?: boolean,
                 ) {
                     if (strict !== true) {
                         const parser = create(source, undefined);
-                        expect(() => {
+                        assertError(message, () => {
                             scan(parser, context);
-                        }).to.throw(SyntaxError, undefined, message);
+                        });
                     }
 
                     if (strict !== false) {
                         const parser = create(source, undefined);
-                        expect(() => {
+                        assertError(message, () => {
                             scan(parser, context | Context.Strict);
-                        }).to.throw(SyntaxError, undefined, message);
+                        });
                     }
                 }
 
@@ -759,16 +772,16 @@ describe("src/scanner/string", () => {
                         const actual = isStrict ? context | Context.Strict : context;
 
                         if (result != null) {
-                            expect({
+                            assert.match<TestResult>({
                                 token: scan(parser, actual),
                                 hasNext: hasNext(parser),
                                 value: parser.tokenValue,
                                 raw: parser.tokenRaw,
                                 line: parser.line,
                                 column: parser.column,
-                            }).to.eql(result);
+                            }, result);
                         } else {
-                            expect(() => { scan(parser, actual); }).to.throw(SyntaxError);
+                            assert.throws(SyntaxError, () => { scan(parser, actual); });
                         }
                     }
                 }
@@ -923,14 +936,14 @@ describe("src/scanner/string", () => {
                 if (strict !== true) {
                     const parser = create(source, undefined);
 
-                    expect({
+                    assert.match({
                         token: scan(parser, context),
                         hasNext: hasNext(parser),
                         value: parser.tokenValue,
                         raw: parser.tokenRaw,
                         line: parser.line,
                         column: parser.column,
-                    }).to.eql({
+                    }, {
                         token,
                         hasNext: column !== source.length,
                         value, raw,
@@ -940,14 +953,14 @@ describe("src/scanner/string", () => {
 
                 if (strict !== false) {
                     const parser = create(source, undefined);
-                    expect({
+                    assert.match({
                         token: scan(parser, context | Context.Strict),
                         hasNext: hasNext(parser),
                         value: parser.tokenValue,
                         raw: parser.tokenRaw,
                         line: parser.line,
                         column: parser.column,
-                    }).to.eql({
+                    }, {
                         token,
                         hasNext: column !== source.length,
                         value, raw,

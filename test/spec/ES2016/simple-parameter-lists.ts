@@ -1,35 +1,35 @@
-import { parseScript, parseModule } from "../../../src";
-
-import {expect} from "chai";
+import {parseScript, parseModule} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2016 - Simple Parameter Lists", () => {
 
     it("expext \"\" to throw", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript(`function a(options = {}) {
   "use strict";
 `);
-        }).to.throw();
+        });
     });
 
     it("expect \"\" to throw", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript(`async function a(options = {}) {
   "use strict";
 }`);
-        }).to.throw();
+        });
     });
 
     it("expect \"\" to throw", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript(`function a({ option1, option2 }) {
   "use strict";
 }`);
-        }).to.throw();
+        });
     });
 
     it("should parse \"var a = (options = {}) => options;\"", () => {
-        expect(parseScript("var a = (options = {}) => options;")).to.eql({
+        assert.match<Program>(parseScript("var a = (options = {}) => options;"), {
             type: "Program",
             body: [
                 {

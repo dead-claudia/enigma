@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Bitwise Not", () => {
-
     it("should parse \"~2147483647\"", () => {
-        expect(parseScript("~2147483647")).to.eql({
+        assert.match<Program>(parseScript("~2147483647"), {
             type: "Program",
             body: [
                 {
@@ -25,7 +25,7 @@ describe.skip("Expressions - Bitwise Not", () => {
     });
 
     it("should parse \"~4294967295\"", () => {
-        expect(parseScript("~4294967295")).to.eql({
+        assert.match<Program>(parseScript("~4294967295"), {
             type: "Program",
             body: [
                 {
@@ -46,7 +46,7 @@ describe.skip("Expressions - Bitwise Not", () => {
     });
 
     it("should parse \"~(function(){return 1}) === -1\"", () => {
-        expect(parseScript("~(function(){return 1}) === -1")).to.eql({
+        assert.match<Program>(parseScript("~(function(){return 1}) === -1"), {
             type: "Program",
             body: [
                 {
@@ -96,7 +96,7 @@ describe.skip("Expressions - Bitwise Not", () => {
     });
 
     it("should parse \"~1.2345\"", () => {
-        expect(parseScript("~1.2345")).to.eql({
+        assert.match<Program>(parseScript("~1.2345"), {
             type: "Program",
             body: [
                 {
@@ -117,7 +117,7 @@ describe.skip("Expressions - Bitwise Not", () => {
     });
 
     it("should parse \"~-5.4321\"", () => {
-        expect(parseScript("~-5.4321")).to.eql({
+        assert.match<Program>(parseScript("~-5.4321"), {
             type: "Program",
             body: [
                 {
@@ -143,7 +143,7 @@ describe.skip("Expressions - Bitwise Not", () => {
     });
 
     it("should parse \"~({})\"", () => {
-        expect(parseScript("~({})")).to.eql({
+        assert.match<Program>(parseScript("~({})"), {
             type: "Program",
             body: [
                 {

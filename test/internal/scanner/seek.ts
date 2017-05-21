@@ -1,7 +1,7 @@
 import {hasNext, skipMeta, seek, Seek} from "../../../src/scanner";
 import {Context} from "../../../src/common";
 import {create} from "../../../src/parser";
-import {expect} from "chai";
+import * as assert from "clean-assert";
 
 describe("src/scanner/seek", () => {
     describe("skipMeta()", () => {
@@ -17,8 +17,10 @@ describe("src/scanner/seek", () => {
                 const parser = create(opts.source, undefined);
 
                 skipMeta(parser);
-                expect({hasNext: hasNext(parser), line: parser.line, column: parser.column})
-                .to.eql({hasNext: opts.hasNext, line: opts.line, column: opts.column});
+                assert.match(
+                    {hasNext: hasNext(parser), line: parser.line, column: parser.column},
+                    {hasNext: opts.hasNext, line: opts.line, column: opts.column},
+                );
             });
         }
 
@@ -329,11 +331,11 @@ describe("src/scanner/seek", () => {
             it(name, () => {
                 const parser = create(opts.source, undefined);
 
-                expect({
+                assert.match({
                     seek: seek(parser, isModule ? Context.Module : Context.Empty),
                     hasNext: hasNext(parser),
                     line: parser.line, column: parser.column,
-                }).to.eql({
+                }, {
                     seek: opts.seek, hasNext: opts.hasNext,
                     line: opts.line, column: opts.column,
                 });

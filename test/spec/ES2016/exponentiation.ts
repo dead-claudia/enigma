@@ -1,10 +1,11 @@
-import { parseScript, parseModule } from "../../../src";
-import {expect} from "chai";
+import {parseScript, parseModule} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2016 - Exponentiation", () => {
 
     it("should parse \"x **= 42\"", () => {
-        expect(parseScript("x **= 42")).to.eql({
+        assert.match<Program>(parseScript("x **= 42"), {
             type: "Program",
             body: [
                 {
@@ -28,7 +29,7 @@ describe.skip("ES2016 - Exponentiation", () => {
     });
 
     it("should parse \"3 ** 5 * 1\"", () => {
-        expect(parseScript("3 ** 5 * 1")).to.eql({
+        assert.match<Program>(parseScript("3 ** 5 * 1"), {
             type: "Program",
             body: [
                 {
@@ -60,7 +61,7 @@ describe.skip("ES2016 - Exponentiation", () => {
     });
 
     it("should parse \"3 % 5 ** 1\"", () => {
-        expect(parseScript("3 % 5 ** 1")).to.eql({
+        assert.match<Program>(parseScript("3 % 5 ** 1"), {
             type: "Program",
             body: [
                 {
@@ -92,7 +93,7 @@ describe.skip("ES2016 - Exponentiation", () => {
     });
 
     it("should parse \"-a * 5\"", () => {
-        expect(parseScript("-a * 5")).to.eql({
+        assert.match<Program>(parseScript("-a * 5"), {
             type: "Program",
             body: [
                 {
@@ -121,7 +122,7 @@ describe.skip("ES2016 - Exponentiation", () => {
     });
 
     it("should parse \"(-5) ** y\"", () => {
-        expect(parseScript("(-5) ** y")).to.eql({
+        assert.match<Program>(parseScript("(-5) ** y"), {
             body: [
                 {
                     expression: {
@@ -150,7 +151,7 @@ describe.skip("ES2016 - Exponentiation", () => {
     });
 
     it("should parse \"++a ** 2\"", () => {
-        expect(parseScript("++a ** 2")).to.eql({
+        assert.match<Program>(parseScript("++a ** 2"), {
             type: "Program",
             body: [
                 {
@@ -179,7 +180,7 @@ describe.skip("ES2016 - Exponentiation", () => {
     });
 
     it("should parse \"a-- ** 2\"", () => {
-        expect(parseScript("a-- ** 2")).to.eql({
+        assert.match<Program>(parseScript("a-- ** 2"), {
             type: "Program",
             body: [
                 {
@@ -208,7 +209,7 @@ describe.skip("ES2016 - Exponentiation", () => {
     });
 
     it("should handle exponential plusplus", () => {
-        expect(parseScript("a++ ** 2")).to.eql({
+        assert.match<Program>(parseScript("a++ ** 2"), {
             type: "Program",
             body: [
                 {
@@ -237,7 +238,7 @@ describe.skip("ES2016 - Exponentiation", () => {
     });
 
     it("should handle exponential precedence", () => {
-        expect(parseScript("1 * 5 ** 2")).to.eql({
+        assert.match<Program>(parseScript("1 * 5 ** 2"), {
             type: "Program",
             body: [
                 {

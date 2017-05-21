@@ -1,10 +1,11 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2015 - Default Parameters", () => {
 
 it("should parse \"function f(a = 1) {}\"", () => {
-        expect(parseScript("function f(a = 1) {}")).to.eql({
+        assert.match<Program>(parseScript("function f(a = 1) {}"), {
     type: "Program",
     body: [
         {
@@ -40,7 +41,7 @@ it("should parse \"function f(a = 1) {}\"", () => {
 });
 
 it("should parse \"x = { f: function(a=1) {} }\"", () => {
-        expect(parseScript("x = { f: function(a=1) {} }")).to.eql({
+        assert.match<Program>(parseScript("x = { f: function(a=1) {} }"), {
     type: "Program",
     body: [
         {
@@ -100,7 +101,7 @@ it("should parse \"x = { f: function(a=1) {} }\"", () => {
 });
 
 it("should parse \"x = function(y = 1) {}\"", () => {
-        expect(parseScript("x = function(y = 1) {}")).to.eql({
+        assert.match<Program>(parseScript("x = function(y = 1) {}"), {
     type: "Program",
     body: [
         {

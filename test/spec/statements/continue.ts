@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Statements - `continue`", () => {
-
     it("should parse \"while (true) { continue }\"", () => {
-        expect(parseScript("while (true) { continue }")).to.eql({
+        assert.match<Program>(parseScript("while (true) { continue }"), {
             type: "Program",
             body: [
                 {
@@ -29,7 +29,7 @@ describe.skip("Statements - `continue`", () => {
     });
 
     it("should parse \"done: while (true) { continue done }\"", () => {
-        expect(parseScript("done: while (true) { continue done }")).to.eql({
+        assert.match<Program>(parseScript("done: while (true) { continue done }"), {
             type: "Program",
             body: [
                 {
@@ -64,7 +64,7 @@ describe.skip("Statements - `continue`", () => {
     });
 
     it("should parse \"__proto__: while (true) { continue __proto__; }\"", () => {
-        expect(parseScript("__proto__: while (true) { continue __proto__; }")).to.eql({
+        assert.match<Program>(parseScript("__proto__: while (true) { continue __proto__; }"), {
             type: "Program",
             body: [
                 {
@@ -99,7 +99,7 @@ describe.skip("Statements - `continue`", () => {
     });
 
     it("should parse \"a: do continue a; while(1);\"", () => {
-        expect(parseScript("a: do continue a; while(1);")).to.eql({
+        assert.match<Program>(parseScript("a: do continue a; while(1);"), {
             type: "Program",
             body: [
                 {
@@ -129,7 +129,7 @@ describe.skip("Statements - `continue`", () => {
     });
 
     it("should parse \"a: while (0) { continue \n b; }\"", () => {
-        expect(parseScript("a: while (0) { continue \n b; }")).to.eql({
+        assert.match<Program>(parseScript("a: while (0) { continue \n b; }"), {
             body: [
                 {
                     body: {
@@ -168,7 +168,7 @@ describe.skip("Statements - `continue`", () => {
     });
 
     it("should parse \"a: while (0) { continue \r b; }\"", () => {
-        expect(parseScript("a: while (0) { continue \r b; }")).to.eql({
+        assert.match<Program>(parseScript("a: while (0) { continue \r b; }"), {
             body: [
                 {
                     body: {
@@ -207,7 +207,7 @@ describe.skip("Statements - `continue`", () => {
     });
 
     it("should parse \"a: while (0) { continue /*\r*/ b; }\"", () => {
-        expect(parseScript("a: while (0) { continue /*\r*/ b; }")).to.eql({
+        assert.match<Program>(parseScript("a: while (0) { continue /*\r*/ b; }"), {
             body: [
                 {
                     body: {
@@ -246,7 +246,7 @@ describe.skip("Statements - `continue`", () => {
     });
 
     it("should parse \"a: while (0) { continue /*\u2029*/ b; }\"", () => {
-        expect(parseScript("a: while (0) { continue /*\u2029*/ b; }")).to.eql({
+        assert.match<Program>(parseScript("a: while (0) { continue /*\u2029*/ b; }"), {
             body: [
                 {
                     body: {
@@ -285,7 +285,7 @@ describe.skip("Statements - `continue`", () => {
     });
 
     it("should parse \"done: while (true) { continue done; }\"", () => {
-        expect(parseScript("done: while (true) { continue done; }")).to.eql({
+        assert.match<Program>(parseScript("done: while (true) { continue done; }"), {
             type: "Program",
             body: [
                 {
@@ -320,7 +320,7 @@ describe.skip("Statements - `continue`", () => {
     });
 
     it("should parse \"while (true) { continue; }\"", () => {
-        expect(parseScript("while (true) { continue; }")).to.eql({
+        assert.match<Program>(parseScript("while (true) { continue; }"), {
             type: "Program",
             body: [
                 {

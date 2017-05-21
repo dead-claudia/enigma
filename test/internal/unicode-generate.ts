@@ -1,7 +1,16 @@
 import {generate, GenerateOpts} from "../../scripts/unicode-generate";
-import {expect} from "chai";
+import * as assert from "clean-assert";
 
 describe("(slow) scripts/unicode-generate", () => {
+    function assertEqual<T>(a: T, b: T, message: string) {
+        if (a !== b) {
+            assert.fail(
+                "{message}: Expected {actual} to equal {expected}",
+                {message, actual: a, expected: b},
+            );
+        }
+    }
+
     const methods = {
         empty: [() => []],
         singleItem: [() => [1]],
@@ -66,62 +75,62 @@ describe("(slow) scripts/unicode-generate", () => {
     });
 
     it("works with zero codes", async () => {
-        expect(tables.empty).to.eql([]);
-        expect(mod.empty(0)).to.equal(false, "(code = 0)");
-        expect(mod.empty(1)).to.equal(false, "(code = 1)");
-        expect(mod.empty(2)).to.equal(false, "(code = 2)");
-        expect(mod.empty(3)).to.equal(false, "(code = 3)");
-        expect(mod.empty(4)).to.equal(false, "(code = 4)");
-        expect(mod.empty(5)).to.equal(false, "(code = 5)");
+        assert.match(tables.empty, []);
+        assertEqual(mod.empty(0), false, "(code = 0)");
+        assertEqual(mod.empty(1), false, "(code = 1)");
+        assertEqual(mod.empty(2), false, "(code = 2)");
+        assertEqual(mod.empty(3), false, "(code = 3)");
+        assertEqual(mod.empty(4), false, "(code = 4)");
+        assertEqual(mod.empty(5), false, "(code = 5)");
     });
 
     it("works with one code", async () => {
-        expect(tables.singleItem).to.eql([-1]);
-        expect(mod.singleItem(0)).to.equal(false, "(code = 0)");
-        expect(mod.singleItem(1)).to.equal(true, "(code = 1)");
-        expect(mod.singleItem(2)).to.equal(false, "(code = 2)");
-        expect(mod.singleItem(3)).to.equal(false, "(code = 3)");
-        expect(mod.singleItem(4)).to.equal(false, "(code = 4)");
-        expect(mod.singleItem(5)).to.equal(false, "(code = 5)");
+        assert.match(tables.singleItem, [-1]);
+        assertEqual(mod.singleItem(0), false, "(code = 0)");
+        assertEqual(mod.singleItem(1), true, "(code = 1)");
+        assertEqual(mod.singleItem(2), false, "(code = 2)");
+        assertEqual(mod.singleItem(3), false, "(code = 3)");
+        assertEqual(mod.singleItem(4), false, "(code = 4)");
+        assertEqual(mod.singleItem(5), false, "(code = 5)");
     });
 
     it("works with small data sets", async () => {
-        expect(tables.singleRange).to.eql([1, 5]);
-        expect(mod.singleRange(0)).to.equal(false, "(code = 0)");
+        assert.match(tables.singleRange, [1, 5]);
+        assertEqual(mod.singleRange(0), false, "(code = 0)");
         for (let i = 1; i < 7; i++) {
-            expect(mod.singleRange(i)).to.equal(true, `(code = ${i})`);
+            assertEqual(mod.singleRange(i), true, `(code = ${i})`);
         }
-        expect(mod.singleRange(7)).to.equal(false, "(code = 7)");
-        expect(mod.singleRange(8)).to.equal(false, "(code = 8)");
-        expect(mod.singleRange(9)).to.equal(false, "(code = 9)");
-        expect(mod.singleRange(10)).to.equal(false, "(code = 10)");
-        expect(mod.singleRange(11)).to.equal(false, "(code = 11)");
-        expect(mod.singleRange(12)).to.equal(false, "(code = 12)");
+        assertEqual(mod.singleRange(7), false, "(code = 7)");
+        assertEqual(mod.singleRange(8), false, "(code = 8)");
+        assertEqual(mod.singleRange(9), false, "(code = 9)");
+        assertEqual(mod.singleRange(10), false, "(code = 10)");
+        assertEqual(mod.singleRange(11), false, "(code = 11)");
+        assertEqual(mod.singleRange(12), false, "(code = 12)");
     });
 
     it("works with multiple ranges", async () => {
-        expect(tables.multiItem).to.eql([
+        assert.match(tables.multiItem, [
             1, 5, 5, 5, 5, 5, 5, 5, 5, 5,
             5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
             5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
             5, 5,
         ]);
-        expect(mod.multiItem(0)).to.equal(false, "(code = 0)");
+        assertEqual(mod.multiItem(0), false, "(code = 0)");
         for (let i = 0; i < 160; i += 10) {
             for (let j = i + 1; j < i + 7; j++) {
-                expect(mod.multiItem(j)).to.equal(true, `(code = ${j})`);
+                assertEqual(mod.multiItem(j), true, `(code = ${j})`);
             }
             for (let j = i + 7; j < i + 11; j++) {
-                expect(mod.multiItem(j)).to.equal(false, `(code = ${j})`);
+                assertEqual(mod.multiItem(j), false, `(code = ${j})`);
             }
         }
         for (let i = 171; i < 181; i++) {
-            expect(mod.multiItem(i)).to.equal(false, `(code = ${i})`);
+            assertEqual(mod.multiItem(i), false, `(code = ${i})`);
         }
     });
 
     it("works with multiple individual values", async () => {
-        expect(tables.multiSingle).to.eql([
+        assert.match(tables.multiSingle, [
             -1, -2, -2, -2, -2, -2, -2, -2, -2, -2,
             -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
             -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
@@ -131,36 +140,36 @@ describe("(slow) scripts/unicode-generate", () => {
             -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
             -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
         ]);
-        expect(mod.multiSingle(0)).to.equal(false, "(code = 0)");
+        assertEqual(mod.multiSingle(0), false, "(code = 0)");
         for (let i = 1; i < 160; i++) {
-            expect(mod.multiSingle(i)).to.equal(i % 2 === 1, `(code = ${i})`);
+            assertEqual(mod.multiSingle(i), i % 2 === 1, `(code = ${i})`);
         }
-        expect(mod.multiSingle(160)).to.equal(false, "(code = 160)");
-        expect(mod.multiSingle(161)).to.equal(false, "(code = 161)");
-        expect(mod.multiSingle(162)).to.equal(false, "(code = 162)");
-        expect(mod.multiSingle(163)).to.equal(false, "(code = 163)");
-        expect(mod.multiSingle(164)).to.equal(false, "(code = 164)");
-        expect(mod.multiSingle(165)).to.equal(false, "(code = 165)");
+        assertEqual(mod.multiSingle(160), false, "(code = 160)");
+        assertEqual(mod.multiSingle(161), false, "(code = 161)");
+        assertEqual(mod.multiSingle(162), false, "(code = 162)");
+        assertEqual(mod.multiSingle(163), false, "(code = 163)");
+        assertEqual(mod.multiSingle(164), false, "(code = 164)");
+        assertEqual(mod.multiSingle(165), false, "(code = 165)");
     });
 
     it("works with multiple mixed, non-unique values", async () => {
-        expect(tables.multiMixed).to.eql([
+        assert.match(tables.multiMixed, [
             1, 6, -2, 2, 6, -2, 2, 6, -2, 2, 6, -2,
             2, 6, -2, 2, 6, -2, 2, 6, -2, 2, 6, -2,
             2, 6, -2, 2, 6, -2, 2, 6, -2, 2, 6, -2,
             2, 6, -2, 2, 6, -2, 2, 6, -2, 2, 6, -2,
         ]);
-        expect(mod.multiMixed(0)).to.equal(false, "(code = 0)");
+        assertEqual(mod.multiMixed(0), false, "(code = 0)");
         for (let i = 0; i < 160; i += 10) {
             for (let j = i + 1; j < i + 7; j++) {
-                expect(mod.multiMixed(j)).to.equal(true, `(code = ${j})`);
+                assertEqual(mod.multiMixed(j), true, `(code = ${j})`);
             }
             for (let j = i + 7; j < i + 11; j++) {
-                expect(mod.multiMixed(j)).to.equal(j % 2 === 1, `(code = ${j})`);
+                assertEqual(mod.multiMixed(j), j % 2 === 1, `(code = ${j})`);
             }
         }
         for (let i = 171; i < 181; i++) {
-            expect(mod.multiMixed(i)).to.equal(false, `(code = ${i})`);
+            assertEqual(mod.multiMixed(i), false, `(code = ${i})`);
         }
     });
 });

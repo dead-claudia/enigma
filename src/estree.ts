@@ -68,7 +68,7 @@ interface _Expression<T extends string> extends _Node<T> {}
 export type Expression =
     | Identifier
     | Literal
-    | RegexLiteral
+    | RegExpLiteral
     | ThisExpression
     | ArrayExpression
     | ObjectExpression
@@ -93,7 +93,7 @@ export type Expression =
     | JSXElement;
 
 interface _Pattern<T extends string> extends _Node<T> {}
-export type PatternTop = Identifier | ObjectPattern | ArrayPattern;
+export type PatternTop = Identifier | ObjectPattern | ArrayPattern | MemberExpression;
 export type PatternNoRest = PatternTop | AssignmentPattern;
 export type Pattern = PatternTop | AssignmentPattern | RestElement;
 
@@ -166,7 +166,7 @@ export type AssignmentOperator =
 
 export interface AssignmentExpression extends _Expression<"AssignmentExpression"> {
     operator: AssignmentOperator;
-    left: Expression;
+    left: Expression | PatternTop;
     right: Expression;
 }
 
@@ -217,24 +217,24 @@ export interface CatchClause extends _Node<"CatchClause"> {
 }
 
 export interface ClassBody extends _Node<"ClassBody"> {
-    body: Property[];
+    body: MethodDefinition[];
 }
 
 export interface ClassDeclaration extends _Declaration<"ClassDeclaration"> {
     id: Identifier | null;
-    superClass: Identifier | null;
+    superClass: Expression | null;
     body: ClassBody;
 }
 
 export interface ClassExpression extends _Expression<"ClassExpression"> {
     id: Identifier | null;
-    superClass: Identifier | null;
+    superClass: Expression | null;
     body: ClassBody;
 }
 
 export interface MemberExpression extends _Expression<"MemberExpression"> {
     computed: boolean;
-    object: Expression;
+    object: Expression | Super;
     property: Expression;
 }
 
@@ -280,13 +280,13 @@ export interface ExpressionStatement extends _Statement<"ExpressionStatement"> {
 }
 
 export interface ForInStatement extends _Statement<"ForInStatement"> {
-    left: VariableDeclaration | Expression;
+    left: VariableDeclaration | Expression | PatternNoRest;
     right: Expression;
     body: Statement;
 }
 
 export interface ForOfStatement extends _Statement<"ForOfStatement"> {
-    left: VariableDeclaration | Expression;
+    left: VariableDeclaration | Expression | PatternNoRest;
     right: Expression;
     body: Statement;
     await: boolean;
@@ -347,11 +347,12 @@ export interface LabeledStatement extends _Statement<"LabeledStatement"> {
 
 export interface Literal extends _Expression<"Literal"> {
     value: boolean | number | string | null;
-    raw: string;
+    raw?: string;
 }
 
+export type LogicalOperator = "&&" | "||";
 export interface LogicalExpression extends _Expression<"LogicalExpression"> {
-    operator: string;
+    operator: LogicalOperator;
     left: Expression;
     right: Expression;
 }
@@ -367,11 +368,6 @@ export interface MethodDefinition extends _Node<"MethodDefinition"> {
     kind: "constructor" | "init" | "get" | "set";
     computed: boolean;
     static: boolean;
-}
-
-export interface Program extends _Node<"Program"> {
-    body: Array<Statement | ModuleDeclaration>;
-    sourceType: "script" | "module";
 }
 
 export interface NewExpression extends _Expression<"NewExpression"> {
@@ -393,7 +389,7 @@ export interface ObjectExpression extends _Expression<"ObjectExpression"> {
 }
 
 export interface AssignmentProperty extends _Node<"Property"> {
-    key: Identifier | Literal;
+    key: Expression;
     value: PatternNoRest;
     computed: boolean;
     kind: "init";
@@ -405,9 +401,9 @@ export interface ObjectPattern extends _Pattern<"ObjectPattern"> {
     properties: Array<AssignmentProperty | RestElement>;
 }
 
-export interface RegexLiteral extends _Expression<"Literal"> {
-    value: RegExp;
-    raw: string;
+export interface RegExpLiteral extends _Expression<"Literal"> {
+    value: RegExp | null;
+    raw?: string;
     regex: { pattern: string, flags: string };
 }
 
@@ -430,7 +426,7 @@ export interface SpreadElement extends _Node<"SpreadElement"> {
 export interface Super extends _Node<"Super"> {}
 
 export interface SwitchCase extends _Node<"SwitchCase"> {
-    test: Expression;
+    test: Expression | null;
     consequent: Statement[];
 }
 
@@ -445,7 +441,7 @@ export interface TaggedTemplateExpression extends _Expression<"TaggedTemplateExp
 }
 
 export interface TemplateElement extends _Node<"TemplateElement"> {
-    value: {cooked: string, raw: string};
+    value: {cooked: string | null, raw: string};
     tail: boolean;
 }
 

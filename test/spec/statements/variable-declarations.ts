@@ -1,349 +1,323 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Statements - Variable Declarations", () => {
-
     it("should parse \"var x\"", () => {
-        expect(parseScript("var x")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "VariableDeclaration",
-            declarations: [
+        assert.match<Program>(parseScript("var x"), {
+            type: "Program",
+            body: [
                 {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "x",
-                    },
-                    init: null,
+                    type: "VariableDeclaration",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "x",
+                            },
+                            init: null,
+                        },
+                    ],
+                    kind: "var",
                 },
             ],
-            kind: "var",
-        },
-    ],
-    sourceType: "script",
-});
+            sourceType: "script",
+        });
     });
 
     it("should parse \"var a;\"", () => {
-        expect(parseScript("var a;")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "VariableDeclaration",
-            declarations: [
+        assert.match<Program>(parseScript("var a;"), {
+            type: "Program",
+            body: [
                 {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "a",
-                    },
-                    init: null,
+                    type: "VariableDeclaration",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "a",
+                            },
+                            init: null,
+                        },
+                    ],
+                    kind: "var",
                 },
             ],
-            kind: "var",
-        },
-    ],
-    sourceType: "script",
-});
+            sourceType: "script",
+        });
     });
 
     it("should parse \"var x, y;\"", () => {
-        expect(parseScript("var x, y;")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "VariableDeclaration",
-            declarations: [
+        assert.match<Program>(parseScript("var x, y;"), {
+            type: "Program",
+            body: [
                 {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "x",
-                    },
-                    init: null,
-                },
-                {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "y",
-                    },
-                    init: null,
+                    type: "VariableDeclaration",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "x",
+                            },
+                            init: null,
+                        },
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "y",
+                            },
+                            init: null,
+                        },
+                    ],
+                    kind: "var",
                 },
             ],
-            kind: "var",
-        },
-    ],
-    sourceType: "script",
-});
+            sourceType: "script",
+        });
     });
 
     it("should parse \"var x = 0\"", () => {
-        expect(parseScript("var x = 0")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "VariableDeclaration",
-            declarations: [
+        assert.match<Program>(parseScript("var x = 0"), {
+            type: "Program",
+            body: [
                 {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "x",
-                    },
-                    init: {
-                        type: "Literal",
-                        value: 0,
-                    },
+                    type: "VariableDeclaration",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "x",
+                            },
+                            init: {
+                                type: "Literal",
+                                value: 0,
+                            },
+                        },
+                    ],
+                    kind: "var",
                 },
             ],
-            kind: "var",
-        },
-    ],
-    sourceType: "script",
-});
+            sourceType: "script",
+        });
     });
 
     it("should parse \"var eval = 0, arguments = 1\"", () => {
-        expect(parseScript("var eval = 0, arguments = 1")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "VariableDeclaration",
-            declarations: [
+        assert.match<Program>(parseScript("var eval = 0, arguments = 1"), {
+            type: "Program",
+            body: [
                 {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "eval",
-                    },
-                    init: {
-                        type: "Literal",
-                        value: 0,
-                    },
-                },
-                {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "arguments",
-                    },
-                    init: {
-                        type: "Literal",
-                        value: 1,
-                    },
+                    type: "VariableDeclaration",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "eval",
+                            },
+                            init: {
+                                type: "Literal",
+                                value: 0,
+                            },
+                        },
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "arguments",
+                            },
+                            init: {
+                                type: "Literal",
+                                value: 1,
+                            },
+                        },
+                    ],
+                    kind: "var",
                 },
             ],
-            kind: "var",
-        },
-    ],
-    sourceType: "script",
-});
+            sourceType: "script",
+        });
     });
 
     it("should parse \"var x = 0, y = 1, z = 2\"", () => {
-        expect(parseScript("var x = 0, y = 1, z = 2")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "VariableDeclaration",
-            declarations: [
+        assert.match<Program>(parseScript("var x = 0, y = 1, z = 2"), {
+            type: "Program",
+            body: [
                 {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "x",
-                    },
-                    init: {
-                        type: "Literal",
-                        value: 0,
-                    },
-                },
-                {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "y",
-                    },
-                    init: {
-                        type: "Literal",
-                        value: 1,
-                    },
-                },
-                {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "z",
-                    },
-                    init: {
-                        type: "Literal",
-                        value: 2,
-                    },
+                    type: "VariableDeclaration",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "x",
+                            },
+                            init: {
+                                type: "Literal",
+                                value: 0,
+                            },
+                        },
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "y",
+                            },
+                            init: {
+                                type: "Literal",
+                                value: 1,
+                            },
+                        },
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "z",
+                            },
+                            init: {
+                                type: "Literal",
+                                value: 2,
+                            },
+                        },
+                    ],
+                    kind: "var",
                 },
             ],
-            kind: "var",
-        },
-    ],
-    sourceType: "script",
-});
+            sourceType: "script",
+        });
     });
 
     it("should parse \"var implements, interface, package\"", () => {
-        expect(parseScript("var implements, interface, package")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "VariableDeclaration",
-            declarations: [
+        assert.match<Program>(parseScript("var implements, interface, package"), {
+            type: "Program",
+            body: [
                 {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "implements",
-                    },
-                    init: null,
-                },
-                {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "interface",
-                    },
-                    init: null,
-                },
-                {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "package",
-                    },
-                    init: null,
+                    type: "VariableDeclaration",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "implements",
+                            },
+                            init: null,
+                        },
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "interface",
+                            },
+                            init: null,
+                        },
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "package",
+                            },
+                            init: null,
+                        },
+                    ],
+                    kind: "var",
                 },
             ],
-            kind: "var",
-        },
-    ],
-    sourceType: "script",
-});
+            sourceType: "script",
+        });
     });
 
     it("should parse \"var private, protected, public\"", () => {
-        expect(parseScript("var private, protected, public")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "VariableDeclaration",
-            declarations: [
+        assert.match<Program>(parseScript("var private, protected, public"), {
+            type: "Program",
+            body: [
                 {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "private",
-                    },
-                    init: null,
-                },
-                {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "protected",
-                    },
-                    init: null,
-                },
-                {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "public",
-                    },
-                    init: null,
+                    type: "VariableDeclaration",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "private",
+                            },
+                            init: null,
+                        },
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "protected",
+                            },
+                            init: null,
+                        },
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "public",
+                            },
+                            init: null,
+                        },
+                    ],
+                    kind: "var",
                 },
             ],
-            kind: "var",
-        },
-    ],
-    sourceType: "script",
-});
+            sourceType: "script",
+        });
     });
 
     it("should parse \"var yield;\"", () => {
-        expect(parseScript("var yield;")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "VariableDeclaration",
-            declarations: [
+        assert.match<Program>(parseScript("var yield;"), {
+            type: "Program",
+            body: [
                 {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "yield",
-                    },
-                    init: null,
+                    type: "VariableDeclaration",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "yield",
+                            },
+                            init: null,
+                        },
+                    ],
+                    kind: "var",
                 },
             ],
-            kind: "var",
-        },
-    ],
-    sourceType: "script",
-});
+            sourceType: "script",
+        });
     });
 
     it("should parse \"var let\"", () => {
-        expect(parseScript("var let")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "VariableDeclaration",
-            declarations: [
+        assert.match<Program>(parseScript("var let"), {
+            type: "Program",
+            body: [
                 {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "let",
-                    },
-                    init: null,
+                    type: "VariableDeclaration",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: "let",
+                            },
+                            init: null,
+                        },
+                    ],
+                    kind: "var",
                 },
             ],
-            kind: "var",
-        },
-    ],
-    sourceType: "script",
-});
+            sourceType: "script",
+        });
     });
 
     it("should parse \"let x\"", () => {
-        expect(parseScript("let x")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "VariableDeclaration",
-            declarations: [
-                {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "x",
-                    },
-                    init: null,
-                },
-            ],
-            kind: "let",
-        },
-    ],
-    sourceType: "script",
-});
-    });
-
-    it("should parse \"{ let x }\"", () => {
-        expect(parseScript("{ let x }")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "BlockStatement",
+        assert.match<Program>(parseScript("let x"), {
+            type: "Program",
             body: [
                 {
                     type: "VariableDeclaration",
@@ -360,133 +334,209 @@ describe.skip("Statements - Variable Declarations", () => {
                     kind: "let",
                 },
             ],
-        },
-    ],
-    sourceType: "script",
-});
+            sourceType: "script",
+        });
+    });
+
+    it("should parse \"{ let x }\"", () => {
+        assert.match<Program>(parseScript("{ let x }"), {
+            type: "Program",
+            body: [
+                {
+                    type: "BlockStatement",
+                    body: [
+                        {
+                            type: "VariableDeclaration",
+                            declarations: [
+                                {
+                                    type: "VariableDeclarator",
+                                    id: {
+                                        type: "Identifier",
+                                        name: "x",
+                                    },
+                                    init: null,
+                                },
+                            ],
+                            kind: "let",
+                        },
+                    ],
+                },
+            ],
+            sourceType: "script",
+        });
     });
 
     it("should parse \"{ let x = 0 }\"", () => {
-        expect(parseScript("{ let x = 0 }")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "BlockStatement",
+        assert.match<Program>(parseScript("{ let x = 0 }"), {
+            type: "Program",
             body: [
                 {
-                    type: "VariableDeclaration",
-                    declarations: [
+                    type: "BlockStatement",
+                    body: [
                         {
-                            type: "VariableDeclarator",
-                            id: {
-                                type: "Identifier",
-                                name: "x",
-                            },
-                            init: {
-                                type: "Literal",
-                                value: 0,
-                            },
+                            type: "VariableDeclaration",
+                            declarations: [
+                                {
+                                    type: "VariableDeclarator",
+                                    id: {
+                                        type: "Identifier",
+                                        name: "x",
+                                    },
+                                    init: {
+                                        type: "Literal",
+                                        value: 0,
+                                    },
+                                },
+                            ],
+                            kind: "let",
                         },
                     ],
-                    kind: "let",
                 },
             ],
-        },
-    ],
-    sourceType: "script",
-});
+            sourceType: "script",
+        });
     });
 
     it("should parse \"{ let x = 0, y = 1, z = 2 }\"", () => {
-        expect(parseScript("{ let x = 0, y = 1, z = 2 }")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "BlockStatement",
+        assert.match<Program>(parseScript("{ let x = 0, y = 1, z = 2 }"), {
+            type: "Program",
             body: [
                 {
-                    type: "VariableDeclaration",
-                    declarations: [
+                    type: "BlockStatement",
+                    body: [
                         {
-                            type: "VariableDeclarator",
-                            id: {
-                                type: "Identifier",
-                                name: "x",
-                            },
-                            init: {
-                                type: "Literal",
-                                value: 0,
-                            },
-                        },
-                        {
-                            type: "VariableDeclarator",
-                            id: {
-                                type: "Identifier",
-                                name: "y",
-                            },
-                            init: {
-                                type: "Literal",
-                                value: 1,
-                            },
-                        },
-                        {
-                            type: "VariableDeclarator",
-                            id: {
-                                type: "Identifier",
-                                name: "z",
-                            },
-                            init: {
-                                type: "Literal",
-                                value: 2,
-                            },
+                            type: "VariableDeclaration",
+                            declarations: [
+                                {
+                                    type: "VariableDeclarator",
+                                    id: {
+                                        type: "Identifier",
+                                        name: "x",
+                                    },
+                                    init: {
+                                        type: "Literal",
+                                        value: 0,
+                                    },
+                                },
+                                {
+                                    type: "VariableDeclarator",
+                                    id: {
+                                        type: "Identifier",
+                                        name: "y",
+                                    },
+                                    init: {
+                                        type: "Literal",
+                                        value: 1,
+                                    },
+                                },
+                                {
+                                    type: "VariableDeclarator",
+                                    id: {
+                                        type: "Identifier",
+                                        name: "z",
+                                    },
+                                    init: {
+                                        type: "Literal",
+                                        value: 2,
+                                    },
+                                },
+                            ],
+                            kind: "let",
                         },
                     ],
-                    kind: "let",
                 },
             ],
-        },
-    ],
-    sourceType: "script",
-});
+            sourceType: "script",
+        });
     });
 
     it("should parse \"{ const x = 0 }\"", () => {
-        expect(parseScript("{ const x = 0 }")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "BlockStatement",
+        assert.match<Program>(parseScript("{ const x = 0 }"), {
+            type: "Program",
             body: [
                 {
-                    type: "VariableDeclaration",
-                    declarations: [
+                    type: "BlockStatement",
+                    body: [
                         {
-                            type: "VariableDeclarator",
-                            id: {
-                                type: "Identifier",
-                                name: "x",
-                            },
-                            init: {
-                                type: "Literal",
-                                value: 0,
-                            },
+                            type: "VariableDeclaration",
+                            declarations: [
+                                {
+                                    type: "VariableDeclarator",
+                                    id: {
+                                        type: "Identifier",
+                                        name: "x",
+                                    },
+                                    init: {
+                                        type: "Literal",
+                                        value: 0,
+                                    },
+                                },
+                            ],
+                            kind: "const",
                         },
                     ],
-                    kind: "const",
                 },
             ],
-        },
-    ],
-    sourceType: "script",
-});
+            sourceType: "script",
+        });
     });
 
     it("should parse \"{ const x = 0, y = 1, z = 2 }\"", () => {
-        expect(parseScript("{ const x = 0, y = 1, z = 2 }")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "BlockStatement",
+        assert.match<Program>(parseScript("{ const x = 0, y = 1, z = 2 }"), {
+            type: "Program",
+            body: [
+                {
+                    type: "BlockStatement",
+                    body: [
+                        {
+                            type: "VariableDeclaration",
+                            declarations: [
+                                {
+                                    type: "VariableDeclarator",
+                                    id: {
+                                        type: "Identifier",
+                                        name: "x",
+                                    },
+                                    init: {
+                                        type: "Literal",
+                                        value: 0,
+                                    },
+                                },
+                                {
+                                    type: "VariableDeclarator",
+                                    id: {
+                                        type: "Identifier",
+                                        name: "y",
+                                    },
+                                    init: {
+                                        type: "Literal",
+                                        value: 1,
+                                    },
+                                },
+                                {
+                                    type: "VariableDeclarator",
+                                    id: {
+                                        type: "Identifier",
+                                        name: "z",
+                                    },
+                                    init: {
+                                        type: "Literal",
+                                        value: 2,
+                                    },
+                                },
+                            ],
+                            kind: "const",
+                        },
+                    ],
+                },
+            ],
+            sourceType: "script",
+        });
+    });
+
+    it("should parse \"var static;\"", () => {
+        assert.match<Program>(parseScript("var static;"), {
+            type: "Program",
             body: [
                 {
                     type: "VariableDeclaration",
@@ -495,130 +545,79 @@ describe.skip("Statements - Variable Declarations", () => {
                             type: "VariableDeclarator",
                             id: {
                                 type: "Identifier",
-                                name: "x",
+                                name: "static",
                             },
-                            init: {
-                                type: "Literal",
-                                value: 0,
-                            },
-                        },
-                        {
-                            type: "VariableDeclarator",
-                            id: {
-                                type: "Identifier",
-                                name: "y",
-                            },
-                            init: {
-                                type: "Literal",
-                                value: 1,
-                            },
-                        },
-                        {
-                            type: "VariableDeclarator",
-                            id: {
-                                type: "Identifier",
-                                name: "z",
-                            },
-                            init: {
-                                type: "Literal",
-                                value: 2,
-                            },
+                            init: null,
                         },
                     ],
-                    kind: "const",
+                    kind: "var",
                 },
             ],
-        },
-    ],
-    sourceType: "script",
-});
-    });
-
-    it("should parse \"var static;\"", () => {
-        expect(parseScript("var static;")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "VariableDeclaration",
-            declarations: [
-                {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "Identifier",
-                        name: "static",
-                    },
-                    init: null,
-                },
-            ],
-            kind: "var",
-        },
-    ],
-    sourceType: "script",
-});
+            sourceType: "script",
+        });
     });
 
     it("should parse \"(let[a])\"", () => {
-        expect(parseScript("(let[a])")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ExpressionStatement",
-            expression: {
-                type: "MemberExpression",
-                computed: true,
-                object: {
-                    type: "Identifier",
-                    name: "let",
+        assert.match<Program>(parseScript("(let[a])"), {
+            type: "Program",
+            body: [
+                {
+                    type: "ExpressionStatement",
+                    expression: {
+                        type: "MemberExpression",
+                        computed: true,
+                        object: {
+                            type: "Identifier",
+                            name: "let",
+                        },
+                        property: {
+                            type: "Identifier",
+                            name: "a",
+                        },
+                    },
                 },
-                property: {
-                    type: "Identifier",
-                    name: "a",
-                },
-            },
-        },
-    ],
-    sourceType: "script",
-});
+            ],
+            sourceType: "script",
+        });
     });
 
     it("should throw \"var const\"", () => {
-        expect(() => parseScript("var const")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("var const"); });
     });
 
     it("should throw \"var a[0]=0;\"", () => {
-        expect(() => parseScript("var a[0]=0;")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("var a[0]=0;"); });
     });
 
     it("should throw \"var (a)=0;\"", () => {
-        expect(() => parseScript("var (a)=0;")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("var (a)=0;"); });
     });
 
     it("should throw \"var new A = 0;\"", () => {
-        expect(() => parseScript("var new A = 0;")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("var new A = 0;"); });
     });
 
     it("should throw \"var (x)\"", () => {
-        expect(() => parseScript("var (x)")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("var (x)"); });
     });
 
     it("should throw \"var this\"", () => {
-        expect(() => parseScript("var this")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("var this"); });
     });
 
     it("should throw \"var a.b;\"", () => {
-        expect(() => parseScript("var a.b;")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("var a.b;"); });
     });
 
     it("should throw \"var [a];\"", () => {
-        expect(() => parseScript("var [a];")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("var [a];"); });
     });
 
     it("should throw \"var {a};\"", () => {
-        expect(() => parseScript("var {a};")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("var {a};"); });
     });
 
     it("should throw \"var {a:a};\"", () => {
-        expect(() => parseScript("var {a:a};")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("var {a:a};"); });
     });
-
 });

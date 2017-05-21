@@ -1,35 +1,36 @@
-import { parseScript, parseModule } from "../../../src";
-import {expect} from "chai";
+import {parseScript, parseModule} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Destructing - Binding Patterns", () => {
     describe("Object", () => {
 
         it("should parse \"try {} catch ({e: x.a}) {}\"", () => {
-            expect(() => { parseScript("try {} catch ({e: x.a}) {}"); }).to.not.throw();
+            parseScript("try {} catch ({e: x.a}) {}");
         });
 
         it("should parse \"var {a: b.c} = 0;\"", () => {
-            expect(() => { parseScript("var {a: b.c} = 0;"); }).to.not.throw();
+            parseScript("var {a: b.c} = 0;");
         });
 
         it("should parse \"function* a({e: a.b}) {}\"", () => {
-            expect(() => { parseScript("function* a({e: a.b}) {}"); }).to.not.throw();
+            parseScript("function* a({e: a.b}) {}");
         });
 
         it("should parse \"({e: a.b}) => 0\"", () => {
-            expect(() => { parseScript("({e: a.b}) => 0"); }).to.not.throw();
+            parseScript("({e: a.b}) => 0");
         });
 
         it("should parse \"(function* ({e: a.b}) {})\"", () => {
-            expect(() => { parseScript("(function* ({e: a.b}) {})"); }).to.not.throw();
+            parseScript("(function* ({e: a.b}) {})");
         });
 
         it("should parse \"({a({e: a.b}){}})\"", () => {
-            expect(() => { parseScript("({a({e: a.b}){}})"); }).to.not.throw();
+            parseScript("({a({e: a.b}){}})");
         });
 
         it("should parse \"let {a:{}} = 0\"", () => {
-            expect(parseScript("let {a:{}} = 0")).to.eql({
+            assert.match<Program>(parseScript("let {a:{}} = 0"), {
                 type: "Program",
                 body: [
                     {
@@ -71,7 +72,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"for (let {x: y = let};;) {}\"", () => {
-            expect(parseScript("for (let {x: y = let};;) {}")).to.eql({
+            assert.match<Program>(parseScript("for (let {x: y = let};;) {}"), {
                 type: "Program",
                 body: [
                     {
@@ -126,7 +127,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"function a({}) {}\"", () => {
-            expect(parseScript("function a({}) {}")).to.eql({
+            assert.match<Program>(parseScript("function a({}) {}"), {
                 type: "Program",
                 body: [
                     {
@@ -155,7 +156,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"let {} = 0\"", () => {
-            expect(parseScript("let {} = 0")).to.eql({
+            assert.match<Program>(parseScript("let {} = 0"), {
                 type: "Program",
                 body: [
                     {
@@ -181,7 +182,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"for (let {} in 0);\"", () => {
-            expect(parseScript("for (let {} in 0);")).to.eql({
+            assert.match<Program>(parseScript("for (let {} in 0);"), {
                 type: "Program",
                 body: [
                     {
@@ -214,7 +215,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"let {a,} = 0\"", () => {
-            expect(parseScript("let {a,} = 0")).to.eql({
+            assert.match<Program>(parseScript("let {a,} = 0"), {
                 type: "Program",
                 body: [
                     {
@@ -256,7 +257,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"try { } catch ({}) {}\"", () => {
-            expect(parseScript("try { } catch ({}) {}")).to.eql({
+            assert.match<Program>(parseScript("try { } catch ({}) {}"), {
                 type: "Program",
                 body: [
                     {
@@ -284,7 +285,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"for (let {} in 0);\"", () => {
-            expect(parseScript("for (let {} in 0);")).to.eql({
+            assert.match<Program>(parseScript("for (let {} in 0);"), {
                 type: "Program",
                 body: [
                     {
@@ -317,7 +318,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"for (var {x, y} in z);\"", () => {
-            expect(parseScript("for (var {x, y} in z);")).to.eql({
+            assert.match<Program>(parseScript("for (var {x, y} in z);"), {
                 type: "Program",
                 body: [
                     {
@@ -381,7 +382,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"var [{a = 0}] = 0;\"", () => {
-            expect(parseScript("var [{a = 0}] = 0;")).to.eql({
+            assert.match<Program>(parseScript("var [{a = 0}] = 0;"), {
                 type: "Program",
                 body: [
                     {
@@ -435,7 +436,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"var [{__proto__:a, __proto__:b}] = 0;\"", () => {
-            expect(parseScript("var [{__proto__:a, __proto__:b}] = 0;")).to.eql({
+            assert.match<Program>(parseScript("var [{__proto__:a, __proto__:b}] = 0;"), {
                 type: "Program",
                 body: [
                     {
@@ -497,7 +498,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"var {a, x: {y: a}} = 0;\"", () => {
-            expect(parseScript("var {a, x: {y: a}} = 0;")).to.eql({
+            assert.match<Program>(parseScript("var {a, x: {y: a}} = 0;"), {
                 type: "Program",
                 body: [
                     {
@@ -570,7 +571,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"var a, {x: {y: a}} = 0;\"", () => {
-            expect(parseScript("var a, {x: {y: a}} = 0;")).to.eql({
+            assert.match<Program>(parseScript("var a, {x: {y: a}} = 0;"), {
                 type: "Program",
                 body: [
                     {
@@ -636,7 +637,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"var {let, yield} = 0;\"", () => {
-            expect(parseScript("var {let, yield} = 0;")).to.eql({
+            assert.match<Program>(parseScript("var {let, yield} = 0;"), {
                 body: [
                     {
                         declarations: [
@@ -693,7 +694,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"try {} catch ({e}) {}\"", () => {
-            expect(parseScript("try {} catch ({e}) {}")).to.eql({
+            assert.match<Program>(parseScript("try {} catch ({e}) {}"), {
                 type: "Program",
                 body: [
                     {
@@ -737,7 +738,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"try {} catch ({e = 0}) {}\"", () => {
-            expect(parseScript("try {} catch ({e = 0}) {}")).to.eql({
+            assert.match<Program>(parseScript("try {} catch ({e = 0}) {}"), {
                 type: "Program",
                 body: [
                     {
@@ -792,43 +793,39 @@ describe.skip("Destructing - Binding Patterns", () => {
     describe("Array", () => {
 
         it("should throw on invalid \"const x, y = 12;\"", () => {
-            expect(() => {
+            assert.throws(SyntaxError, () => {
                 parseModule(`const x, y = 12;`);
-            }).to.throw();
+            });
         });
 
         it("should throw on invalid \"try { } catch ([a] = []) { }\"", () => {
-            expect(() => {
+            assert.throws(SyntaxError, () => {
                 parseModule(`try { } catch ([a] = []) { }`);
-            }).to.throw();
+            });
         });
 
         it("should throw on invalid \"let [...a] = 0;\"", () => {
-            expect(() => {
-                parseModule(`let [...a] = 0;`);
-            }).to.not.throw();
+            parseModule(`let [...a] = 0;`);
         });
 
         it("should throw on invalid \"let [...a] = 0;\"", () => {
-            expect(() => {
-                parseModule(`let [...a] = 0;`);
-            }).to.not.throw();
+            parseModule(`let [...a] = 0;`);
         });
 
         it("should throw on invalid \"var ([x]) = 0\"", () => {
-            expect(() => {
+            assert.throws(SyntaxError, () => {
                 parseModule(`var ([x]) = 0`);
-            }).to.throw();
+            });
         });
 
         it("should throw on invalid \"var [a.b] = 0\"", () => {
-            expect(() => {
+            assert.throws(SyntaxError, () => {
                 parseModule(`var [a.b] = 0`);
-            }).to.throw();
+            });
         });
 
         it("should parse \"let [a,,]=0\"", () => {
-            expect(parseScript("let [a,,]=0")).to.eql({
+            assert.match<Program>(parseScript("let [a,,]=0"), {
                 type: "Program",
                 body: [
                     {
@@ -860,7 +857,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"var [,a] = 0;\"", () => {
-            expect(parseScript("var [,a] = 0;")).to.eql({
+            assert.match<Program>(parseScript("var [,a] = 0;"), {
                 type: "Program",
                 body: [
                     {
@@ -892,7 +889,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"let [a,,b]=0\"", () => {
-            expect(parseScript("let [a,,b]=0")).to.eql({
+            assert.match<Program>(parseScript("let [a,,b]=0"), {
                 type: "Program",
                 body: [
                     {
@@ -928,7 +925,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"let [...a] = 0;\"", () => {
-            expect(parseScript("let [...a] = 0;")).to.eql({
+            assert.match<Program>(parseScript("let [...a] = 0;"), {
                 type: "Program",
                 body: [
                     {
@@ -962,7 +959,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"var [let] = answer;\"", () => {
-            expect(parseScript("var [let] = answer;")).to.eql({
+            assert.match<Program>(parseScript("var [let] = answer;"), {
                 type: "Program",
                 body: [
                     {
@@ -993,7 +990,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"let [...[x]] = y\"", () => {
-            expect(parseScript("let [...[x]] = y")).to.eql({
+            assert.match<Program>(parseScript("let [...[x]] = y"), {
                 type: "Program",
                 body: [
                     {
@@ -1032,7 +1029,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"let [[]]=0\"", () => {
-            expect(parseScript("let [[]]=0")).to.eql({
+            assert.match<Program>(parseScript("let [[]]=0"), {
                 type: "Program",
                 body: [
                     {
@@ -1063,7 +1060,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"let [] = [];\"", () => {
-            expect(parseScript("let [] = [];")).to.eql({
+            assert.match<Program>(parseScript("let [] = [];"), {
                 type: "Program",
                 body: [
                     {
@@ -1089,7 +1086,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"var [] = 0;\"", () => {
-            expect(parseScript("var [] = 0;")).to.eql({
+            assert.match<Program>(parseScript("var [] = 0;"), {
                 type: "Program",
                 body: [
                     {
@@ -1115,7 +1112,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"[a] = 0;\"", () => {
-            expect(parseScript("[a] = 0;")).to.eql({
+            assert.match<Program>(parseScript("[a] = 0;"), {
                 type: "Program",
                 body: [
                     {
@@ -1144,7 +1141,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"[...a[0]] = 0;\"", () => {
-            expect(parseScript("[...a[0]] = 0;")).to.eql({
+            assert.match<Program>(parseScript("[...a[0]] = 0;"), {
                 type: "Program",
                 body: [
                     {
@@ -1184,7 +1181,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"[a,a,,...a]=0;\"", () => {
-            expect(parseScript("[a,a,,...a]=0;")).to.eql({
+            assert.match<Program>(parseScript("[a,a,,...a]=0;"), {
                 type: "Program",
                 body: [
                     {
@@ -1225,7 +1222,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"[,,]=0\"", () => {
-            expect(parseScript("[,,]=0")).to.eql({
+            assert.match<Program>(parseScript("[,,]=0"), {
                 type: "Program",
                 body: [
                     {
@@ -1252,7 +1249,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"var [a]=[1];\"", () => {
-            expect(parseScript("var [a]=[1];")).to.eql({
+            assert.match<Program>(parseScript("var [a]=[1];"), {
                 type: "Program",
                 body: [
                     {
@@ -1288,7 +1285,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"var [[a]]=0;\"", () => {
-            expect(parseScript("var [[a]]=0;")).to.eql({
+            assert.match<Program>(parseScript("var [[a]]=0;"), {
                 type: "Program",
                 body: [
                     {
@@ -1324,7 +1321,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"var a, [a] = 0;\"", () => {
-            expect(parseScript("var a, [a] = 0;")).to.eql({
+            assert.match<Program>(parseScript("var a, [a] = 0;"), {
                 type: "Program",
                 body: [
                     {
@@ -1363,7 +1360,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"var [a, a] = 0;\"", () => {
-            expect(parseScript("var [a, a] = 0;")).to.eql({
+            assert.match<Program>(parseScript("var [a, a] = 0;"), {
                 type: "Program",
                 body: [
                     {
@@ -1398,7 +1395,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"var [a, ...a] = 0;\"", () => {
-            expect(parseScript("var [a, ...a] = 0;")).to.eql({
+            assert.match<Program>(parseScript("var [a, ...a] = 0;"), {
                 type: "Program",
                 body: [
                     {
@@ -1436,7 +1433,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"try {} catch ([e]) {}\"", () => {
-            expect(parseScript("try {} catch ([e]) {}")).to.eql({
+            assert.match<Program>(parseScript("try {} catch ([e]) {}"), {
                 type: "Program",
                 body: [
                     {
@@ -1469,7 +1466,7 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should parse \"try {} catch ([e, ...a]) {}\"", () => {
-            expect(parseScript("try {} catch ([e, ...a]) {}")).to.eql({
+            assert.match<Program>(parseScript("try {} catch ([e, ...a]) {}"), {
                 type: "Program",
                 body: [
                     {
@@ -1509,31 +1506,31 @@ describe.skip("Destructing - Binding Patterns", () => {
         });
 
         it("should throw \"function* y({yield}) {}", () => {
-            expect(() => { parseScript("function* y({yield}) {}"); }).to.throw();
+            assert.throws(SyntaxError, () => { parseScript("function* y({yield}) {}"); });
         });
 
         it("should throw \"var { this };", () => {
-            expect(() => { parseScript("var { this };"); }).to.throw();
+            assert.throws(SyntaxError, () => { parseScript("var { this };"); });
         });
 
         it("should throw \"([a += a] = a)", () => {
-            expect(() => { parseScript("([a += a] = a)"); }).to.throw();
+            assert.throws(SyntaxError, () => { parseScript("([a += a] = a)"); });
         });
 
         it("should throw \"try {} catch ({e: x.a}) {}\"", () => {
-            expect(() => { parseScript("try {} catch ({e: x.a}) {}"); }).to.not.throw();
+            parseScript("try {} catch ({e: x.a}) {}");
         });
 
         it("should throw \"({set a([a.b]){}})\"", () => {
-            expect(() => { parseScript("({set a([a.b]){}})"); }).to.throw();
+            assert.throws(SyntaxError, () => { parseScript("({set a([a.b]){}})"); });
         });
 
         it("should throw \"({set a([a.b]){}})\"", () => {
-            expect(() => { parseScript("({set a([a.b]){}})"); }).to.throw();
+            assert.throws(SyntaxError, () => { parseScript("({set a([a.b]){}})"); });
         });
 
         it("should throw \"function* a([a.b]) {}\"", () => {
-            expect(() => { parseScript("function* a([a.b]) {}"); }).to.throw();
+            assert.throws(SyntaxError, () => { parseScript("function* a([a.b]) {}"); });
         });
 
     });

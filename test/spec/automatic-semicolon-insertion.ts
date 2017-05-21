@@ -1,11 +1,11 @@
 import {parseScript, parseModule} from "../../src";
-import {expect} from "chai";
+import * as assert from "clean-assert";
 import {n} from "../../scripts/test-util";
 
 describe.skip("ASI", () => {
     describe("Script", () => {
         it("should parse `1 * {}`", () => {
-            expect(parseScript(`1 * {}`)).to.eql(n("Program", {
+            assert.match(parseScript(`1 * {}`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("ExpressionStatement", {expression: n("BinaryExpression", {
@@ -18,7 +18,7 @@ describe.skip("ASI", () => {
         });
 
         it("should parse \"var x=0, y=2;\"", () => {
-            expect(parseScript(`var x=0, y=2;`)).to.eql(n("Program", {
+            assert.match(parseScript(`var x=0, y=2;`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("VariableDeclaration", {kind: "var", declarations: [
@@ -36,7 +36,7 @@ describe.skip("ASI", () => {
         });
 
         it("should parse \"throw 0\n;\"", () => {
-            expect(parseScript(`for(false\n    ;;false\n) {\n  break;\n}`)).to.eql(n("Program", {
+            assert.match(parseScript(`for(false\n    ;;false\n) {\n  break;\n}`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("ForStatement", {
@@ -52,7 +52,7 @@ describe.skip("ASI", () => {
         });
 
         it("should parse \"throw 0\n;\"", () => {
-            expect(parseScript(`for(;\n  ;\n) {\n  break;\n}`)).to.eql(n("Program", {
+            assert.match(parseScript(`for(;\n  ;\n) {\n  break;\n}`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("ForStatement", {
@@ -68,7 +68,7 @@ describe.skip("ASI", () => {
         });
 
         it("should parse \"var x = 1\"", () => {
-            expect(parseScript(`var x =\n1`)).to.eql(n("Program", {
+            assert.match(parseScript(`var x =\n1`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("VariableDeclaration", {kind: "var", declarations: [
@@ -82,7 +82,7 @@ describe.skip("ASI", () => {
         });
 
         it("should parse \"throw 0\n;\"", () => {
-            expect(parseScript(`var x\ny`)).to.eql(n("Program", {
+            assert.match(parseScript(`var x\ny`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("VariableDeclaration", {kind: "var", declarations: [
@@ -97,7 +97,7 @@ describe.skip("ASI", () => {
         });
 
         it("should parse \" ;1; ;1; ;1;;1;\"", () => {
-            expect(parseScript(`;1;\n;1\n;1;\n;1`)).to.eql(n("Program", {
+            assert.match(parseScript(`;1;\n;1\n;1;\n;1`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("EmptyStatement"),
@@ -112,7 +112,7 @@ describe.skip("ASI", () => {
         });
 
         it("should parse \"var x = 1\"", () => {
-            expect(parseScript(`var\nx\n=\n1`)).to.eql(n("Program", {
+            assert.match(parseScript(`var\nx\n=\n1`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("VariableDeclaration", {kind: "var", declarations: [
@@ -126,7 +126,7 @@ describe.skip("ASI", () => {
         });
 
         it("should parse \"var x = 1\"", () => {
-            expect(parseScript(`var x =\n1`)).to.eql(n("Program", {
+            assert.match(parseScript(`var x =\n1`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("VariableDeclaration", {kind: "var", declarations: [
@@ -140,11 +140,11 @@ describe.skip("ASI", () => {
         });
 
         it("should parse \"do while (false)\"", () => {
-            expect(parseScript(`do\n\nwhile (false)`)).to.eql({});
+            assert.match(parseScript(`do\n\nwhile (false)`), {});
         });
 
         it("should parse \"throw 0\n;\"", () => {
-            expect(parseScript(`throw 0\n;`)).to.eql(n("Program", {
+            assert.match(parseScript(`throw 0\n;`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("ThrowStatement", {argument: n("Literal", {value: 0})}),
@@ -153,7 +153,7 @@ describe.skip("ASI", () => {
         });
 
         it("should parse \"var x /* comment */;\"", () => {
-            expect(parseScript(`var x /* comment */;`)).to.eql(n("Program", {
+            assert.match(parseScript(`var x /* comment */;`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("VariableDeclaration", {kind: "var", declarations: [
@@ -167,7 +167,7 @@ describe.skip("ASI", () => {
         });
 
         it("should parse \"0\n;\"", () => {
-            expect(parseScript(`0\n;`)).to.eql(n("Program", {
+            assert.match(parseScript(`0\n;`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("ExpressionStatement", {expression: n("Literal", {value: 0})}),
@@ -176,7 +176,7 @@ describe.skip("ASI", () => {
         });
 
         it("should parse \"debugger\n;\"", () => {
-            expect(parseScript(`debugger\n;`)).to.eql(n("Program", {
+            assert.match(parseScript(`debugger\n;`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("DebuggerStatement"),
@@ -185,7 +185,7 @@ describe.skip("ASI", () => {
         });
 
         it("should parse \"while(true) { break\n; }\"", () => {
-            expect(parseScript(`while(true) { break\n; }`)).to.eql(n("Program", {
+            assert.match(parseScript(`while(true) { break\n; }`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("WhileStatement", {
@@ -199,7 +199,7 @@ describe.skip("ASI", () => {
         });
 
         it("should parse \"if(a)b\n;else c;\"", () => {
-            expect(parseScript(`var x /* comment */;`)).to.eql(n("Program", {
+            assert.match(parseScript(`var x /* comment */;`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("VariableDeclaration", {kind: "var", declarations: [
@@ -213,7 +213,7 @@ describe.skip("ASI", () => {
         });
 
         it("should parse \"x: while(true) { continue x\n; }\"", () => {
-            expect(parseScript(`x: while(true) { continue x\n; }`)).to.eql(n("Program", {
+            assert.match(parseScript(`x: while(true) { continue x\n; }`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("LabeledStatement", {
@@ -233,7 +233,7 @@ describe.skip("ASI", () => {
 
     describe("Module", () => {
         it("should parse \"var x\n;\"", () => {
-            expect(parseModule(`var x\n;`)).to.eql(n("Program", {
+            assert.match(parseModule(`var x\n;`), n("Program", {
                 sourceType: "script",
                 body: [
                     n("VariableDeclaration", {kind: "var", declarations: [

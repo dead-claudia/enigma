@@ -1,11 +1,12 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2015 - Binding Patterns", () => {
     describe("Object", () => {
 
         it("should parse empty function", () => {
-            expect(parseScript(`function a({}) {}`)).to.eql({
+            assert.match<Program>(parseScript(`function a({}) {}`), {
                 type: "Program",
                 body: [
                     {
@@ -34,7 +35,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse ellison", () => {
-            expect(parseScript(`let {a,} = 0`)).to.eql({
+            assert.match<Program>(parseScript(`let {a,} = 0`), {
                 type: "Program",
                 body: [
                     {
@@ -76,7 +77,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse empty for let in", () => {
-            expect(parseScript(`for (let {} in 0);`)).to.eql({
+            assert.match<Program>(parseScript(`for (let {} in 0);`), {
                 type: "Program",
                 body: [
                     {
@@ -109,7 +110,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse empty lexical", () => {
-            expect(parseScript(`let {} = 0`)).to.eql({
+            assert.match<Program>(parseScript(`let {} = 0`), {
                 type: "Program",
                 body: [
                     {
@@ -135,7 +136,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse empty function", () => {
-            expect(parseScript(`var {} = 0`)).to.eql({
+            assert.match<Program>(parseScript(`var {} = 0`), {
                 type: "Program",
                 body: [
                     {
@@ -161,7 +162,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse empty function", () => {
-            expect(parseScript(`for (let {x: y = let};;) {}`)).to.eql({
+            assert.match<Program>(parseScript(`for (let {x: y = let};;) {}`), {
                 type: "Program",
                 body: [
                     {
@@ -216,7 +217,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse empty function", () => {
-            expect(parseScript(`let {a,b=0,c:d,e:f=0,[g]:[h]}=0`)).to.eql({
+            assert.match<Program>(parseScript(`let {a,b=0,c:d,e:f=0,[g]:[h]}=0`), {
                 type: "Program",
                 body: [
                     {
@@ -337,7 +338,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse empty function", () => {
-            expect(parseScript(`for (var {x, y} in z);`)).to.eql({
+            assert.match<Program>(parseScript(`for (var {x, y} in z);`), {
                 type: "Program",
                 body: [
                     {
@@ -405,7 +406,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
     describe("Array", () => {
 
         it("should parse ellison", () => {
-            expect(parseScript(`let [a,] = 0;`)).to.eql({
+            assert.match<Program>(parseScript(`let [a,] = 0;`), {
                 type: "Program",
                 body: [
                     {
@@ -436,7 +437,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse empty pattern function", () => {
-            expect(parseScript("function a([]) {}")).to.eql({
+            assert.match<Program>(parseScript("function a([]) {}"), {
                 type: "Program",
                 body: [
                     {
@@ -465,7 +466,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse empty pattern lexical", () => {
-            expect(parseScript("let [] = [];")).to.eql({
+            assert.match<Program>(parseScript("let [] = [];"), {
                 type: "Program",
                 body: [
                     {
@@ -491,7 +492,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse empty pattern var", () => {
-            expect(parseScript("var [] = 0;")).to.eql({
+            assert.match<Program>(parseScript("var [] = 0;"), {
                 type: "Program",
                 body: [
                     {
@@ -517,7 +518,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse hole", () => {
-            expect(parseScript("let [a,,b]=0")).to.eql({
+            assert.match<Program>(parseScript("let [a,,b]=0"), {
                 type: "Program",
                 body: [
                     {
@@ -553,7 +554,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse nested pattern", () => {
-            expect(parseScript("let [[]]=0")).to.eql({
+            assert.match<Program>(parseScript("let [[]]=0"), {
                 type: "Program",
                 body: [
                     {
@@ -584,7 +585,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse rest element array pattern", () => {
-            expect(parseScript("let [...[x]] = y")).to.eql({
+            assert.match<Program>(parseScript("let [...[x]] = y"), {
                 type: "Program",
                 body: [
                     {
@@ -623,7 +624,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse rest", () => {
-            expect(parseScript("let [...a] = 0;")).to.eql({
+            assert.match<Program>(parseScript("let [...a] = 0;"), {
                 type: "Program",
                 body: [
                     {
@@ -657,7 +658,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse var for in ", () => {
-            expect(parseScript("for (var [x, y] in z);")).to.eql({
+            assert.match<Program>(parseScript("for (var [x, y] in z);"), {
                 type: "Program",
                 body: [
                     {
@@ -699,7 +700,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse var let array", () => {
-            expect(parseScript("var [let] = answer;")).to.eql({
+            assert.match<Program>(parseScript("var [let] = answer;"), {
                 type: "Program",
                 body: [
                     {
@@ -730,7 +731,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse with default catch param", () => {
-            expect(parseScript("try { } catch ([a = 0]) { }")).to.eql({
+            assert.match<Program>(parseScript("try { } catch ([a = 0]) { }"), {
                 type: "Program",
                 body: [
                     {
@@ -770,7 +771,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should with default function", () => {
-            expect(parseScript("function a([a=0]) {}")).to.eql({
+            assert.match<Program>(parseScript("function a([a=0]) {}"), {
                 type: "Program",
                 body: [
                     {
@@ -811,7 +812,7 @@ describe.skip("ES2015 - Binding Patterns", () => {
         });
 
         it("should parse for let let", () => {
-            expect(parseScript("for (let [x = let];;) {}")).to.eql({
+            assert.match<Program>(parseScript("for (let [x = let];;) {}"), {
                 type: "Program",
                 body: [
                     {

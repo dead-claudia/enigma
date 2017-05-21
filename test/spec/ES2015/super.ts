@@ -1,14 +1,15 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2015 - `super`", () => {
 
     it("should parse empty function", () => {
-        expect(parseScript(`class A extends B {
+        assert.match<Program>(parseScript(`class A extends B {
     constructor() {
         super();
     }
-}`)).to.eql({
+}`), {
             type: "Program",
             body: [
                 {
@@ -51,7 +52,6 @@ describe.skip("ES2015 - `super`", () => {
                                         ],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
                                 kind: "constructor",
@@ -66,11 +66,11 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse new super", () => {
-        expect(parseScript(`class A extends B {
+        assert.match<Program>(parseScript(`class A extends B {
     foo() {
         new super.bar()
     }
-}`)).to.eql({
+}`), {
             type: "Program",
             body: [
                 {
@@ -121,10 +121,9 @@ describe.skip("ES2015 - `super`", () => {
                                         ],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -136,11 +135,11 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse empty function", () => {
-        expect(parseScript(`class A extends B {
+        assert.match<Program>(parseScript(`class A extends B {
     X() {
         return super.y
     }
-}`)).to.eql({
+}`), {
             type: "Program",
             body: [
                 {
@@ -187,10 +186,9 @@ describe.skip("ES2015 - `super`", () => {
                                         ],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -202,11 +200,11 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse empty function", () => {
-        expect(parseScript(`class A extends B {
+        assert.match<Program>(parseScript(`class A extends B {
     X() {
         return super[1]
     }
-}`)).to.eql({
+}`), {
             type: "Program",
             body: [
                 {
@@ -247,17 +245,16 @@ describe.skip("ES2015 - `super`", () => {
                                                     property: {
                                                         type: "Literal",
                                                         value: 1,
-                                                        raw: 1,
+                                                        raw: "1",
                                                     },
                                                 },
                                             },
                                         ],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -269,7 +266,7 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse \"class A extends B { constructor() { super() } }\"", () => {
-        expect(parseScript(`class A extends B { constructor() { super() } }`)).to.eql({
+        assert.match<Program>(parseScript(`class A extends B { constructor() { super() } }`), {
             type: "Program",
             body: [
                 {
@@ -312,7 +309,6 @@ describe.skip("ES2015 - `super`", () => {
                                         ],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
                                 kind: "constructor",
@@ -327,7 +323,7 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse \"class A extends B { \"constructor\"() { super() } }\"", () => {
-        expect(parseScript(`class A extends B { "constructor"() { super() } }`)).to.eql({
+        assert.match<Program>(parseScript(`class A extends B { "constructor"() { super() } }`), {
             type: "Program",
             body: [
                 {
@@ -370,7 +366,6 @@ describe.skip("ES2015 - `super`", () => {
                                         ],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
                                 kind: "constructor",
@@ -385,7 +380,7 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse \"class A extends B { constructor(a = super()){} }\"", () => {
-        expect(parseScript(`class A extends B { constructor(a = super()){} }`)).to.eql({
+        assert.match<Program>(parseScript(`class A extends B { constructor(a = super()){} }`), {
             body: [
                 {
                     body: {
@@ -405,7 +400,6 @@ describe.skip("ES2015 - `super`", () => {
                                         body: [],
                                         type: "BlockStatement",
                                     },
-                                    expression: false,
                                     generator: false,
                                     id: null,
                                     params: [
@@ -447,221 +441,227 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse \"class A extends B { constructor() { ({a: super()}); } }\"", () => {
-        expect(parseScript(`class A extends B { constructor() { ({a: super()}); } }`)).to.eql({
-            type: "Program",
-            body: [
-                {
-                    type: "ClassDeclaration",
-                    id: {
-                        type: "Identifier",
-                        name: "A",
-                    },
-                    superClass: {
-                        type: "Identifier",
-                        name: "B",
-                    },
-                    body: {
-                        type: "ClassBody",
-                        body: [
-                            {
-                                type: "MethodDefinition",
-                                key: {
-                                    type: "Identifier",
-                                    name: "constructor",
-                                },
-                                computed: false,
-                                value: {
-                                    type: "FunctionExpression",
-                                    id: null,
-                                    params: [],
-                                    body: {
-                                        type: "BlockStatement",
-                                        body: [
-                                            {
-                                                type: "ExpressionStatement",
-                                                expression: {
-                                                    type: "ObjectExpression",
-                                                    properties: [
-                                                        {
-                                                            type: "Property",
-                                                            key: {
-                                                                type: "Identifier",
-                                                                name: "a",
-                                                            },
-                                                            computed: false,
-                                                            value: {
-                                                                type: "CallExpression",
-                                                                callee: {
-                                                                    type: "Super",
-                                                                },
-                                                                arguments: [],
-                                                            },
-                                                            kind: "init",
-                                                            method: false,
-                                                            shorthand: false,
-                                                        },
-                                                    ],
-                                                },
-                                            },
-                                        ],
+        assert.match<Program>(
+            parseScript(`class A extends B { constructor() { ({a: super()}); } }`),
+            {
+                type: "Program",
+                body: [
+                    {
+                        type: "ClassDeclaration",
+                        id: {
+                            type: "Identifier",
+                            name: "A",
+                        },
+                        superClass: {
+                            type: "Identifier",
+                            name: "B",
+                        },
+                        body: {
+                            type: "ClassBody",
+                            body: [
+                                {
+                                    type: "MethodDefinition",
+                                    key: {
+                                        type: "Identifier",
+                                        name: "constructor",
                                     },
-                                    generator: false,
-                                    expression: false,
-                                    async: false,
-                                },
-                                kind: "constructor",
-                                static: false,
-                            },
-                        ],
-                    },
-                },
-            ],
-            sourceType: "script",
-        });
-    });
-
-    it("should parse \"class A extends B { constructor() { () => super(); } }\"", () => {
-        expect(parseScript(`class A extends B { constructor() { () => super(); } }`)).to.eql({
-            type: "Program",
-            body: [
-                {
-                    type: "ClassDeclaration",
-                    id: {
-                        type: "Identifier",
-                        name: "A",
-                    },
-                    superClass: {
-                        type: "Identifier",
-                        name: "B",
-                    },
-                    body: {
-                        type: "ClassBody",
-                        body: [
-                            {
-                                type: "MethodDefinition",
-                                key: {
-                                    type: "Identifier",
-                                    name: "constructor",
-                                },
-                                computed: false,
-                                value: {
-                                    type: "FunctionExpression",
-                                    id: null,
-                                    params: [],
-                                    body: {
-                                        type: "BlockStatement",
-                                        body: [
-                                            {
-                                                type: "ExpressionStatement",
-                                                expression: {
-                                                    type: "ArrowFunctionExpression",
-                                                    id: null,
-                                                    params: [],
-                                                    body: {
-                                                        type: "CallExpression",
-                                                        callee: {
-                                                            type: "Super",
-                                                        },
-                                                        arguments: [],
-                                                    },
-                                                    generator: false,
-                                                    expression: true,
-                                                    async: false,
-                                                },
-                                            },
-                                        ],
-                                    },
-                                    generator: false,
-                                    expression: false,
-                                    async: false,
-                                },
-                                kind: "constructor",
-                                static: false,
-                            },
-                        ],
-                    },
-                },
-            ],
-            sourceType: "script",
-        });
-    });
-
-    it("should parse \"class A extends B { constructor() { () => { super(); } } }\"", () => {
-        expect(parseScript(`class A extends B { constructor() { () => { super(); } } }`)).to.eql({
-            type: "Program",
-            body: [
-                {
-                    type: "ClassDeclaration",
-                    id: {
-                        type: "Identifier",
-                        name: "A",
-                    },
-                    superClass: {
-                        type: "Identifier",
-                        name: "B",
-                    },
-                    body: {
-                        type: "ClassBody",
-                        body: [
-                            {
-                                type: "MethodDefinition",
-                                key: {
-                                    type: "Identifier",
-                                    name: "constructor",
-                                },
-                                computed: false,
-                                value: {
-                                    type: "FunctionExpression",
-                                    id: null,
-                                    params: [],
-                                    body: {
-                                        type: "BlockStatement",
-                                        body: [
-                                            {
-                                                type: "ExpressionStatement",
-                                                expression: {
-                                                    type: "ArrowFunctionExpression",
-                                                    id: null,
-                                                    params: [],
-                                                    body: {
-                                                        type: "BlockStatement",
-                                                        body: [
+                                    computed: false,
+                                    value: {
+                                        type: "FunctionExpression",
+                                        id: null,
+                                        params: [],
+                                        body: {
+                                            type: "BlockStatement",
+                                            body: [
+                                                {
+                                                    type: "ExpressionStatement",
+                                                    expression: {
+                                                        type: "ObjectExpression",
+                                                        properties: [
                                                             {
-                                                                type: "ExpressionStatement",
-                                                                expression: {
+                                                                type: "Property",
+                                                                key: {
+                                                                    type: "Identifier",
+                                                                    name: "a",
+                                                                },
+                                                                computed: false,
+                                                                value: {
                                                                     type: "CallExpression",
                                                                     callee: {
                                                                         type: "Super",
                                                                     },
                                                                     arguments: [],
                                                                 },
+                                                                kind: "init",
+                                                                method: false,
+                                                                shorthand: false,
                                                             },
                                                         ],
                                                     },
-                                                    generator: false,
-                                                    expression: false,
-                                                    async: false,
                                                 },
-                                            },
-                                        ],
+                                            ],
+                                        },
+                                        generator: false,
+                                        async: false,
                                     },
-                                    generator: false,
-                                    expression: false,
-                                    async: false,
+                                    kind: "constructor",
+                                    static: false,
                                 },
-                                kind: "constructor",
-                                static: false,
-                            },
-                        ],
+                            ],
+                        },
                     },
-                },
-            ],
-            sourceType: "script",
-        });
+                ],
+                sourceType: "script",
+            },
+        );
+    });
+
+    it("should parse \"class A extends B { constructor() { () => super(); } }\"", () => {
+        assert.match<Program>(
+            parseScript(`class A extends B { constructor() { () => super(); } }`),
+            {
+                type: "Program",
+                body: [
+                    {
+                        type: "ClassDeclaration",
+                        id: {
+                            type: "Identifier",
+                            name: "A",
+                        },
+                        superClass: {
+                            type: "Identifier",
+                            name: "B",
+                        },
+                        body: {
+                            type: "ClassBody",
+                            body: [
+                                {
+                                    type: "MethodDefinition",
+                                    key: {
+                                        type: "Identifier",
+                                        name: "constructor",
+                                    },
+                                    computed: false,
+                                    value: {
+                                        type: "FunctionExpression",
+                                        id: null,
+                                        params: [],
+                                        body: {
+                                            type: "BlockStatement",
+                                            body: [
+                                                {
+                                                    type: "ExpressionStatement",
+                                                    expression: {
+                                                        type: "ArrowFunctionExpression",
+                                                        id: null,
+                                                        params: [],
+                                                        body: {
+                                                            type: "CallExpression",
+                                                            callee: {
+                                                                type: "Super",
+                                                            },
+                                                            arguments: [],
+                                                        },
+                                                        generator: false,
+                                                        expression: true,
+                                                        async: false,
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                        generator: false,
+                                        async: false,
+                                    },
+                                    kind: "constructor",
+                                    static: false,
+                                },
+                            ],
+                        },
+                    },
+                ],
+                sourceType: "script",
+            },
+        );
+    });
+
+    it("should parse \"class A extends B { constructor() { () => { super(); } } }\"", () => {
+        assert.match<Program>(
+            parseScript(`class A extends B { constructor() { () => { super(); } } }`),
+            {
+                type: "Program",
+                body: [
+                    {
+                        type: "ClassDeclaration",
+                        id: {
+                            type: "Identifier",
+                            name: "A",
+                        },
+                        superClass: {
+                            type: "Identifier",
+                            name: "B",
+                        },
+                        body: {
+                            type: "ClassBody",
+                            body: [
+                                {
+                                    type: "MethodDefinition",
+                                    key: {
+                                        type: "Identifier",
+                                        name: "constructor",
+                                    },
+                                    computed: false,
+                                    value: {
+                                        type: "FunctionExpression",
+                                        id: null,
+                                        params: [],
+                                        body: {
+                                            type: "BlockStatement",
+                                            body: [
+                                                {
+                                                    type: "ExpressionStatement",
+                                                    expression: {
+                                                        type: "ArrowFunctionExpression",
+                                                        id: null,
+                                                        params: [],
+                                                        body: {
+                                                            type: "BlockStatement",
+                                                            body: [
+                                                                {
+                                                                    type: "ExpressionStatement",
+                                                                    expression: {
+                                                                        type: "CallExpression",
+                                                                        callee: {
+                                                                            type: "Super",
+                                                                        },
+                                                                        arguments: [],
+                                                                    },
+                                                                },
+                                                            ],
+                                                        },
+                                                        generator: false,
+                                                        expression: false,
+                                                        async: false,
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                        generator: false,
+                                        async: false,
+                                    },
+                                    kind: "constructor",
+                                    static: false,
+                                },
+                            ],
+                        },
+                    },
+                ],
+                sourceType: "script",
+            },
+        );
     });
 
     it("should parse \"({ a() { super.b(); } });\"", () => {
-        expect(parseScript(`({ a() { super.b(); } });`)).to.eql({
+        assert.match<Program>(parseScript(`({ a() { super.b(); } });`), {
             type: "Program",
             body: [
                 {
@@ -721,16 +721,16 @@ describe.skip("ES2015 - `super`", () => {
 
     /*
      it('should parse "({ *a() { super.b = 0; } });"', function() {
-     expect(parseScript(`({ *a() { super.b = 0; } });`)).to.eql({});
+     assert.match<Program>(parseScript(`({ *a() { super.b = 0; } });`), {});
      });
      */
     /*
      it('should parse "({ get a() { super[0] = 1; } });"', function() {
-     expect(parseScript(`({ get a() { super[0] = 1; } });`)).to.eql({});
+     assert.match<Program>(parseScript(`({ get a() { super[0] = 1; } });`), {});
      });*/
 
     it("should parse \"({ set a(x) { super.b[0] = 1; } });\"", () => {
-        expect(parseScript(`({ set a(x) { super.b[0] = 1; } });`)).to.eql({
+        assert.match<Program>(parseScript(`({ set a(x) { super.b[0] = 1; } });`), {
             type: "Program",
             body: [
                 {
@@ -806,7 +806,7 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse \"(class extends B { constructor() { super() } });\"", () => {
-        expect(parseScript(`(class extends B { constructor() { super() } });`)).to.eql({
+        assert.match<Program>(parseScript(`(class extends B { constructor() { super() } });`), {
             type: "Program",
             body: [
                 {
@@ -848,7 +848,6 @@ describe.skip("ES2015 - `super`", () => {
                                             ],
                                         },
                                         generator: false,
-                                        expression: false,
                                         async: false,
                                     },
                                     kind: "constructor",
@@ -864,11 +863,11 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse empty function", () => {
-        expect(parseScript(`class A extends B {
+        assert.match<Program>(parseScript(`class A extends B {
      constructor() {
-     super();
+         super();
      }
-     }`)).to.eql({
+ }`), {
             type: "Program",
             body: [
                 {
@@ -911,7 +910,6 @@ describe.skip("ES2015 - `super`", () => {
                                         ],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
                                 kind: "constructor",

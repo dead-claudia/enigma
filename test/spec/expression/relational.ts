@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Relational", () => {
-
     it("should parse \"x < y\"", () => {
-        expect(parseScript("x < y")).to.eql({
+        assert.match<Program>(parseScript("x < y"), {
             type: "Program",
             body: [
                 {
@@ -28,7 +28,7 @@ describe.skip("Expressions - Relational", () => {
     });
 
     it("should parse \"x > y\"", () => {
-        expect(parseScript("x > y")).to.eql({
+        assert.match<Program>(parseScript("x > y"), {
             type: "Program",
             body: [
                 {
@@ -52,7 +52,7 @@ describe.skip("Expressions - Relational", () => {
     });
 
     it("should parse \"x <= y\"", () => {
-        expect(parseScript("x <= y")).to.eql({
+        assert.match<Program>(parseScript("x <= y"), {
             type: "Program",
             body: [
                 {
@@ -76,7 +76,7 @@ describe.skip("Expressions - Relational", () => {
     });
 
     it("should parse \"x >= y\"", () => {
-        expect(parseScript("x >= y")).to.eql({
+        assert.match<Program>(parseScript("x >= y"), {
             type: "Program",
             body: [
                 {
@@ -100,7 +100,7 @@ describe.skip("Expressions - Relational", () => {
     });
 
     it("should parse \"x in y\"", () => {
-        expect(parseScript("x in y")).to.eql({
+        assert.match<Program>(parseScript("x in y"), {
             type: "Program",
             body: [
                 {
@@ -124,7 +124,7 @@ describe.skip("Expressions - Relational", () => {
     });
 
     it("should parse \"x instanceof y\"", () => {
-        expect(parseScript("x instanceof y")).to.eql({
+        assert.match<Program>(parseScript("x instanceof y"), {
             type: "Program",
             body: [
                 {
@@ -148,7 +148,7 @@ describe.skip("Expressions - Relational", () => {
     });
 
     it("should parse \"x < y < z\"", () => {
-        expect(parseScript("x < y < z")).to.eql({
+        assert.match<Program>(parseScript("x < y < z"), {
             type: "Program",
             body: [
                 {

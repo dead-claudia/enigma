@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2017 - `async`", () => {
-
     it("should parse assigned async arrow", () => {
-        expect(parseScript("f(a, async b => await b)")).to.eql({
+        assert.match<Program>(parseScript("f(a, async b => await b)"), {
             type: "Program",
             body: [
                 {
@@ -49,7 +49,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow as parameter", () => {
-        expect(parseScript("f(a, async (b, c) => await [b, c], d)")).to.eql({
+        assert.match<Program>(parseScript("f(a, async (b, c) => await [b, c], d)"), {
             type: "Program",
             body: [
                 {
@@ -111,7 +111,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow multi await", () => {
-        expect(parseScript("async (a, b) => { await a }")).to.eql({
+        assert.match<Program>(parseScript("async (a, b) => { await a }"), {
             type: "Program",
             body: [
                 {
@@ -155,7 +155,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse assigned async arrow", () => {
-        expect(parseScript("async (a, b) => await a")).to.eql({
+        assert.match<Program>(parseScript("async (a, b) => await a"), {
             type: "Program",
             body: [
                 {
@@ -191,7 +191,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow multi args concise", () => {
-        expect(parseScript("async (x, y) => y")).to.eql({
+        assert.match<Program>(parseScript("async (x, y) => y"), {
             type: "Program",
             body: [
                 {
@@ -224,7 +224,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow multi args", () => {
-        expect(parseScript("async (x, y) => { x * y }")).to.eql({
+        assert.match<Program>(parseScript("async (x, y) => { x * y }"), {
             type: "Program",
             body: [
                 {
@@ -273,7 +273,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow no args", () => {
-        expect(parseScript("async () => 42")).to.eql({
+        assert.match<Program>(parseScript("async () => 42"), {
             type: "Program",
             body: [
                 {
@@ -297,7 +297,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow object pattern", () => {
-        expect(parseScript("async ({x: y = z}) => x")).to.eql({
+        assert.match<Program>(parseScript("async ({x: y = z}) => x"), {
             type: "Program",
             body: [
                 {
@@ -349,7 +349,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow one arg await", () => {
-        expect(parseScript("async a => { await a }")).to.eql({
+        assert.match<Program>(parseScript("async a => { await a }"), {
             type: "Program",
             body: [
                 {
@@ -389,7 +389,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow one arg concise", () => {
-        expect(parseScript("async a => await a")).to.eql({
+        assert.match<Program>(parseScript("async a => await a"), {
             type: "Program",
             body: [
                 {
@@ -421,7 +421,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow one arg", () => {
-        expect(parseScript("async x => { x * x }")).to.eql({
+        assert.match<Program>(parseScript("async x => { x * x }"), {
             type: "Program",
             body: [
                 {
@@ -466,7 +466,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        expect(parseScript("async (yield) => 1;")).to.eql({
+        assert.match<Program>(parseScript("async (yield) => 1;"), {
             type: "Program",
             body: [
                 {
@@ -495,7 +495,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow parenthesized", () => {
-        expect(parseScript("async (x) => { x * x }")).to.eql({
+        assert.match<Program>(parseScript("async (x) => { x * x }"), {
             type: "Program",
             body: [
                 {
@@ -540,7 +540,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow pattern parameter", () => {
-        expect(parseScript("async ({x = y}) => z")).to.eql({
+        assert.match<Program>(parseScript("async ({x = y}) => z"), {
             type: "Program",
             body: [
                 {
@@ -592,7 +592,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow rest", () => {
-        expect(parseScript("async (x, ...y) => x")).to.eql({
+        assert.match<Program>(parseScript("async (x, ...y) => x"), {
             type: "Program",
             body: [
                 {
@@ -628,7 +628,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow trailing comma", () => {
-        expect(parseScript("async (x,y,) => x")).to.eql({
+        assert.match<Program>(parseScript("async (x,y,) => x"), {
             type: "Program",
             body: [
                 {
@@ -661,7 +661,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow yield", () => {
-        expect(parseScript("async yield => 0;")).to.eql({
+        assert.match<Program>(parseScript("async yield => 0;"), {
             type: "Program",
             body: [
                 {
@@ -690,7 +690,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow parenthesized await", () => {
-        expect(parseScript("async (a) => { await a }")).to.eql({
+        assert.match<Program>(parseScript("async (a) => { await a }"), {
             type: "Program",
             body: [
                 {
@@ -730,7 +730,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse assigned async arrow", () => {
-        expect(parseScript("id = async x => x, square = async (y) => { y * y }")).to.eql({
+        assert.match<Program>(parseScript("id = async x => x, square = async (y) => { y * y }"), {
             type: "Program",
             body: [
                 {
@@ -813,7 +813,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse argument async call", () => {
-        expect(parseScript("f(x, async(y, z))")).to.eql({
+        assert.match<Program>(parseScript("f(x, async(y, z))"), {
             type: "Program",
             body: [
                 {
@@ -855,7 +855,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        expect(parseScript("async => 42;")).to.eql({
+        assert.match<Program>(parseScript("async => 42;"), {
             type: "Program",
             body: [
                 {
@@ -884,7 +884,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        expect(parseScript("const answer = async => 42;")).to.eql({
+        assert.match<Program>(parseScript("const answer = async => 42;"), {
             type: "Program",
             body: [
                 {
@@ -923,7 +923,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse await function name", () => {
-        expect(parseScript("async function await() {}")).to.eql({
+        assert.match<Program>(parseScript("async function await() {}"), {
             type: "Program",
             body: [
                 {
@@ -947,7 +947,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        expect(parseScript("class X { static async await(){} }")).to.eql({
+        assert.match<Program>(parseScript("class X { static async await(){} }"), {
             type: "Program",
             body: [
                 {
@@ -976,10 +976,9 @@ describe.skip("ES2017 - `async`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: true,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                         ],
@@ -991,7 +990,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        expect(parseScript("a = async(await);")).to.eql({
+        assert.match<Program>(parseScript("a = async(await);"), {
             type: "Program",
             body: [
                 {
@@ -1024,7 +1023,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        expect(parseScript("x = async(y);")).to.eql({
+        assert.match<Program>(parseScript("x = async(y);"), {
             type: "Program",
             body: [
                 {
@@ -1057,7 +1056,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse label async", () => {
-        expect(parseScript("async: function f() {}")).to.eql({
+        assert.match<Program>(parseScript("async: function f() {}"), {
             type: "Program",
             body: [
                 {
@@ -1088,8 +1087,8 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        expect(parseScript(`async
-x => x`)).to.eql({
+        assert.match<Program>(parseScript(`async
+x => x`), {
             type: "Program",
             body: [
                 {
@@ -1125,7 +1124,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        expect(parseScript("class X { async() {} }")).to.eql({
+        assert.match<Program>(parseScript("class X { async() {} }"), {
             type: "Program",
             body: [
                 {
@@ -1154,10 +1153,9 @@ x => x`)).to.eql({
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -1169,7 +1167,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        expect(parseScript("x = { async: false }")).to.eql({
+        assert.match<Program>(parseScript("x = { async: false }"), {
             type: "Program",
             body: [
                 {
@@ -1209,7 +1207,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        expect(parseScript("class X { static *async() {} }")).to.eql({
+        assert.match<Program>(parseScript("class X { static *async() {} }"), {
             type: "Program",
             body: [
                 {
@@ -1238,10 +1236,9 @@ x => x`)).to.eql({
                                         body: [],
                                     },
                                     generator: true,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                         ],
@@ -1253,7 +1250,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        expect(parseScript("class X { static async() {} }")).to.eql({
+        assert.match<Program>(parseScript("class X { static async() {} }"), {
             type: "Program",
             body: [
                 {
@@ -1282,10 +1279,9 @@ x => x`)).to.eql({
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                         ],
@@ -1297,7 +1293,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async function expression", () => {
-        expect(parseScript("f(async function(x) { await x })")).to.eql({
+        assert.match<Program>(parseScript("f(async function(x) { await x })"), {
             type: "Program",
             body: [
                 {
@@ -1346,7 +1342,7 @@ x => x`)).to.eql({
     });
 
     it("should parse function async declaration", () => {
-        expect(parseScript("async function f(a) { await a }")).to.eql({
+        assert.match<Program>(parseScript("async function f(a) { await a }"), {
             type: "Program",
             body: [
                 {
@@ -1386,7 +1382,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async function declaration", () => {
-        expect(parseScript("async function f() {}")).to.eql({
+        assert.match<Program>(parseScript("async function f() {}"), {
             type: "Program",
             body: [
                 {
@@ -1410,7 +1406,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async function expression await", () => {
-        expect(parseScript("f(b, async function(b) { await b }, c)")).to.eql({
+        assert.match<Program>(parseScript("f(b, async function(b) { await b }, c)"), {
             type: "Program",
             body: [
                 {
@@ -1467,7 +1463,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async function expression await", () => {
-        expect(parseScript("x = async function(a) { await a }")).to.eql({
+        assert.match<Program>(parseScript("x = async function(a) { await a }"), {
             type: "Program",
             body: [
                 {
@@ -1515,7 +1511,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async function expression named await", () => {
-        expect(parseScript("x = async function f(a) { await a }")).to.eql({
+        assert.match<Program>(parseScript("x = async function f(a) { await a }"), {
             type: "Program",
             body: [
                 {
@@ -1566,7 +1562,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async function expression", () => {
-        expect(parseScript("a = async function() {}")).to.eql({
+        assert.match<Program>(parseScript("a = async function() {}"), {
             type: "Program",
             body: [
                 {
@@ -1598,7 +1594,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async if await", () => {
-        expect(parseScript("if (x) async function f(a) { await a }")).to.eql({
+        assert.match<Program>(parseScript("if (x) async function f(a) { await a }"), {
             type: "Program",
             body: [
                 {
@@ -1646,7 +1642,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        expect(parseScript("var async; async = 3;")).to.eql({
+        assert.match<Program>(parseScript("var async; async = 3;"), {
             type: "Program",
             body: [
                 {
@@ -1684,7 +1680,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async if", () => {
-        expect(parseScript("if (x) async function f() {}")).to.eql({
+        assert.match<Program>(parseScript("if (x) async function f() {}"), {
             type: "Program",
             body: [
                 {
@@ -1716,7 +1712,7 @@ x => x`)).to.eql({
     });
 
     it("should parse inner function async", () => {
-        expect(parseScript("(function(x) { async function inner() { await x } })")).to.eql({
+        assert.match<Program>(parseScript("(function(x) { async function inner() { await x } })"), {
             type: "Program",
             body: [
                 {
@@ -1772,7 +1768,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        expect(parseScript("({ async f(a) { await a } })")).to.eql({
+        assert.match<Program>(parseScript("({ async f(a) { await a } })"), {
             type: "Program",
             body: [
                 {
@@ -1828,7 +1824,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async arrow rest\"", () => {
-        expect(parseScript("async (x, ...y) => x")).to.eql({
+        assert.match<Program>(parseScript("async (x, ...y) => x"), {
             type: "Program",
             body: [
                 {
@@ -1864,7 +1860,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async arrow yield\"", () => {
-        expect(parseScript("async yield => 0;")).to.eql({
+        assert.match<Program>(parseScript("async yield => 0;"), {
             type: "Program",
             body: [
                 {
@@ -1893,7 +1889,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async function foo() { }\"", () => {
-        expect(parseScript("async function foo() { }")).to.eql({
+        assert.match<Program>(parseScript("async function foo() { }"), {
             type: "Program",
             body: [
                 {
@@ -1917,7 +1913,7 @@ x => x`)).to.eql({
     });
 
     it("should parse arrow last param\"", () => {
-        expect(parseScript("f(a, async b => await b)")).to.eql({
+        assert.match<Program>(parseScript("f(a, async b => await b)"), {
             type: "Program",
             body: [
                 {
@@ -1962,7 +1958,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"var ok = async(x)\"", () => {
-        expect(parseScript("var ok = async(x)")).to.eql({
+        assert.match<Program>(parseScript("var ok = async(x)"), {
             type: "Program",
             body: [
                 {
@@ -1997,7 +1993,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"f(a, async(1, 2), b)\"", () => {
-        expect(parseScript("f(a, async(1, 2), b)")).to.eql({
+        assert.match<Program>(parseScript("f(a, async(1, 2), b)"), {
             type: "Program",
             body: [
                 {
@@ -2044,7 +2040,7 @@ x => x`)).to.eql({
 
     it("should parse \"(function() { var async; async = 10 })\"", () => {
 
-        expect(parseScript("var foo = async function(promise) { await promise; }")).to.eql({
+        assert.match<Program>(parseScript("var foo = async function(promise) { await promise; }"), {
             type: "Program",
             body: [
                 {
@@ -2095,7 +2091,7 @@ x => x`)).to.eql({
 
     it("should parse \"f(a, async promise => await promise)\"", () => {
 
-        expect(parseScript("f(a, async promise => await promise)")).to.eql({
+        assert.match<Program>(parseScript("f(a, async promise => await promise)"), {
             type: "Program",
             body: [
                 {
@@ -2141,7 +2137,7 @@ x => x`)).to.eql({
 
     it("should parse \"var foo = async function(promise) { await promise; }\"", () => {
 
-        expect(parseScript("var foo = async function(promise) { await promise; }")).to.eql({
+        assert.match<Program>(parseScript("var foo = async function(promise) { await promise; }"), {
             type: "Program",
             body: [
                 {
@@ -2192,7 +2188,7 @@ x => x`)).to.eql({
 
     it("should parse \"(function(x) { async function inner() { await x } })\"", () => {
 
-        expect(parseScript("(function(x) { async function inner() { await x } })")).to.eql({
+        assert.match<Program>(parseScript("(function(x) { async function inner() { await x } })"), {
             type: "Program",
             body: [
                 {
@@ -2249,7 +2245,7 @@ x => x`)).to.eql({
 
     it("should parse \"async x => x\"", () => {
 
-        expect(parseScript("async x => x")).to.eql({
+        assert.match<Program>(parseScript("async x => x"), {
             type: "Program",
             body: [
                 {
@@ -2278,7 +2274,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async function foo(promise) { await promise; }\"", () => {
-        expect(parseScript("async function foo(promise) { await promise; }")).to.eql({
+        assert.match<Program>(parseScript("async function foo(promise) { await promise; }"), {
             type: "Program",
             body: [
                 {
@@ -2319,7 +2315,7 @@ x => x`)).to.eql({
 
     it("should parse \"(function(x) { async function inner() { await x } })\"", () => {
 
-        expect(parseScript("(function(x) { async function inner() { await x } })")).to.eql({
+        assert.match<Program>(parseScript("(function(x) { async function inner() { await x } })"), {
             type: "Program",
             body: [
                 {
@@ -2375,7 +2371,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async\\nfunction foo() { }\"", () => {
-        expect(parseScript("async\nfunction foo() { }")).to.eql({
+        assert.match<Program>(parseScript("async\nfunction foo() { }"), {
             body: [
                 {
                     async: true,
@@ -2399,7 +2395,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async function await() { }\"", () => {
-        expect(parseScript("async function await() { }")).to.eql({
+        assert.match<Program>(parseScript("async function await() { }"), {
             type: "Program",
             body: [
                 {
@@ -2423,7 +2419,7 @@ x => x`)).to.eql({
     });
 
     it("should parse arrow parenthesized", () => {
-        expect(parseScript("async (x) => { x * x }")).to.eql({
+        assert.match<Program>(parseScript("async (x) => { x * x }"), {
             type: "Program",
             body: [
                 {
@@ -2468,7 +2464,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async arrow one arg\"", () => {
-        expect(parseScript("async x => { x * x }")).to.eql({
+        assert.match<Program>(parseScript("async x => { x * x }"), {
             type: "Program",
             body: [
                 {
@@ -2513,7 +2509,7 @@ x => x`)).to.eql({
     });
 
     it("should parse parenthesized await", () => {
-        expect(parseScript("async (a) => { await a }")).to.eql({
+        assert.match<Program>(parseScript("async (a) => { await a }"), {
             type: "Program",
             body: [
                 {
@@ -2553,7 +2549,7 @@ x => x`)).to.eql({
     });
 
     it("should parse arrow parenthesized concise\"", () => {
-        expect(parseScript("async (y) => y")).to.eql({
+        assert.match<Program>(parseScript("async (y) => y"), {
             type: "Program",
             body: [
                 {
@@ -2582,7 +2578,7 @@ x => x`)).to.eql({
     });
 
     it("should parse arrow parenthesized yield\"", () => {
-        expect(parseScript("async (yield) => 1;")).to.eql({
+        assert.match<Program>(parseScript("async (yield) => 1;"), {
             type: "Program",
             body: [
                 {
@@ -2611,7 +2607,7 @@ x => x`)).to.eql({
     });
 
     it("should parse async arrow yield\"", () => {
-        expect(parseScript("async yield => 0;")).to.eql({
+        assert.match<Program>(parseScript("async yield => 0;"), {
             type: "Program",
             body: [
                 {
@@ -2640,7 +2636,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"(async function foo() { })\"", () => {
-        expect(parseScript("(async function foo() { })")).to.eql({
+        assert.match<Program>(parseScript("(async function foo() { })"), {
             type: "Program",
             body: [
                 {
@@ -2667,7 +2663,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async a => a\"", () => {
-        expect(parseScript("async a => a")).to.eql({
+        assert.match<Program>(parseScript("async a => a"), {
             type: "Program",
             body: [
                 {
@@ -2696,7 +2692,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async () => a\"", () => {
-        expect(parseScript("async () => a")).to.eql({
+        assert.match<Program>(parseScript("async () => a"), {
             type: "Program",
             body: [
                 {
@@ -2720,7 +2716,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async (a, b) => a\"", () => {
-        expect(parseScript("async (a, b) => a")).to.eql({
+        assert.match<Program>(parseScript("async (a, b) => a"), {
             type: "Program",
             body: [
                 {
@@ -2753,7 +2749,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async (await)\"", () => {
-        expect(parseScript("async (await)")).to.eql({
+        assert.match<Program>(parseScript("async (await)"), {
             type: "Program",
             body: [
                 {
@@ -2778,7 +2774,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async yield => 1\"", () => {
-        expect(parseScript("async yield => 1")).to.eql({
+        assert.match<Program>(parseScript("async yield => 1"), {
             type: "Program",
             body: [
                 {
@@ -2807,7 +2803,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async function foo(a, b) { await a + await b }\"", () => {
-        expect(parseScript("async function foo(a, b) { await a + await b }")).to.eql({
+        assert.match<Program>(parseScript("async function foo(a, b) { await a + await b }"), {
             type: "Program",
             body: [
                 {
@@ -2862,7 +2858,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"function foo() { await + 1 }\"", () => {
-        expect(parseScript("function foo() { await + 1 }")).to.eql({
+        assert.match<Program>(parseScript("function foo() { await + 1 }"), {
             type: "Program",
             body: [
                 {
@@ -2902,7 +2898,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async function foo() { await + 1 }\"", () => {
-        expect(parseScript("async function foo() { await + 1 }")).to.eql({
+        assert.match<Program>(parseScript("async function foo() { await + 1 }"), {
             type: "Program",
             body: [
                 {
@@ -2942,65 +2938,68 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async function foo(a = async function foo() { await b }) {}\"", () => {
-        expect(parseScript("async function foo(a = async function foo() { await b }) {}")).to.eql({
-            type: "Program",
-            body: [
-                {
-                    type: "FunctionDeclaration",
-                    id: {
-                        type: "Identifier",
-                        name: "foo",
-                    },
-                    params: [
-                        {
-                            type: "AssignmentPattern",
-                            left: {
-                                type: "Identifier",
-                                name: "a",
-                            },
-                            right: {
-                                type: "FunctionExpression",
-                                id: {
+        assert.match<Program>(
+            parseScript("async function foo(a = async function foo() { await b }) {}"),
+            {
+                type: "Program",
+                body: [
+                    {
+                        type: "FunctionDeclaration",
+                        id: {
+                            type: "Identifier",
+                            name: "foo",
+                        },
+                        params: [
+                            {
+                                type: "AssignmentPattern",
+                                left: {
                                     type: "Identifier",
-                                    name: "foo",
+                                    name: "a",
                                 },
-                                params: [],
-                                body: {
-                                    type: "BlockStatement",
-                                    body: [
-                                        {
-                                            type: "ExpressionStatement",
-                                            expression: {
-                                                type: "AwaitExpression",
-                                                argument: {
-                                                    type: "Identifier",
-                                                    name: "b",
+                                right: {
+                                    type: "FunctionExpression",
+                                    id: {
+                                        type: "Identifier",
+                                        name: "foo",
+                                    },
+                                    params: [],
+                                    body: {
+                                        type: "BlockStatement",
+                                        body: [
+                                            {
+                                                type: "ExpressionStatement",
+                                                expression: {
+                                                    type: "AwaitExpression",
+                                                    argument: {
+                                                        type: "Identifier",
+                                                        name: "b",
+                                                    },
                                                 },
                                             },
-                                        },
-                                    ],
+                                        ],
+                                    },
+                                    generator: false,
+                                    expression: false,
+                                    async: true,
                                 },
-                                generator: false,
-                                expression: false,
-                                async: true,
                             },
+                        ],
+                        body: {
+                            type: "BlockStatement",
+                            body: [],
                         },
-                    ],
-                    body: {
-                        type: "BlockStatement",
-                        body: [],
+                        generator: false,
+                        expression: false,
+                        async: true,
                     },
-                    generator: false,
-                    expression: false,
-                    async: true,
-                },
-            ],
-            sourceType: "script",
-        });
+                ],
+                sourceType: "script",
+            },
+        );
     });
 
     it("should parse \"async function foo(a = async () => await b) {}\"", () => {
-        expect(parseScript("async function foo(a = async () => await b) {}")).to.eql({
+        assert.match<Program>(parseScript("async function foo(a = async () => await b) {}"), {
             type: "Program",
             body: [
                 {
@@ -3047,7 +3046,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"if (x) async function f() {}\"", () => {
-        expect(parseScript("if (x) async function f() {}")).to.eql({
+        assert.match<Program>(parseScript("if (x) async function f() {}"), {
             type: "Program",
             body: [
                 {
@@ -3080,7 +3079,7 @@ x => x`)).to.eql({
 
     it("should parse \"(function(x) { async function inner() { await x } })\"", () => {
 
-        expect(parseScript("(function(x) { async function inner() { await x } })")).to.eql({
+        assert.match<Program>(parseScript("(function(x) { async function inner() { await x } })"), {
             type: "Program",
             body: [
                 {
@@ -3136,7 +3135,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async ({a = b}) => a\"", () => {
-        expect(parseScript("async ({a = b}) => a")).to.eql({
+        assert.match<Program>(parseScript("async ({a = b}) => a"), {
             type: "Program",
             body: [
                 {
@@ -3189,7 +3188,7 @@ x => x`)).to.eql({
 
     // TODO! This has no body and should fail, not pass!!
     it("should parse \"async ({a: b = c}) =>\"", () => {
-        expect(parseScript("async ({a: b = c}) =>")).to.eql({
+        assert.match<Program>(parseScript("async ({a: b = c}) =>"), {
             body: [
                 {
                     expression: {
@@ -3241,7 +3240,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async ({a: b = c})\"", () => {
-        expect(parseScript("async ({a: b = c})")).to.eql({
+        assert.match<Program>(parseScript("async ({a: b = c})"), {
             type: "Program",
             body: [
                 {
@@ -3290,7 +3289,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async\na => a\"", () => {
-        expect(parseScript("async\na => a")).to.eql({
+        assert.match<Program>(parseScript("async\na => a"), {
             body: [
                 {
                     expression: {
@@ -3326,7 +3325,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"({async foo() { }})\"", () => {
-        expect(parseScript("({async foo() { }})")).to.eql({
+        assert.match<Program>(parseScript("({async foo() { }})"), {
             type: "Program",
             body: [
                 {
@@ -3366,7 +3365,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"({async() { }})\"", () => {
-        expect(parseScript("({async() { }})")).to.eql({
+        assert.match<Program>(parseScript("({async() { }})"), {
             type: "Program",
             body: [
                 {
@@ -3406,7 +3405,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"({async await() { }})\"", () => {
-        expect(parseScript("({async await() { }})")).to.eql({
+        assert.match<Program>(parseScript("({async await() { }})"), {
             type: "Program",
             body: [
                 {
@@ -3446,7 +3445,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"class A {async foo() { }}\"", () => {
-        expect(parseScript("class A {async foo() { }}")).to.eql({
+        assert.match<Program>(parseScript("class A {async foo() { }}"), {
             type: "Program",
             body: [
                 {
@@ -3475,10 +3474,9 @@ x => x`)).to.eql({
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: true,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -3490,7 +3488,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"class A {static async() { }}\"", () => {
-        expect(parseScript("class A {static async() { }}")).to.eql({
+        assert.match<Program>(parseScript("class A {static async() { }}"), {
             type: "Program",
             body: [
                 {
@@ -3519,10 +3517,9 @@ x => x`)).to.eql({
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                         ],
@@ -3534,7 +3531,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"class A {*async() { }}\"", () => {
-        expect(parseScript("class A {*async() { }}")).to.eql({
+        assert.match<Program>(parseScript("class A {*async() { }}"), {
             type: "Program",
             body: [
                 {
@@ -3563,10 +3560,9 @@ x => x`)).to.eql({
                                         body: [],
                                     },
                                     generator: true,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -3578,7 +3574,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"class A {async await() { }}\"", () => {
-        expect(parseScript("class A {async await() { }}")).to.eql({
+        assert.match<Program>(parseScript("class A {async await() { }}"), {
             type: "Program",
             body: [
                 {
@@ -3607,10 +3603,9 @@ x => x`)).to.eql({
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: true,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -3622,7 +3617,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"await\"", () => {
-        expect(parseScript("await")).to.eql({
+        assert.match<Program>(parseScript("await"), {
             type: "Program",
             body: [
                 {
@@ -3638,7 +3633,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"\"async function foo(a, b) { await a }\"", () => {
-        expect(parseScript("async function foo(a, b) { await a }")).to.eql({
+        assert.match<Program>(parseScript("async function foo(a, b) { await a }"), {
             type: "Program",
             body: [
                 {
@@ -3682,7 +3677,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async function foo(a) { await a })\"", () => {
-        expect(parseScript("async function foo(a) { await a })")).to.eql({
+        assert.match<Program>(parseScript("async function foo(a) { await a })"), {
             body: [
                 {
                     async: true,
@@ -3729,7 +3724,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"(async (a) => await a)\"", () => {
-        expect(parseScript("(async (a) => await a)")).to.eql({
+        assert.match<Program>(parseScript("(async (a) => await a)"), {
             type: "Program",
             body: [
                 {
@@ -3761,7 +3756,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"({async foo(a) { await a }})\"", () => {
-        expect(parseScript("({async foo(a) { await a }})")).to.eql({
+        assert.match<Program>(parseScript("({async foo(a) { await a }})"), {
             type: "Program",
             body: [
                 {
@@ -3817,7 +3812,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async function foo(a, b) { await a + await b }\"", () => {
-        expect(parseScript("async function foo(a, b) { await a + await b }")).to.eql({
+        assert.match<Program>(parseScript("async function foo(a, b) { await a + await b }"), {
             type: "Program",
             body: [
                 {
@@ -3872,7 +3867,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"\"", () => {
-        expect(parseScript("function foo() { await + 1 }")).to.eql({
+        assert.match<Program>(parseScript("function foo() { await + 1 }"), {
             type: "Program",
             body: [
                 {
@@ -3912,7 +3907,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async function foo() { await + 1 }\"", () => {
-        expect(parseScript("async function foo() { await + 1 }")).to.eql({
+        assert.match<Program>(parseScript("async function foo() { await + 1 }"), {
             type: "Program",
             body: [
                 {
@@ -3952,65 +3947,68 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async function foo(a = async function foo() { await b }) {}\"", () => {
-        expect(parseScript("async function foo(a = async function foo() { await b }) {}")).to.eql({
-            type: "Program",
-            body: [
-                {
-                    type: "FunctionDeclaration",
-                    id: {
-                        type: "Identifier",
-                        name: "foo",
-                    },
-                    params: [
-                        {
-                            type: "AssignmentPattern",
-                            left: {
-                                type: "Identifier",
-                                name: "a",
-                            },
-                            right: {
-                                type: "FunctionExpression",
-                                id: {
+        assert.match<Program>(
+            parseScript("async function foo(a = async function foo() { await b }) {}"),
+            {
+                type: "Program",
+                body: [
+                    {
+                        type: "FunctionDeclaration",
+                        id: {
+                            type: "Identifier",
+                            name: "foo",
+                        },
+                        params: [
+                            {
+                                type: "AssignmentPattern",
+                                left: {
                                     type: "Identifier",
-                                    name: "foo",
+                                    name: "a",
                                 },
-                                params: [],
-                                body: {
-                                    type: "BlockStatement",
-                                    body: [
-                                        {
-                                            type: "ExpressionStatement",
-                                            expression: {
-                                                type: "AwaitExpression",
-                                                argument: {
-                                                    type: "Identifier",
-                                                    name: "b",
+                                right: {
+                                    type: "FunctionExpression",
+                                    id: {
+                                        type: "Identifier",
+                                        name: "foo",
+                                    },
+                                    params: [],
+                                    body: {
+                                        type: "BlockStatement",
+                                        body: [
+                                            {
+                                                type: "ExpressionStatement",
+                                                expression: {
+                                                    type: "AwaitExpression",
+                                                    argument: {
+                                                        type: "Identifier",
+                                                        name: "b",
+                                                    },
                                                 },
                                             },
-                                        },
-                                    ],
+                                        ],
+                                    },
+                                    generator: false,
+                                    expression: false,
+                                    async: true,
                                 },
-                                generator: false,
-                                expression: false,
-                                async: true,
                             },
+                        ],
+                        body: {
+                            type: "BlockStatement",
+                            body: [],
                         },
-                    ],
-                    body: {
-                        type: "BlockStatement",
-                        body: [],
+                        generator: false,
+                        expression: false,
+                        async: true,
                     },
-                    generator: false,
-                    expression: false,
-                    async: true,
-                },
-            ],
-            sourceType: "script",
-        });
+                ],
+                sourceType: "script",
+            },
+        );
     });
 
     it("should parse \"async function foo(a = async () => await b) {}\"", () => {
-        expect(parseScript("async function foo(a = async () => await b) {}")).to.eql({
+        assert.match<Program>(parseScript("async function foo(a = async () => await b) {}"), {
             type: "Program",
             body: [
                 {
@@ -4057,7 +4055,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async function foo(a = {async bar() { await b }}) {}\"", () => {
-        expect(parseScript("async function foo(a = {async bar() { await b }}) {}")).to.eql({
+        assert.match<Program>(parseScript("async function foo(a = {async bar() { await b }}) {}"), {
             type: "Program",
             body: [
                 {
@@ -4128,82 +4126,84 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async function foo(a = class {async bar() { await b }}) {}\"", () => {
-        expect(parseScript("async function foo(a = class {async bar() { await b }}) {}")).to.eql({
-            type: "Program",
-            body: [
-                {
-                    type: "FunctionDeclaration",
-                    id: {
-                        type: "Identifier",
-                        name: "foo",
-                    },
-                    params: [
-                        {
-                            type: "AssignmentPattern",
-                            left: {
-                                type: "Identifier",
-                                name: "a",
-                            },
-                            right: {
-                                type: "ClassExpression",
-                                id: null,
-                                superClass: null,
-                                body: {
-                                    type: "ClassBody",
-                                    body: [
-                                        {
-                                            type: "MethodDefinition",
-                                            key: {
-                                                type: "Identifier",
-                                                name: "bar",
-                                            },
-                                            computed: false,
-                                            value: {
-                                                type: "FunctionExpression",
-                                                id: null,
-                                                params: [],
-                                                body: {
-                                                    type: "BlockStatement",
-                                                    body: [
-                                                        {
-                                                            type: "ExpressionStatement",
-                                                            expression: {
-                                                                type: "AwaitExpression",
-                                                                argument: {
-                                                                    type: "Identifier",
-                                                                    name: "b",
+        assert.match<Program>(
+            parseScript("async function foo(a = class {async bar() { await b }}) {}"),
+            {
+                type: "Program",
+                body: [
+                    {
+                        type: "FunctionDeclaration",
+                        id: {
+                            type: "Identifier",
+                            name: "foo",
+                        },
+                        params: [
+                            {
+                                type: "AssignmentPattern",
+                                left: {
+                                    type: "Identifier",
+                                    name: "a",
+                                },
+                                right: {
+                                    type: "ClassExpression",
+                                    id: null,
+                                    superClass: null,
+                                    body: {
+                                        type: "ClassBody",
+                                        body: [
+                                            {
+                                                type: "MethodDefinition",
+                                                key: {
+                                                    type: "Identifier",
+                                                    name: "bar",
+                                                },
+                                                computed: false,
+                                                value: {
+                                                    type: "FunctionExpression",
+                                                    id: null,
+                                                    params: [],
+                                                    body: {
+                                                        type: "BlockStatement",
+                                                        body: [
+                                                            {
+                                                                type: "ExpressionStatement",
+                                                                expression: {
+                                                                    type: "AwaitExpression",
+                                                                    argument: {
+                                                                        type: "Identifier",
+                                                                        name: "b",
+                                                                    },
                                                                 },
                                                             },
-                                                        },
-                                                    ],
+                                                        ],
+                                                    },
+                                                    generator: false,
+                                                    async: true,
                                                 },
-                                                generator: false,
-                                                expression: false,
-                                                async: true,
+                                                kind: "init",
+                                                static: false,
                                             },
-                                            kind: "method",
-                                            static: false,
-                                        },
-                                    ],
+                                        ],
+                                    },
                                 },
                             },
+                        ],
+                        body: {
+                            type: "BlockStatement",
+                            body: [],
                         },
-                    ],
-                    body: {
-                        type: "BlockStatement",
-                        body: [],
+                        generator: false,
+                        expression: false,
+                        async: true,
                     },
-                    generator: false,
-                    expression: false,
-                    async: true,
-                },
-            ],
-            sourceType: "script",
-        });
+                ],
+                sourceType: "script",
+            },
+        );
     });
 
     it("should parse \"async function wrap() {\n(a = await b)\n}\"", () => {
-        expect(parseScript("async function wrap() {\n(a = await b)\n}")).to.eql({
+        assert.match<Program>(parseScript("async function wrap() {\n(a = await b)\n}"), {
             body: [
                 {
                     async: true,
@@ -4246,7 +4246,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async function wrap() {\n({a = await b} = obj)\n}\"", () => {
-        expect(parseScript("async function wrap() {\n({a = await b} = obj)\n}")).to.eql({
+        assert.match<Program>(parseScript("async function wrap() {\n({a = await b} = obj)\n}"), {
             body: [
                 {
                     async: true,
@@ -4312,228 +4312,230 @@ x => x`)).to.eql({
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        /* tslint:disable max-line-length */
-        expect(parseScript(`f = ({ w = counter(), x = counter(), y = counter(), z = counter() } = { w: null, x: 0, y: false, z: '' }) => {}`))
-        /* tslint:enable max-line-length */
-        .to.eql({
-            type: "Program",
-            body: [
-                {
-                    type: "ExpressionStatement",
-                    expression: {
-                        type: "AssignmentExpression",
-                        operator: "=",
-                        left: {
-                            type: "Identifier",
-                            name: "f",
-                        },
-                        right: {
-                            type: "ArrowFunctionExpression",
-                            id: null,
-                            params: [
-                                {
-                                    type: "AssignmentPattern",
-                                    left: {
-                                        type: "ObjectPattern",
-                                        properties: [
-                                            {
-                                                type: "Property",
-                                                key: {
-                                                    type: "Identifier",
-                                                    name: "w",
-                                                },
-                                                computed: false,
-                                                value: {
-                                                    type: "AssignmentPattern",
-                                                    left: {
+        assert.match<Program>(
+            /* tslint:disable max-line-length */
+            parseScript(`f = ({ w = counter(), x = counter(), y = counter(), z = counter() } = { w: null, x: 0, y: false, z: '' }) => {}`),
+            /* tslint:enable max-line-length */
+            {
+                type: "Program",
+                body: [
+                    {
+                        type: "ExpressionStatement",
+                        expression: {
+                            type: "AssignmentExpression",
+                            operator: "=",
+                            left: {
+                                type: "Identifier",
+                                name: "f",
+                            },
+                            right: {
+                                type: "ArrowFunctionExpression",
+                                id: null,
+                                params: [
+                                    {
+                                        type: "AssignmentPattern",
+                                        left: {
+                                            type: "ObjectPattern",
+                                            properties: [
+                                                {
+                                                    type: "Property",
+                                                    key: {
                                                         type: "Identifier",
                                                         name: "w",
                                                     },
-                                                    right: {
-                                                        type: "CallExpression",
-                                                        callee: {
+                                                    computed: false,
+                                                    value: {
+                                                        type: "AssignmentPattern",
+                                                        left: {
                                                             type: "Identifier",
-                                                            name: "counter",
+                                                            name: "w",
                                                         },
-                                                        arguments: [],
+                                                        right: {
+                                                            type: "CallExpression",
+                                                            callee: {
+                                                                type: "Identifier",
+                                                                name: "counter",
+                                                            },
+                                                            arguments: [],
+                                                        },
                                                     },
+                                                    kind: "init",
+                                                    method: false,
+                                                    shorthand: true,
                                                 },
-                                                kind: "init",
-                                                method: false,
-                                                shorthand: true,
-                                            },
-                                            {
-                                                type: "Property",
-                                                key: {
-                                                    type: "Identifier",
-                                                    name: "x",
-                                                },
-                                                computed: false,
-                                                value: {
-                                                    type: "AssignmentPattern",
-                                                    left: {
+                                                {
+                                                    type: "Property",
+                                                    key: {
                                                         type: "Identifier",
                                                         name: "x",
                                                     },
-                                                    right: {
-                                                        type: "CallExpression",
-                                                        callee: {
+                                                    computed: false,
+                                                    value: {
+                                                        type: "AssignmentPattern",
+                                                        left: {
                                                             type: "Identifier",
-                                                            name: "counter",
+                                                            name: "x",
                                                         },
-                                                        arguments: [],
+                                                        right: {
+                                                            type: "CallExpression",
+                                                            callee: {
+                                                                type: "Identifier",
+                                                                name: "counter",
+                                                            },
+                                                            arguments: [],
+                                                        },
                                                     },
+                                                    kind: "init",
+                                                    method: false,
+                                                    shorthand: true,
                                                 },
-                                                kind: "init",
-                                                method: false,
-                                                shorthand: true,
-                                            },
-                                            {
-                                                type: "Property",
-                                                key: {
-                                                    type: "Identifier",
-                                                    name: "y",
-                                                },
-                                                computed: false,
-                                                value: {
-                                                    type: "AssignmentPattern",
-                                                    left: {
+                                                {
+                                                    type: "Property",
+                                                    key: {
                                                         type: "Identifier",
                                                         name: "y",
                                                     },
-                                                    right: {
-                                                        type: "CallExpression",
-                                                        callee: {
+                                                    computed: false,
+                                                    value: {
+                                                        type: "AssignmentPattern",
+                                                        left: {
                                                             type: "Identifier",
-                                                            name: "counter",
+                                                            name: "y",
                                                         },
-                                                        arguments: [],
+                                                        right: {
+                                                            type: "CallExpression",
+                                                            callee: {
+                                                                type: "Identifier",
+                                                                name: "counter",
+                                                            },
+                                                            arguments: [],
+                                                        },
                                                     },
+                                                    kind: "init",
+                                                    method: false,
+                                                    shorthand: true,
                                                 },
-                                                kind: "init",
-                                                method: false,
-                                                shorthand: true,
-                                            },
-                                            {
-                                                type: "Property",
-                                                key: {
-                                                    type: "Identifier",
-                                                    name: "z",
-                                                },
-                                                computed: false,
-                                                value: {
-                                                    type: "AssignmentPattern",
-                                                    left: {
+                                                {
+                                                    type: "Property",
+                                                    key: {
                                                         type: "Identifier",
                                                         name: "z",
                                                     },
-                                                    right: {
-                                                        type: "CallExpression",
-                                                        callee: {
+                                                    computed: false,
+                                                    value: {
+                                                        type: "AssignmentPattern",
+                                                        left: {
                                                             type: "Identifier",
-                                                            name: "counter",
+                                                            name: "z",
                                                         },
-                                                        arguments: [],
+                                                        right: {
+                                                            type: "CallExpression",
+                                                            callee: {
+                                                                type: "Identifier",
+                                                                name: "counter",
+                                                            },
+                                                            arguments: [],
+                                                        },
                                                     },
+                                                    kind: "init",
+                                                    method: false,
+                                                    shorthand: true,
                                                 },
-                                                kind: "init",
-                                                method: false,
-                                                shorthand: true,
-                                            },
-                                        ],
+                                            ],
+                                        },
+                                        right: {
+                                            type: "ObjectExpression",
+                                            properties: [
+                                                {
+                                                    type: "Property",
+                                                    key: {
+                                                        type: "Identifier",
+                                                        name: "w",
+                                                    },
+                                                    computed: false,
+                                                    value: {
+                                                        type: "Literal",
+                                                        value: "null",
+                                                    },
+                                                    kind: "init",
+                                                    method: false,
+                                                    shorthand: false,
+                                                },
+                                                {
+                                                    type: "Property",
+                                                    key: {
+                                                        type: "Identifier",
+                                                        name: "x",
+                                                    },
+                                                    computed: false,
+                                                    value: {
+                                                        type: "Literal",
+                                                        value: 0,
+                                                    },
+                                                    kind: "init",
+                                                    method: false,
+                                                    shorthand: false,
+                                                },
+                                                {
+                                                    type: "Property",
+                                                    key: {
+                                                        type: "Identifier",
+                                                        name: "y",
+                                                    },
+                                                    computed: false,
+                                                    value: {
+                                                        type: "Literal",
+                                                        value: false,
+                                                    },
+                                                    kind: "init",
+                                                    method: false,
+                                                    shorthand: false,
+                                                },
+                                                {
+                                                    type: "Property",
+                                                    key: {
+                                                        type: "Identifier",
+                                                        name: "z",
+                                                    },
+                                                    computed: false,
+                                                    value: {
+                                                        type: "Literal",
+                                                        value: "",
+                                                    },
+                                                    kind: "init",
+                                                    method: false,
+                                                    shorthand: false,
+                                                },
+                                            ],
+                                        },
                                     },
-                                    right: {
-                                        type: "ObjectExpression",
-                                        properties: [
-                                            {
-                                                type: "Property",
-                                                key: {
-                                                    type: "Identifier",
-                                                    name: "w",
-                                                },
-                                                computed: false,
-                                                value: {
-                                                    type: "Literal",
-                                                    value: "null",
-                                                },
-                                                kind: "init",
-                                                method: false,
-                                                shorthand: false,
-                                            },
-                                            {
-                                                type: "Property",
-                                                key: {
-                                                    type: "Identifier",
-                                                    name: "x",
-                                                },
-                                                computed: false,
-                                                value: {
-                                                    type: "Literal",
-                                                    value: 0,
-                                                },
-                                                kind: "init",
-                                                method: false,
-                                                shorthand: false,
-                                            },
-                                            {
-                                                type: "Property",
-                                                key: {
-                                                    type: "Identifier",
-                                                    name: "y",
-                                                },
-                                                computed: false,
-                                                value: {
-                                                    type: "Literal",
-                                                    value: false,
-                                                },
-                                                kind: "init",
-                                                method: false,
-                                                shorthand: false,
-                                            },
-                                            {
-                                                type: "Property",
-                                                key: {
-                                                    type: "Identifier",
-                                                    name: "z",
-                                                },
-                                                computed: false,
-                                                value: {
-                                                    type: "Literal",
-                                                    value: "",
-                                                },
-                                                kind: "init",
-                                                method: false,
-                                                shorthand: false,
-                                            },
-                                        ],
-                                    },
+                                ],
+                                body: {
+                                    type: "BlockStatement",
+                                    body: [],
                                 },
-                            ],
-                            body: {
-                                type: "BlockStatement",
-                                body: [],
+                                generator: false,
+                                expression: false,
+                                async: false,
                             },
-                            generator: false,
-                            expression: false,
-                            async: false,
                         },
                     },
-                },
-            ],
-            sourceType: "script",
-        });
+                ],
+                sourceType: "script",
+            },
+        );
     });
 
     it("should parse \"class X { async get(){} }\"", () => {
-        expect(parseScript("class X { async get(){} }")).to.eql({});
+        assert.match(parseScript("class X { async get(){} }"), {});
     });
 
     it("should parse \"class X { static async get() {} }\"", () => {
-        expect(parseScript("class X { static async get() {} }")).to.eql({});
+        assert.match(parseScript("class X { static async get() {} }"), {});
     });
 
     it("should parse \"({async foo(a) { await a }})\"", () => {
-        expect(parseScript("({async foo(a) { await a }})")).to.eql({
+        assert.match<Program>(parseScript("({async foo(a) { await a }})"), {
             type: "Program",
             body: [
                 {
@@ -4589,7 +4591,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"(class {async foo(a) { await a }})\"", () => {
-        expect(parseScript("(class {async foo(a) { await a }})")).to.eql({
+        assert.match<Program>(parseScript("(class {async foo(a) { await a }})"), {
             type: "Program",
             body: [
                 {
@@ -4633,10 +4635,9 @@ x => x`)).to.eql({
                                             ],
                                         },
                                         generator: false,
-                                        expression: false,
                                         async: true,
                                     },
-                                    kind: "method",
+                                    kind: "init",
                                     static: false,
                                 },
                             ],
@@ -4649,7 +4650,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"function foo() { await + 1 }\"", () => {
-        expect(parseScript("function foo() { await + 1 }")).to.eql({
+        assert.match<Program>(parseScript("function foo() { await + 1 }"), {
             type: "Program",
             body: [
                 {
@@ -4689,7 +4690,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"async function foo(a, b) { await a }\"", () => {
-        expect(parseScript("async function foo(a, b) { await a }")).to.eql({
+        assert.match<Program>(parseScript("async function foo(a, b) { await a }"), {
             type: "Program",
             body: [
                 {
@@ -4733,7 +4734,7 @@ x => x`)).to.eql({
     });
 
     it("should parse \"({ async: true })\"", () => {
-        expect(parseScript("({ async: true })")).to.eql({
+        assert.match<Program>(parseScript("({ async: true })"), {
             type: "Program",
             body: [
                 {
@@ -4765,67 +4766,69 @@ x => x`)).to.eql({
     });
 
     it("should throw \"async ({a = b})\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("async ({a = b})");
-        }).to.throw();
+        });
     });
 
     it("should throw \"(async function foo() { return {await} })\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("(async function foo() { return {await} })");
-        }).to.throw();
+        });
     });
 
     it("should throw \"async await => 1\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("async await => 1");
-        }).to.throw();
+        });
     });
 
     it("should throw \"async ({a: await}) => 1\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("async ({a: await}) => 1");
-        }).to.throw();
+        });
     });
 
     it("should throw \"async ([await]) => 1\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("async ([await]) => 1");
-        }).to.throw();
+        });
     });
 
     it("should throw \"async (a = await b) => {} \"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("async (a = await b) => {} ");
-        }).to.throw();
+        });
     });
 
     it("should throw \"({async foo(a = await b) {}})\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("({async foo(a = await b) {}})");
-        }).to.throw();
+        });
     });
 
     it("should throw \"({async foo(a = await b) {}})\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("({async foo(a = await b) {}})");
-        }).to.throw();
+        });
     });
 
     it("should throw \"async function foo(a = class extends (await b) {}) {}\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("async function foo(a = class extends (await b) {}) {}");
-        }).to.throw();
+        });
     });
 
     // FIXME: infinite loop
     it("should throw \"async(x = await) => {  }\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("async(x = await) => {  }");
-        }).to.throw();
+        });
     });
 
     it("should throw if not subject to annex B", () => {
-        expect(() => { parseScript("if (false) L: async function l() {}"); }).to.throw();
+        assert.throws(SyntaxError, () => {
+            parseScript("if (false) L: async function l() {}");
+        });
     });
 });

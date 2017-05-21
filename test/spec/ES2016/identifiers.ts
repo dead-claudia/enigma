@@ -1,9 +1,10 @@
-import { parseScript, parseModule } from "../../../src";
-import {expect} from "chai";
+import {parseScript, parseModule} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2016 - Identifiers", () => {
     it("should pass", () => {
-        expect(parseScript("ૹ")).to.eql({
+        assert.match<Program>(parseScript("ૹ"), {
             type: "Program",
             body: [
                 {

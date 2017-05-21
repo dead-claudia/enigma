@@ -3,7 +3,7 @@ import {
 } from "../../../src/scanner";
 import {Context} from "../../../src/common";
 import {create} from "../../../src/parser";
-import {expect} from "chai";
+import * as assert from "clean-assert";
 
 describe("src/scanner/directive", () => {
     describe("scanDirective()", () => {
@@ -17,15 +17,15 @@ describe("src/scanner/directive", () => {
 
                 for (const step of opts.steps) {
                     if (step.directive != null) {
-                        expect({
+                        assert.match({
                             directive: scanDirective(parser, Context.Empty),
                             hasNext: hasNext(parser), line: parser.line, column: parser.column,
-                        }).to.eql(step);
+                        }, step);
                     } else {
-                        expect({
+                        assert.match({
                             semi: consumeDirectiveSemicolon(parser, Context.Empty),
                             hasNext: hasNext(parser), line: parser.line, column: parser.column,
-                        }).to.eql(step);
+                        }, step);
                     }
                 }
             });
@@ -35,9 +35,9 @@ describe("src/scanner/directive", () => {
             it(name, () => {
                 const parser = create(source, undefined);
 
-                expect(() => {
+                assert.throws(SyntaxError, () => {
                     scanDirective(parser, Context.Empty);
-                }).to.throw(SyntaxError);
+                });
             });
         }
 

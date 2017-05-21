@@ -1,22 +1,23 @@
-import { parseScript, parseModule } from "../../../src";
-import {expect} from "chai";
+import {parseScript, parseModule} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Test262 - Punctuators", () => {
     it("should throw on \"\u003B;;\"", () => {
-        expect(() => { parseScript(`\u003B;`); }).throw();
+        assert.throws(SyntaxError, () => { parseScript(`\u003B;`); });
     });
     it("should throw on \"1\u002C2;\"", () => {
-        expect(() => { parseScript(`1\u002C2;`); }).throw();
+        assert.throws(SyntaxError, () => { parseScript(`1\u002C2;`); });
     });
     it("should throw on \"1\u002D2;\"", () => {
-        expect(() => { parseScript(`1\u002D2;`); }).throw();
+        assert.throws(SyntaxError, () => { parseScript(`1\u002D2;`); });
     });
     it("should throw on \"\u007B\u007D;\"\"", () => {
-        expect(() => { parseScript(`\u007B\u007D;"`); }).throw();
+        assert.throws(SyntaxError, () => { parseScript(`\u007B\u007D;"`); });
     });
 
     it("should parse \"1 & 2 | 3 ^ 4 && !5 || ~6;\"", () => {
-        expect(parseScript(`1 & 2 | 3 ^ 4 && !5 || ~6;`)).to.eql({
+        assert.match<Program>(parseScript(`1 & 2 | 3 ^ 4 && !5 || ~6;`), {
             type: "Program",
             body: [
                 {
@@ -82,7 +83,7 @@ describe.skip("Test262 - Punctuators", () => {
     });
 
     it("should parse \" 1 < 2 > 3 <= 4 >= 5 == 6 != 7 === 8 !== 9;\"", () => {
-        expect(parseScript(` 1 < 2 > 3 <= 4 >= 5 == 6 != 7 === 8 !== 9;`)).to.eql({
+        assert.match<Program>(parseScript(` 1 < 2 > 3 <= 4 >= 5 == 6 != 7 === 8 !== 9;`), {
             type: "Program",
             body: [
                 {
@@ -162,7 +163,7 @@ describe.skip("Test262 - Punctuators", () => {
     });
 
     it("should parse \"1 + 2 - 3 * 4 % 5 / 6 << 7 >> 8 >>> 9;\"", () => {
-        expect(parseScript(`1 + 2 - 3 * 4 % 5 / 6 << 7 >> 8 >>> 9;`)).to.eql({
+        assert.match<Program>(parseScript(`1 + 2 - 3 * 4 % 5 / 6 << 7 >> 8 >>> 9;`), {
             type: "Program",
             body: [
                 {
@@ -242,7 +243,7 @@ describe.skip("Test262 - Punctuators", () => {
     });
 
     it("should parse \"({});[];\"", () => {
-        expect(parseScript(`({});[];`)).to.eql({
+        assert.match<Program>(parseScript(`({});[];`), {
             type: "Program",
             body: [
                 {
@@ -265,100 +266,102 @@ describe.skip("Test262 - Punctuators", () => {
     });
 
     it("should parse \" this.nan %= 6; this.nan <<= 7; this.nan >>= 8; this.nan >>>= 9;\"", () => {
-        expect(parseScript(` this.nan %= 6; this.nan <<= 7; this.nan >>= 8; this.nan >>>= 9;`))
-        .to.eql({
-            type: "Program",
-            body: [
-                {
-                    type: "ExpressionStatement",
-                    expression: {
-                        type: "AssignmentExpression",
-                        operator: "%=",
-                        left: {
-                            type: "MemberExpression",
-                            computed: false,
-                            object: {
-                                type: "ThisExpression",
+        assert.match<Program>(
+            parseScript(` this.nan %= 6; this.nan <<= 7; this.nan >>= 8; this.nan >>>= 9;`),
+            {
+                type: "Program",
+                body: [
+                    {
+                        type: "ExpressionStatement",
+                        expression: {
+                            type: "AssignmentExpression",
+                            operator: "%=",
+                            left: {
+                                type: "MemberExpression",
+                                computed: false,
+                                object: {
+                                    type: "ThisExpression",
+                                },
+                                property: {
+                                    type: "Identifier",
+                                    name: "nan",
+                                },
                             },
-                            property: {
-                                type: "Identifier",
-                                name: "nan",
+                            right: {
+                                type: "Literal",
+                                value: 6,
                             },
-                        },
-                        right: {
-                            type: "Literal",
-                            value: 6,
                         },
                     },
-                },
-                {
-                    type: "ExpressionStatement",
-                    expression: {
-                        type: "AssignmentExpression",
-                        operator: "<<=",
-                        left: {
-                            type: "MemberExpression",
-                            computed: false,
-                            object: {
-                                type: "ThisExpression",
+                    {
+                        type: "ExpressionStatement",
+                        expression: {
+                            type: "AssignmentExpression",
+                            operator: "<<=",
+                            left: {
+                                type: "MemberExpression",
+                                computed: false,
+                                object: {
+                                    type: "ThisExpression",
+                                },
+                                property: {
+                                    type: "Identifier",
+                                    name: "nan",
+                                },
                             },
-                            property: {
-                                type: "Identifier",
-                                name: "nan",
+                            right: {
+                                type: "Literal",
+                                value: 7,
                             },
-                        },
-                        right: {
-                            type: "Literal",
-                            value: 7,
                         },
                     },
-                },
-                {
-                    type: "ExpressionStatement",
-                    expression: {
-                        type: "AssignmentExpression",
-                        operator: ">>=",
-                        left: {
-                            type: "MemberExpression",
-                            computed: false,
-                            object: {
-                                type: "ThisExpression",
+                    {
+                        type: "ExpressionStatement",
+                        expression: {
+                            type: "AssignmentExpression",
+                            operator: ">>=",
+                            left: {
+                                type: "MemberExpression",
+                                computed: false,
+                                object: {
+                                    type: "ThisExpression",
+                                },
+                                property: {
+                                    type: "Identifier",
+                                    name: "nan",
+                                },
                             },
-                            property: {
-                                type: "Identifier",
-                                name: "nan",
+                            right: {
+                                type: "Literal",
+                                value: 8,
                             },
-                        },
-                        right: {
-                            type: "Literal",
-                            value: 8,
                         },
                     },
-                },
-                {
-                    type: "ExpressionStatement",
-                    expression: {
-                        type: "AssignmentExpression",
-                        operator: ">>>=",
-                        left: {
-                            type: "MemberExpression",
-                            computed: false,
-                            object: {
-                                type: "ThisExpression",
+                    {
+                        type: "ExpressionStatement",
+                        expression: {
+                            type: "AssignmentExpression",
+                            operator: ">>>=",
+                            left: {
+                                type: "MemberExpression",
+                                computed: false,
+                                object: {
+                                    type: "ThisExpression",
+                                },
+                                property: {
+                                    type: "Identifier",
+                                    name: "nan",
+                                },
                             },
-                            property: {
-                                type: "Identifier",
-                                name: "nan",
+                            right: {
+                                type: "Literal",
+                                value: 9,
                             },
-                        },
-                        right: {
-                            type: "Literal",
-                            value: 9,
                         },
                     },
-                },
-            ],
-            sourceType: "script",
-        });
+                ],
+                sourceType: "script",
+            },
+        );
     });
 });

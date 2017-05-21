@@ -1,9 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Statements - `throw`", () => {
     it("should parse \"throw this\"", () => {
-        expect(parseScript("throw this")).to.eql({
+        assert.match<Program>(parseScript("throw this"), {
             type: "Program",
             body: [
                 {
@@ -18,7 +19,7 @@ describe.skip("Statements - `throw`", () => {
     });
 
     it("should handle throw statements", () => {
-        expect(parseScript("throw x;")).to.eql({
+        assert.match<Program>(parseScript("throw x;"), {
             type: "Program",
             body: [
                 {
@@ -32,7 +33,7 @@ describe.skip("Statements - `throw`", () => {
             sourceType: "script",
         });
 
-        expect(parseScript("throw x * y")).to.eql({
+        assert.match<Program>(parseScript("throw x * y"), {
             type: "Program",
             body: [
                 {

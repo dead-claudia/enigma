@@ -15,7 +15,7 @@ export interface Options {
     raw?: boolean;
 }
 
-function parseRoot(source: string, options: Options | void, context: Context) {
+function parseRoot(source: string, options: Options | void, context: Context): ESTree.Program {
     let onComment: OnComment;
 
     if (options != null) {
@@ -27,13 +27,11 @@ function parseRoot(source: string, options: Options | void, context: Context) {
     }
 
     const parser = Parser.create(source, onComment);
-    const statements: ESTree.Statement[] = [];
-
     skipMeta(parser);
 
     const node: ESTree.Program = {
         type: "Program",
-        sourceType: "script",
+        sourceType: context & Context.Module ? "module" : "script",
         body: Parser.parseBody(parser, context),
     };
 

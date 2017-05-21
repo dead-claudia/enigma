@@ -1,452 +1,451 @@
-import { parseModule } from "../../../src";
-import {expect} from "chai";
+import {parseModule} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Modules - `import`", () => {
-
     it("should parse \"export default function* a(){}\"", () => {
-        expect(parseModule("import \"a\" ")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ImportDeclaration",
-            specifiers: [],
-            source: {
-                type: "Literal",
-                value: "a",
-            },
-        },
-    ],
-    sourceType: "module",
-});
+        assert.match<Program>(parseModule("import \"a\" "), {
+            type: "Program",
+            body: [
+                {
+                    type: "ImportDeclaration",
+                    specifiers: [],
+                    source: {
+                        type: "Literal",
+                        value: "a",
+                    },
+                },
+            ],
+            sourceType: "module",
+        });
     });
 
     it("should parse \"import * as a from a\"", () => {
-        expect(parseModule("import * as a from \"a\"")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ImportDeclaration",
-            specifiers: [
+        assert.match<Program>(parseModule("import * as a from \"a\""), {
+            type: "Program",
+            body: [
                 {
-                    type: "ImportNamespaceSpecifier",
-                    local: {
-                        type: "Identifier",
-                        name: "a",
+                    type: "ImportDeclaration",
+                    specifiers: [
+                        {
+                            type: "ImportNamespaceSpecifier",
+                            local: {
+                                type: "Identifier",
+                                name: "a",
+                            },
+                        },
+                    ],
+                    source: {
+                        type: "Literal",
+                        value: "a",
                     },
                 },
             ],
-            source: {
-                type: "Literal",
-                value: "a",
-            },
-        },
-    ],
-    sourceType: "module",
-});
+            sourceType: "module",
+        });
     });
 
     it("should parse \"import foo, {bar} from \"foo\";\"", () => {
-        expect(parseModule("import foo, {bar} from \"foo\";")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ImportDeclaration",
-            specifiers: [
+        assert.match<Program>(parseModule("import foo, {bar} from \"foo\";"), {
+            type: "Program",
+            body: [
                 {
-                    type: "ImportDefaultSpecifier",
-                    local: {
-                        type: "Identifier",
-                        name: "foo",
-                    },
-                },
-                {
-                    type: "ImportSpecifier",
-                    local: {
-                        type: "Identifier",
-                        name: "bar",
-                    },
-                    imported: {
-                        type: "Identifier",
-                        name: "bar",
+                    type: "ImportDeclaration",
+                    specifiers: [
+                        {
+                            type: "ImportDefaultSpecifier",
+                            local: {
+                                type: "Identifier",
+                                name: "foo",
+                            },
+                        },
+                        {
+                            type: "ImportSpecifier",
+                            local: {
+                                type: "Identifier",
+                                name: "bar",
+                            },
+                            imported: {
+                                type: "Identifier",
+                                name: "bar",
+                            },
+                        },
+                    ],
+                    source: {
+                        type: "Literal",
+                        value: "foo",
                     },
                 },
             ],
-            source: {
-                type: "Literal",
-                value: "foo",
-            },
-        },
-    ],
-    sourceType: "module",
-});
+            sourceType: "module",
+        });
     });
 
     it("should parse \"import {default as foo} from \"foo\";\"", () => {
-        expect(parseModule("import {default as foo} from \"foo\";")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ImportDeclaration",
-            specifiers: [
+        assert.match<Program>(parseModule("import {default as foo} from \"foo\";"), {
+            type: "Program",
+            body: [
                 {
-                    type: "ImportSpecifier",
-                    local: {
-                        type: "Identifier",
-                        name: "foo",
-                    },
-                    imported: {
-                        type: "Identifier",
-                        name: "default",
+                    type: "ImportDeclaration",
+                    specifiers: [
+                        {
+                            type: "ImportSpecifier",
+                            local: {
+                                type: "Identifier",
+                                name: "foo",
+                            },
+                            imported: {
+                                type: "Identifier",
+                                name: "default",
+                            },
+                        },
+                    ],
+                    source: {
+                        type: "Literal",
+                        value: "foo",
                     },
                 },
             ],
-            source: {
-                type: "Literal",
-                value: "foo",
-            },
-        },
-    ],
-    sourceType: "module",
-});
+            sourceType: "module",
+        });
     });
 
     it("should parse \"import foo from \"foo\";\"", () => {
-        expect(parseModule("import foo from \"foo\";")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ImportDeclaration",
-            specifiers: [
+        assert.match<Program>(parseModule("import foo from \"foo\";"), {
+            type: "Program",
+            body: [
                 {
-                    type: "ImportDefaultSpecifier",
-                    local: {
-                        type: "Identifier",
-                        name: "foo",
+                    type: "ImportDeclaration",
+                    specifiers: [
+                        {
+                            type: "ImportDefaultSpecifier",
+                            local: {
+                                type: "Identifier",
+                                name: "foo",
+                            },
+                        },
+                    ],
+                    source: {
+                        type: "Literal",
+                        value: "foo",
                     },
                 },
             ],
-            source: {
-                type: "Literal",
-                value: "foo",
-            },
-        },
-    ],
-    sourceType: "module",
-});
+            sourceType: "module",
+        });
     });
 
     it("should parse \"import \"foo\";\"", () => {
-        expect(parseModule("import \"foo\";")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ImportDeclaration",
-            specifiers: [],
-            source: {
-                type: "Literal",
-                value: "foo",
-            },
-        },
-    ],
-    sourceType: "module",
-});
+        assert.match<Program>(parseModule("import \"foo\";"), {
+            type: "Program",
+            body: [
+                {
+                    type: "ImportDeclaration",
+                    specifiers: [],
+                    source: {
+                        type: "Literal",
+                        value: "foo",
+                    },
+                },
+            ],
+            sourceType: "module",
+        });
     });
 
     it("should parse \"import {bar as baz, xyz} from \"foo\";\"", () => {
-        expect(parseModule("import {bar as baz, xyz} from \"foo\";")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ImportDeclaration",
-            specifiers: [
+        assert.match<Program>(parseModule("import {bar as baz, xyz} from \"foo\";"), {
+            type: "Program",
+            body: [
                 {
-                    type: "ImportSpecifier",
-                    local: {
-                        type: "Identifier",
-                        name: "baz",
-                    },
-                    imported: {
-                        type: "Identifier",
-                        name: "bar",
-                    },
-                },
-                {
-                    type: "ImportSpecifier",
-                    local: {
-                        type: "Identifier",
-                        name: "xyz",
-                    },
-                    imported: {
-                        type: "Identifier",
-                        name: "xyz",
+                    type: "ImportDeclaration",
+                    specifiers: [
+                        {
+                            type: "ImportSpecifier",
+                            local: {
+                                type: "Identifier",
+                                name: "baz",
+                            },
+                            imported: {
+                                type: "Identifier",
+                                name: "bar",
+                            },
+                        },
+                        {
+                            type: "ImportSpecifier",
+                            local: {
+                                type: "Identifier",
+                                name: "xyz",
+                            },
+                            imported: {
+                                type: "Identifier",
+                                name: "xyz",
+                            },
+                        },
+                    ],
+                    source: {
+                        type: "Literal",
+                        value: "foo",
                     },
                 },
             ],
-            source: {
-                type: "Literal",
-                value: "foo",
-            },
-        },
-    ],
-    sourceType: "module",
-});
+            sourceType: "module",
+        });
     });
 
     it("should parse \"import {} from \"foo\";\"", () => {
-        expect(parseModule("import {} from \"foo\";")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ImportDeclaration",
-            specifiers: [],
-            source: {
-                type: "Literal",
-                value: "foo",
-            },
-        },
-    ],
-    sourceType: "module",
-});
+        assert.match<Program>(parseModule("import {} from \"foo\";"), {
+            type: "Program",
+            body: [
+                {
+                    type: "ImportDeclaration",
+                    specifiers: [],
+                    source: {
+                        type: "Literal",
+                        value: "foo",
+                    },
+                },
+            ],
+            sourceType: "module",
+        });
     });
 
     it("should parse \"import {bar} from \"foo\";\"", () => {
-        expect(parseModule("import {bar} from \"foo\";")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ImportDeclaration",
-            specifiers: [
+        assert.match<Program>(parseModule("import {bar} from \"foo\";"), {
+            type: "Program",
+            body: [
                 {
-                    type: "ImportSpecifier",
-                    local: {
-                        type: "Identifier",
-                        name: "bar",
-                    },
-                    imported: {
-                        type: "Identifier",
-                        name: "bar",
+                    type: "ImportDeclaration",
+                    specifiers: [
+                        {
+                            type: "ImportSpecifier",
+                            local: {
+                                type: "Identifier",
+                                name: "bar",
+                            },
+                            imported: {
+                                type: "Identifier",
+                                name: "bar",
+                            },
+                        },
+                    ],
+                    source: {
+                        type: "Literal",
+                        value: "foo",
                     },
                 },
             ],
-            source: {
-                type: "Literal",
-                value: "foo",
-            },
-        },
-    ],
-    sourceType: "module",
-});
+            sourceType: "module",
+        });
     });
 
     it("should parse \"import {bar, baz,} from \"foo\";\"", () => {
-        expect(parseModule("import {bar, baz,} from \"foo\";")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ImportDeclaration",
-            specifiers: [
+        assert.match<Program>(parseModule("import {bar, baz,} from \"foo\";"), {
+            type: "Program",
+            body: [
                 {
-                    type: "ImportSpecifier",
-                    local: {
-                        type: "Identifier",
-                        name: "bar",
-                    },
-                    imported: {
-                        type: "Identifier",
-                        name: "bar",
-                    },
-                },
-                {
-                    type: "ImportSpecifier",
-                    local: {
-                        type: "Identifier",
-                        name: "baz",
-                    },
-                    imported: {
-                        type: "Identifier",
-                        name: "baz",
+                    type: "ImportDeclaration",
+                    specifiers: [
+                        {
+                            type: "ImportSpecifier",
+                            local: {
+                                type: "Identifier",
+                                name: "bar",
+                            },
+                            imported: {
+                                type: "Identifier",
+                                name: "bar",
+                            },
+                        },
+                        {
+                            type: "ImportSpecifier",
+                            local: {
+                                type: "Identifier",
+                                name: "baz",
+                            },
+                            imported: {
+                                type: "Identifier",
+                                name: "baz",
+                            },
+                        },
+                    ],
+                    source: {
+                        type: "Literal",
+                        value: "foo",
                     },
                 },
             ],
-            source: {
-                type: "Literal",
-                value: "foo",
-            },
-        },
-    ],
-    sourceType: "module",
-});
+            sourceType: "module",
+        });
     });
     it("should parse \"import {bar, baz} from \"foo\";\"", () => {
-        expect(parseModule("import {bar, baz} from \"foo\";")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ImportDeclaration",
-            specifiers: [
+        assert.match<Program>(parseModule("import {bar, baz} from \"foo\";"), {
+            type: "Program",
+            body: [
                 {
-                    type: "ImportSpecifier",
-                    local: {
-                        type: "Identifier",
-                        name: "bar",
-                    },
-                    imported: {
-                        type: "Identifier",
-                        name: "bar",
-                    },
-                },
-                {
-                    type: "ImportSpecifier",
-                    local: {
-                        type: "Identifier",
-                        name: "baz",
-                    },
-                    imported: {
-                        type: "Identifier",
-                        name: "baz",
+                    type: "ImportDeclaration",
+                    specifiers: [
+                        {
+                            type: "ImportSpecifier",
+                            local: {
+                                type: "Identifier",
+                                name: "bar",
+                            },
+                            imported: {
+                                type: "Identifier",
+                                name: "bar",
+                            },
+                        },
+                        {
+                            type: "ImportSpecifier",
+                            local: {
+                                type: "Identifier",
+                                name: "baz",
+                            },
+                            imported: {
+                                type: "Identifier",
+                                name: "baz",
+                            },
+                        },
+                    ],
+                    source: {
+                        type: "Literal",
+                        value: "foo",
                     },
                 },
             ],
-            source: {
-                type: "Literal",
-                value: "foo",
-            },
-        },
-    ],
-    sourceType: "module",
-});
+            sourceType: "module",
+        });
     });
 
     it("should parse \"import * as foo from \"foo\";\"", () => {
-        expect(parseModule("import * as foo from \"foo\";")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ImportDeclaration",
-            specifiers: [
+        assert.match<Program>(parseModule("import * as foo from \"foo\";"), {
+            type: "Program",
+            body: [
                 {
-                    type: "ImportNamespaceSpecifier",
-                    local: {
-                        type: "Identifier",
-                        name: "foo",
+                    type: "ImportDeclaration",
+                    specifiers: [
+                        {
+                            type: "ImportNamespaceSpecifier",
+                            local: {
+                                type: "Identifier",
+                                name: "foo",
+                            },
+                        },
+                    ],
+                    source: {
+                        type: "Literal",
+                        value: "foo",
                     },
                 },
             ],
-            source: {
-                type: "Literal",
-                value: "foo",
-            },
-        },
-    ],
-    sourceType: "module",
-});
+            sourceType: "module",
+        });
     });
     it("should parse \"import { null as nil } from \"bar\"\"", () => {
-        expect(parseModule("import { null as nil } from \"bar\"")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ImportDeclaration",
-            specifiers: [
+        assert.match<Program>(parseModule("import { null as nil } from \"bar\""), {
+            type: "Program",
+            body: [
                 {
-                    type: "ImportSpecifier",
-                    local: {
-                        type: "Identifier",
-                        name: "nil",
-                    },
-                    imported: {
-                        type: "Identifier",
-                        name: "null",
+                    type: "ImportDeclaration",
+                    specifiers: [
+                        {
+                            type: "ImportSpecifier",
+                            local: {
+                                type: "Identifier",
+                                name: "nil",
+                            },
+                            imported: {
+                                type: "Identifier",
+                                name: "null",
+                            },
+                        },
+                    ],
+                    source: {
+                        type: "Literal",
+                        value: "bar",
                     },
                 },
             ],
-            source: {
-                type: "Literal",
-                value: "bar",
-            },
-        },
-    ],
-    sourceType: "module",
-});
+            sourceType: "module",
+        });
     });
 
     it("should throw on \"import foo, {bar}, foo from \"foo\";\"", () => {
-        expect(() => { parseModule("import foo, {bar}, foo from \"foo\";"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import foo, {bar}, foo from \"foo\";"); });
     });
 
     it("should throw on \"import { true } from \"logic\"\"", () => {
-        expect(() => { parseModule("import { true } from \"logic\""); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import { true } from \"logic\""); });
     });
 
     it("should throw on \"import foo\"", () => {
-        expect(() => { parseModule("import foo"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import foo"); });
     });
 
     it("should throw on \"import { foo, bar }\"", () => {
-        expect(() => { parseModule("import { foo, bar }"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import { foo, bar }"); });
     });
 
     it("should throw on \"import { for } from \"iteration\"\"", () => {
-        expect(() => { parseModule("import { for } from \"iteration\""); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import { for } from \"iteration\""); });
     });
 
     it("should throw on \"import { foo, bar }\"", () => {
-        expect(() => { parseModule("import { foo, bar }"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import { foo, bar }"); });
     });
 
     it("should throw on \"import {bar}, {foo} from \"foo\";\"", () => {
-        expect(() => { parseModule("import {bar}, {foo} from \"foo\";"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import {bar}, {foo} from \"foo\";"); });
     });
 
     it("should throw on \"import {bar}, {foo} from \"foo\";", () => {
-        expect(() => { parseModule("import {bar}, {foo} from \"foo\";"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import {bar}, {foo} from \"foo\";"); });
     });
     it("should throw on \"import {default as foo}\"", () => {
-        expect(() => { parseModule("import {default as foo}"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import {default as foo}"); });
     });
 
     it("should throw on \"import { null } from \"null\"\"", () => {
-        expect(() => { parseModule("import { null } from \"null\""); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import { null } from \"null\""); });
     });
 
     it("should throw on \"import foo, from \"bar\";\"", () => {
-        expect(() => { parseModule("import foo, from \"bar\";"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import foo, from \"bar\";"); });
     });
 
     it("should throw on \"import foo, from \"bar\";\"", () => {
-        expect(() => { parseModule("import foo, from \"bar\";"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import foo, from \"bar\";"); });
     });
 
     it("should throw on \"export {foo} from bar\"", () => {
-        expect(() => { parseModule("export {foo} from bar"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export {foo} from bar"); });
     });
 
     it("should throw on \"export {foo} from bar\"", () => {
-        expect(() => { parseModule("export {foo} from bar"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export {foo} from bar"); });
     });
 
     it("should throw on \"export {foo} from bar\"", () => {
-        expect(() => { parseModule("export {foo} from bar"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export {foo} from bar"); });
     });
 
     it("should throw on \"import {a as function} from bar\"", () => {
-        expect(() => { parseModule("import {a as function} from bar"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import {a as function} from bar"); });
     });
 
     it("should throw on \"import a, b from  bar\"", () => {
-        expect(() => { parseModule("import a, b from bar"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import a, b from bar"); });
     });
 
     it("should throw on \"import {b,,} from from  bar\"", () => {
-        expect(() => { parseModule("import {b,,} from bar"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import {b,,} from bar"); });
     });
 
     it("should throw on \"import {};\"", () => {
-        expect(() => { parseModule("import {};"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import {};"); });
     });
 
     it("should throw on \"import\"", () => {
-        expect(() => { parseModule("import"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("import"); });
     });
-
 });

@@ -1,10 +1,10 @@
-import { parseScript, parseModule } from "../../../src";
-import {expect} from "chai";
+import {parseScript, parseModule} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("TC39 - Pass Explicit", () => {
-
     it("should parse \"o = { async 1(){} \"", () => {
-        expect(parseScript(`o = { foo: async function(){} }`)).to.eql({
+        assert.match<Program>(parseScript(`o = { foo: async function(){} }`), {
             type: "Program",
             body: [
                 {
@@ -52,7 +52,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"var l = { __proto__: 12, __proto__ }\"", () => {
-        expect(parseScript(`var l = { __proto__: 12, __proto__ }`)).to.eql({
+        assert.match<Program>(parseScript(`var l = { __proto__: 12, __proto__ }`), {
             type: "Program",
             body: [
                 {
@@ -109,7 +109,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({ x(...[ a, b ]){} })\"", () => {
-        expect(parseScript(`({ x(...[ a, b ]){} })`)).to.eql({
+        assert.match<Program>(parseScript(`({ x(...[ a, b ]){} })`), {
             type: "Program",
             body: [
                 {
@@ -166,7 +166,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"[a = (b = c)] = (0);\"", () => {
-        expect(parseScript(`[a = (b = c)] = (0);`)).to.eql({
+        assert.match<Program>(parseScript(`[a = (b = c)] = (0);`), {
             type: "Program",
             body: [
                 {
@@ -210,7 +210,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"[a = (0)];\"", () => {
-        expect(parseScript(`[a = (0)];`)).to.eql({
+        assert.match<Program>(parseScript(`[a = (0)];`), {
             type: "Program",
             body: [
                 {
@@ -239,7 +239,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({a: b} = (0));\"", () => {
-        expect(parseScript(`({a: b} = (0));`)).to.eql({
+        assert.match<Program>(parseScript(`({a: b} = (0));`), {
             type: "Program",
             body: [
                 {
@@ -279,7 +279,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({a: b = (0)} = (1));\"", () => {
-        expect(parseScript(`({a: b = (0)} = (1));`)).to.eql({
+        assert.match<Program>(parseScript(`({a: b = (0)} = (1));`), {
             type: "Program",
             body: [
                 {
@@ -326,7 +326,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({a: b.c} = (0));\"", () => {
-        expect(parseScript(`({a: b.c} = (0));`)).to.eql({
+        assert.match<Program>(parseScript(`({a: b.c} = (0));`), {
             type: "Program",
             body: [
                 {
@@ -374,7 +374,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({a: b = (0)});\"", () => {
-        expect(parseScript(`({a: b = (0)});`)).to.eql({
+        assert.match<Program>(parseScript(`({a: b = (0)});`), {
             type: "Program",
             body: [
                 {
@@ -414,7 +414,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"function a(...b) {}\"", () => {
-        expect(parseScript(`function a(...b) {}`)).to.eql({
+        assert.match<Program>(parseScript(`function a(...b) {}`), {
             type: "Program",
             body: [
                 {
@@ -446,7 +446,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"function a(...[]) {}\"", () => {
-        expect(parseScript(`function a(...[]) {}`)).to.eql({
+        assert.match<Program>(parseScript(`function a(...[]) {}`), {
             type: "Program",
             body: [
                 {
@@ -478,7 +478,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"(...a) => (0);\"", () => {
-        expect(parseScript(`(...a) => (0);`)).to.eql({
+        assert.match<Program>(parseScript(`(...a) => (0);`), {
             type: "Program",
             body: [
                 {
@@ -510,7 +510,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"(...[]) => (0);\"", () => {
-        expect(parseScript(`(...[]) => (0);`)).to.eql({
+        assert.match<Program>(parseScript(`(...[]) => (0);`), {
             type: "Program",
             body: [
                 {
@@ -542,7 +542,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"(a, ...[]) => (0);\"", () => {
-        expect(parseScript(`(a, ...[]) => (0);`)).to.eql({
+        assert.match<Program>(parseScript(`(a, ...[]) => (0);`), {
             type: "Program",
             body: [
                 {
@@ -578,9 +578,9 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"(class extends (yield) {})\" inside generator", () => {
-        expect(parseScript(`function* a() {
-   (class extends (yield) {});
- }`)).to.eql({
+        assert.match<Program>(parseScript(`function* a() {
+    (class extends (yield) {});
+}`), {
             type: "Program",
             body: [
                 {
@@ -621,7 +621,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"[a = (b = c)] = 0\"", () => {
-        expect(parseScript(`[a = (b = c)] = 0`)).to.eql({
+        assert.match<Program>(parseScript(`[a = (b = c)] = 0`), {
             type: "Program",
             body: [
                 {
@@ -665,7 +665,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"[(a.b)] = 0\"", () => {
-        expect(parseScript(`[(a.b)] = 0`)).to.eql({
+        assert.match<Program>(parseScript(`[(a.b)] = 0`), {
             type: "Program",
             body: [
                 {
@@ -702,7 +702,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"function a(...[]) { }\"", () => {
-        expect(parseScript(`function a(...[]) { }`)).to.eql({
+        assert.match<Program>(parseScript(`function a(...[]) { }`), {
             type: "Program",
             body: [
                 {
@@ -734,7 +734,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"(...a) => 0\"", () => {
-        expect(parseScript(`(...a) => 0`)).to.eql({
+        assert.match<Program>(parseScript(`(...a) => 0`), {
             type: "Program",
             body: [
                 {
@@ -766,7 +766,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"(...[]) => 0\"", () => {
-        expect(parseScript(`(...[]) => 0`)).to.eql({
+        assert.match<Program>(parseScript(`(...[]) => 0`), {
             type: "Program",
             body: [
                 {
@@ -798,7 +798,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"(a, ...[]) => 0\"", () => {
-        expect(parseScript(`(a, ...[]) => 0`)).to.eql({
+        assert.match<Program>(parseScript(`(a, ...[]) => 0`), {
             type: "Program",
             body: [
                 {
@@ -834,7 +834,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"9;\"", () => {
-        expect(parseScript(`9;`)).to.eql({
+        assert.match<Program>(parseScript(`9;`), {
             type: "Program",
             body: [
                 {
@@ -850,7 +850,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"18;\"", () => {
-        expect(parseScript(`18;`)).to.eql({
+        assert.match<Program>(parseScript(`18;`), {
             type: "Program",
             body: [
                 {
@@ -866,7 +866,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"(a < b) < c;\"", () => {
-        expect(parseScript(`(a < b) < c;`)).to.eql({
+        assert.match<Program>(parseScript(`(a < b) < c;`), {
             type: "Program",
             body: [
                 {
@@ -898,7 +898,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"let [a, , ] = (1);\"", () => {
-        expect(parseScript(`let [a, , ] = (1);`)).to.eql({
+        assert.match<Program>(parseScript(`let [a, , ] = (1);`), {
             type: "Program",
             body: [
                 {
@@ -930,7 +930,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"var [let] = (a);\"", () => {
-        expect(parseScript(`var [let] = (a);`)).to.eql({
+        assert.match<Program>(parseScript(`var [let] = (a);`), {
             type: "Program",
             body: [
                 {
@@ -961,7 +961,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"for (var [a, b] in c) ;\"", () => {
-        expect(parseScript(`for (var [a, b] in c) ;`)).to.eql({
+        assert.match<Program>(parseScript(`for (var [a, b] in c) ;`), {
             type: "Program",
             body: [
                 {
@@ -1003,7 +1003,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"try {} catch ([a = 1]) {}\"", () => {
-        expect(parseScript(`try {} catch ([a = 1]) {}`)).to.eql({
+        assert.match<Program>(parseScript(`try {} catch ([a = 1]) {}`), {
             type: "Program",
             body: [
                 {
@@ -1043,7 +1043,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"function a([a = 1]) {}\"", () => {
-        expect(parseScript(`function a([a = 1]) {}`)).to.eql({
+        assert.match<Program>(parseScript(`function a([a = 1]) {}`), {
             type: "Program",
             body: [
                 {
@@ -1084,7 +1084,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"let [{a}] = (1);\"", () => {
-        expect(parseScript(`let [{a}] = (1);`)).to.eql({
+        assert.match<Program>(parseScript(`let [{a}] = (1);`), {
             type: "Program",
             body: [
                 {
@@ -1131,7 +1131,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"let {a} = (1);\"", () => {
-        expect(parseScript(`let {a} = (1);`)).to.eql({
+        assert.match<Program>(parseScript(`let {a} = (1);`), {
             type: "Program",
             body: [
                 {
@@ -1173,7 +1173,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"try {} catch ({}) {}\"", () => {
-        expect(parseScript(`try {} catch ({}) {}`)).to.eql({
+        assert.match<Program>(parseScript(`try {} catch ({}) {}`), {
             type: "Program",
             body: [
                 {
@@ -1201,7 +1201,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"function a({}) {}\"", () => {
-        expect(parseScript(`function a({}) {}`)).to.eql({
+        assert.match<Program>(parseScript(`function a({}) {}`), {
             type: "Program",
             body: [
                 {
@@ -1230,7 +1230,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"for (let {} in 1) ;\"", () => {
-        expect(parseScript(`for (let {} in 1) ;`)).to.eql({
+        assert.match<Program>(parseScript(`for (let {} in 1) ;`), {
             type: "Program",
             body: [
                 {
@@ -1263,7 +1263,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"a == b;\"", () => {
-        expect(parseScript(`a == b;`)).to.eql({
+        assert.match<Program>(parseScript(`a == b;`), {
             type: "Program",
             body: [
                 {
@@ -1287,7 +1287,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"var {} = (1);\"", () => {
-        expect(parseScript(`var {} = (1);`)).to.eql({
+        assert.match<Program>(parseScript(`var {} = (1);`), {
             type: "Program",
             body: [
                 {
@@ -1313,7 +1313,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"let {} = (1);\"", () => {
-        expect(parseScript(`let {} = (1);`)).to.eql({
+        assert.match<Program>(parseScript(`let {} = (1);`), {
             type: "Program",
             body: [
                 {
@@ -1339,7 +1339,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"let {a: {}} = (1);\"", () => {
-        expect(parseScript(`let {a: {}} = (1);`)).to.eql({
+        assert.match<Program>(parseScript(`let {a: {}} = (1);`), {
             type: "Program",
             body: [
                 {
@@ -1381,7 +1381,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"for (var {a, b} in c) ;\"", () => {
-        expect(parseScript(`for (var {a, b} in c) ;`)).to.eql({
+        assert.match<Program>(parseScript(`for (var {a, b} in c) ;`), {
             type: "Program",
             body: [
                 {
@@ -1445,7 +1445,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"class a {}\"", () => {
-        expect(parseScript(`class a {}`)).to.eql({
+        assert.match<Program>(parseScript(`class a {}`), {
             type: "Program",
             body: [
                 {
@@ -1466,7 +1466,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"class a extends (1) {}\"", () => {
-        expect(parseScript(`class a extends (1) {}`)).to.eql({
+        assert.match<Program>(parseScript(`class a extends (1) {}`), {
             type: "Program",
             body: [
                 {
@@ -1490,7 +1490,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"class a {}\"", () => {
-        expect(parseScript(`class a {}`)).to.eql({
+        assert.match<Program>(parseScript(`class a {}`), {
             type: "Program",
             body: [
                 {
@@ -1511,7 +1511,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"a === b;\"", () => {
-        expect(parseScript(`a === b;`)).to.eql({
+        assert.match<Program>(parseScript(`a === b;`), {
             type: "Program",
             body: [
                 {
@@ -1535,10 +1535,10 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse computed `static` class members", () => {
-        expect(parseScript(`class a {
-  static [b]() {}
-  static [c]() {}
-}`)).to.eql({
+        assert.match<Program>(parseScript(`class a {
+    static [b]() {}
+    static [c]() {}
+}`), {
             type: "Program",
             body: [
                 {
@@ -1567,10 +1567,9 @@ describe.skip("TC39 - Pass Explicit", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                             {
@@ -1589,10 +1588,9 @@ describe.skip("TC39 - Pass Explicit", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                         ],
@@ -1604,7 +1602,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"var a = (class b extends (1) {});\"", () => {
-        expect(parseScript(`var a = (class b extends (1) {});`)).to.eql({
+        assert.match<Program>(parseScript(`var a = (class b extends (1) {});`), {
             type: "Program",
             body: [
                 {
@@ -1641,9 +1639,9 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"prototype()\" as an instance method", () => {
-        expect(parseScript(`class a {
-  prototype() {}
-}`)).to.eql({
+        assert.match<Program>(parseScript(`class a {
+    prototype() {}
+}`), {
             type: "Program",
             body: [
                 {
@@ -1672,10 +1670,9 @@ describe.skip("TC39 - Pass Explicit", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -1687,10 +1684,10 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse a dynamic \"constructor\" method name", () => {
-        expect(parseScript(`class a {
-  constructor() {}
-  ["constructor"]() {}
-}`)).to.eql({
+        assert.match<Program>(parseScript(`class a {
+    constructor() {}
+    ["constructor"]() {}
+}`), {
             type: "Program",
             body: [
                 {
@@ -1719,7 +1716,6 @@ describe.skip("TC39 - Pass Explicit", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
                                 kind: "constructor",
@@ -1741,10 +1737,9 @@ describe.skip("TC39 - Pass Explicit", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -1756,10 +1751,10 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse duplicate \"static constructor() {}\"", () => {
-        expect(parseScript(`class a {
-  static constructor() {}
-  static constructor() {}
-}`)).to.eql({
+        assert.match<Program>(parseScript(`class a {
+    static constructor() {}
+    static constructor() {}
+}`), {
             type: "Program",
             body: [
                 {
@@ -1788,10 +1783,9 @@ describe.skip("TC39 - Pass Explicit", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                             {
@@ -1810,10 +1804,9 @@ describe.skip("TC39 - Pass Explicit", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                         ],
@@ -1825,9 +1818,9 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse dynamic static \"prototype\" method", () => {
-        expect(parseScript(`class a {
-  static ["prototype"]() {}
-}`)).to.eql({
+        assert.match<Program>(parseScript(`class a {
+    static ["prototype"]() {}
+}`), {
             type: "Program",
             body: [
                 {
@@ -1856,10 +1849,9 @@ describe.skip("TC39 - Pass Explicit", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                         ],
@@ -1871,7 +1863,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"(class extends (1) {});\"", () => {
-        expect(parseScript(`(class extends (1) {});`)).to.eql({
+        assert.match<Program>(parseScript(`(class extends (1) {});`), {
             type: "Program",
             body: [
                 {
@@ -1895,7 +1887,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"[a, a, , ...a] = (1);\"", () => {
-        expect(parseScript(`[a, a, , ...a] = (1);`)).to.eql({
+        assert.match<Program>(parseScript(`[a, a, , ...a] = (1);`), {
             type: "Program",
             body: [
                 {
@@ -1936,7 +1928,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"[, , ] = (1);\"", () => {
-        expect(parseScript(`[, , ] = (1);`)).to.eql({
+        assert.match<Program>(parseScript(`[, , ] = (1);`), {
             type: "Program",
             body: [
                 {
@@ -1963,7 +1955,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"[...a[1]] = (2);\"", () => {
-        expect(parseScript(`[...a[1]] = (2);`)).to.eql({
+        assert.match<Program>(parseScript(`[...a[1]] = (2);`), {
             type: "Program",
             body: [
                 {
@@ -2003,7 +1995,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"[a, b = 1, [c, ...a[2]] = {}] = (3);\"", () => {
-        expect(parseScript(`[a, b = 1, [c, ...a[2]] = {}] = (3);`)).to.eql({
+        assert.match<Program>(parseScript(`[a, b = 1, [c, ...a[2]] = {}] = (3);`), {
             type: "Program",
             body: [
                 {
@@ -2074,7 +2066,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"[{a = b} = (1)];\"", () => {
-        expect(parseScript(`[{a = b} = (1)];`)).to.eql({
+        assert.match<Program>(parseScript(`[{a = b} = (1)];`), {
             type: "Program",
             body: [
                 {
@@ -2126,7 +2118,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"[a] = (1);\"", () => {
-        expect(parseScript(`[a] = (1);`)).to.eql({
+        assert.match<Program>(parseScript(`[a] = (1);`), {
             type: "Program",
             body: [
                 {
@@ -2156,7 +2148,7 @@ describe.skip("TC39 - Pass Explicit", () => {
 
     it("should parse \"[[[[[[[[[[[[[[[[[[[[{a = b[1]}]]]]]]]]]]]]]]]]]]]] = (2);\"", () => {
         /* tslint:disable max-line-length */
-        expect(parseScript(`[[[[[[[[[[[[[[[[[[[[{a = b[1]}]]]]]]]]]]]]]]]]]]]] = (2);`)).to.eql({
+        assert.match<Program>(parseScript(`[[[[[[[[[[[[[[[[[[[[{a = b[1]}]]]]]]]]]]]]]]]]]]]] = (2);`), {
             type: "Program",
             body: [
                 {
@@ -2312,7 +2304,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"a & b;\"", () => {
-        expect(parseScript(`a & b;`)).to.eql({
+        assert.match<Program>(parseScript(`a & b;`), {
             type: "Program",
             body: [
                 {
@@ -2336,7 +2328,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"for (const {a, b} of c) ;\"", () => {
-        expect(parseScript(`for (const {a, b} of c) ;`)).to.eql({
+        assert.match<Program>(parseScript(`for (const {a, b} of c) ;`), {
             type: "Program",
             body: [
                 {
@@ -2401,7 +2393,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"for (var a of b) ;\"", () => {
-        expect(parseScript(`for (var a of b) ;`)).to.eql({
+        assert.match<Program>(parseScript(`for (var a of b) ;`), {
             type: "Program",
             body: [
                 {
@@ -2435,7 +2427,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"(function* () {});\"", () => {
-        expect(parseScript(`(function* () {});`)).to.eql({
+        assert.match<Program>(parseScript(`(function* () {});`), {
             type: "Program",
             body: [
                 {
@@ -2459,9 +2451,9 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse shorthand generators", () => {
-        expect(parseScript(`({*a() {
-  yield;
-}});`)).to.eql({
+        assert.match<Program>(parseScript(`({*a() {
+    yield;
+}});`), {
             type: "Program",
             body: [
                 {
@@ -2510,7 +2502,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({*a() {}});\"", () => {
-        expect(parseScript(`({*a() {}});`)).to.eql({
+        assert.match<Program>(parseScript(`({*a() {}});`), {
             type: "Program",
             body: [
                 {
@@ -2550,9 +2542,9 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse static generators", () => {
-        expect(parseScript(`class a {
-  static *b() {}
-}`)).to.eql({
+        assert.match<Program>(parseScript(`class a {
+    static *b() {}
+}`), {
             type: "Program",
             body: [
                 {
@@ -2581,10 +2573,9 @@ describe.skip("TC39 - Pass Explicit", () => {
                                         body: [],
                                     },
                                     generator: true,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                         ],
@@ -2596,7 +2587,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse Unicode identifiers", () => {
-        expect(parseScript(`゛ + ゜;`)).to.eql({
+        assert.match<Program>(parseScript(`゛ + ゜;`), {
             type: "Program",
             body: [
                 {
@@ -2619,31 +2610,31 @@ describe.skip("TC39 - Pass Explicit", () => {
         });
     });
     /*
-     it('should parse "var 𞸆_$;"', () => {
-     expect(parseScript(`var 𞸆_$;`)).to.eql({
-     "type": "Program",
-     "body": [
-     {
-     "type": "VariableDeclaration",
-     "declarations": [
-     {
-     "type": "VariableDeclarator",
-     "id": {
-     "type": "Identifier",
-     "name": "𞸆_$"
-     },
-     "init": null
-     }
-     ],
-     "kind": "var"
-     }
-     ],
-     "sourceType": "script"
-     });
-     });*/
+    it('should parse "var 𞸆_$;"', () => {
+        assert.match<Program>(parseScript(`var 𞸆_$;`), {
+            "type": "Program",
+            "body": [
+                {
+                "type": "VariableDeclaration",
+                    "declarations": [
+                        {
+                            "type": "VariableDeclarator",
+                            "id": {
+                                "type": "Identifier",
+                                "name": "𞸆_$"
+                            },
+                            "init": null
+                        }
+                    ],
+                    "kind": "var"
+                }
+            ],
+            "sourceType": "script"
+        });
+    });*/
 
     it("should parse \"var ABC;\"", () => {
-        expect(parseScript(`var ABC;`)).to.eql({
+        assert.match<Program>(parseScript(`var ABC;`), {
             type: "Program",
             body: [
                 {
@@ -2666,9 +2657,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"new (new.target)\" within a function declaration", () => {
-        expect(parseScript(`function a() {
-  new (new.target);
-}`)).to.eql({
+        assert.match<Program>(parseScript(`function a() { new (new.target); }`), {
             type: "Program",
             body: [
                 {
@@ -2711,9 +2700,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"new.target\" within a function declaration", () => {
-        expect(parseScript(`function a() {
-  new.target;
-}`)).to.eql({
+        assert.match<Program>(parseScript(`function a() { new.target; }`), {
             type: "Program",
             body: [
                 {
@@ -2752,9 +2739,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"new.target\" within anonymous functions", () => {
-        expect(parseScript(`var a = (function () {
-  new.target;
-});`)).to.eql({
+        assert.match<Program>(parseScript(`var a = (function () { new.target; });`), {
             type: "Program",
             body: [
                 {
@@ -2803,7 +2788,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"a(...b, ...c, ...d);\"", () => {
-        expect(parseScript(`a(...b, ...c, ...d);`)).to.eql({
+        assert.match<Program>(parseScript(`a(...b, ...c, ...d);`), {
             type: "Program",
             body: [
                 {
@@ -2845,7 +2830,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"a = ({b(...c) {}});\"", () => {
-        expect(parseScript(`a = ({b(...c) {}});`)).to.eql({
+        assert.match<Program>(parseScript(`a = ({b(...c) {}});`), {
             type: "Program",
             body: [
                 {
@@ -2901,7 +2886,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"a(...b, ...c, ...d);\"", () => {
-        expect(parseScript(`a(...b, ...c, ...d);`)).to.eql({
+        assert.match<Program>(parseScript(`a(...b, ...c, ...d);`), {
             type: "Program",
             body: [
                 {
@@ -2943,7 +2928,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"a(b, ...(c = d));\"", () => {
-        expect(parseScript(`a(b, ...(c = d));`)).to.eql({
+        assert.match<Program>(parseScript(`a(b, ...(c = d));`), {
             type: "Program",
             body: [
                 {
@@ -2983,7 +2968,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"a(...b, c, d);\"", () => {
-        expect(parseScript(`a(...b, c, d);`)).to.eql({
+        assert.match<Program>(parseScript(`a(...b, c, d);`), {
             type: "Program",
             body: [
                 {
@@ -3019,11 +3004,11 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse super methods in subclasses", () => {
-        expect(parseScript(`class a extends b {
-  c() {
-    return super.d;
-  }
-}`)).to.eql({
+        assert.match<Program>(parseScript(`class a extends b {
+            c() {
+                return super.d;
+            }
+        }`), {
             type: "Program",
             body: [
                 {
@@ -3070,10 +3055,9 @@ describe.skip("TC39 - Pass Explicit", () => {
                                         ],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -3085,7 +3069,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"\"\u{00000000034}\";\"", () => {
-        expect(parseScript(`"\u{00000000034}";`)).to.eql({
+        assert.match<Program>(parseScript(`"\u{00000000034}";`), {
             type: "Program",
             body: [
                 {
@@ -3101,7 +3085,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"[yield] = a;\"", () => {
-        expect(parseScript(`[yield] = a;`)).to.eql({
+        assert.match<Program>(parseScript(`[yield] = a;`), {
             type: "Program",
             body: [
                 {
@@ -3130,9 +3114,9 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"yield\" within sloppy arrow functions", () => {
-        expect(parseScript(`a => {
-  yield + a;
-};`)).to.eql({
+        assert.match<Program>(parseScript(`a => {
+            yield + a;
+        };`), {
             type: "Program",
             body: [
                 {
@@ -3177,7 +3161,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"function a(yield) {}\"", () => {
-        expect(parseScript(`function a(yield) {}`)).to.eql({
+        assert.match<Program>(parseScript(`function a(yield) {}`), {
             type: "Program",
             body: [
                 {
@@ -3206,7 +3190,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({yield() {}});\"", () => {
-        expect(parseScript(`({yield() {}});`)).to.eql({
+        assert.match<Program>(parseScript(`({yield() {}});`), {
             type: "Program",
             body: [
                 {
@@ -3246,7 +3230,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"function a({yield: b}) {}\"", () => {
-        expect(parseScript(`function a({yield: b}) {}`)).to.eql({
+        assert.match<Program>(parseScript(`function a({yield: b}) {}`), {
             type: "Program",
             body: [
                 {
@@ -3291,7 +3275,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"((1) + (2)) + (3);\"", () => {
-        expect(parseScript(`((1) + (2)) + (3);`)).to.eql({
+        assert.match<Program>(parseScript(`((1) + (2)) + (3);`), {
             type: "Program",
             body: [
                 {
@@ -3323,7 +3307,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"0;\"", () => {
-        expect(parseScript(`0;`)).to.eql({
+        assert.match<Program>(parseScript(`0;`), {
             type: "Program",
             body: [
                 {
@@ -3339,7 +3323,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({a: b} = (1));\"", () => {
-        expect(parseScript(`({a: b} = (1));`)).to.eql({
+        assert.match<Program>(parseScript(`({a: b} = (1));`), {
             type: "Program",
             body: [
                 {
@@ -3379,7 +3363,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({0: a} = (1));\"", () => {
-        expect(parseScript(`({0: a} = (1));`)).to.eql({
+        assert.match<Program>(parseScript(`({0: a} = (1));`), {
             type: "Program",
             body: [
                 {
@@ -3419,7 +3403,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({0: a, 1: a} = (1));\"", () => {
-        expect(parseScript(`({0: a, 1: a} = (1));`)).to.eql({
+        assert.match<Program>(parseScript(`({0: a, 1: a} = (1));`), {
             type: "Program",
             body: [
                 {
@@ -3474,7 +3458,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({a: b = 1} = (2));\"", () => {
-        expect(parseScript(`({a: b = 1} = (2));`)).to.eql({
+        assert.match<Program>(parseScript(`({a: b = 1} = (2));`), {
             type: "Program",
             body: [
                 {
@@ -3521,7 +3505,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({a: b = c = (1)} = (2));\"", () => {
-        expect(parseScript(`({a: b = c = (1)} = (2));`)).to.eql({
+        assert.match<Program>(parseScript(`({a: b = c = (1)} = (2));`), {
             type: "Program",
             body: [
                 {
@@ -3576,7 +3560,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({a: [b] = 1} = (2));\"", () => {
-        expect(parseScript(`({a: [b] = 1} = (2));`)).to.eql({
+        assert.match<Program>(parseScript(`({a: [b] = 1} = (2));`), {
             type: "Program",
             body: [
                 {
@@ -3628,7 +3612,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({a: let} = (1));\"", () => {
-        expect(parseScript(`({a: let} = (1));`)).to.eql({
+        assert.match<Program>(parseScript(`({a: let} = (1));`), {
             type: "Program",
             body: [
                 {
@@ -3668,7 +3652,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({a: yield} = (1));\"", () => {
-        expect(parseScript(`({a: yield} = (1));`)).to.eql({
+        assert.match<Program>(parseScript(`({a: yield} = (1));`), {
             type: "Program",
             body: [
                 {
@@ -3708,9 +3692,9 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"[...{a = yield}] = (1)\"", () => {
-        expect(parseScript(`(function* () {
-  [...{a = yield}] = (1);
-});`)).to.eql({
+        assert.match<Program>(parseScript(`(function* () {
+            [...{a = yield}] = (1);
+        });`), {
             type: "Program",
             body: [
                 {
@@ -3782,7 +3766,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"var [, a] = (1);\"", () => {
-        expect(parseScript(`var [, a] = (1);`)).to.eql({
+        assert.match<Program>(parseScript(`var [, a] = (1);`), {
             type: "Program",
             body: [
                 {
@@ -3814,7 +3798,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"var [a] = ([1]);\"", () => {
-        expect(parseScript(`var [a] = ([1]);`)).to.eql({
+        assert.match<Program>(parseScript(`var [a] = ([1]);`), {
             type: "Program",
             body: [
                 {
@@ -3850,7 +3834,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"var a, [a] = (1);\"", () => {
-        expect(parseScript(`var a, [a] = (1);`)).to.eql({
+        assert.match<Program>(parseScript(`var a, [a] = (1);`), {
             type: "Program",
             body: [
                 {
@@ -3889,7 +3873,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"var a, {b: {c: a}} = (1);\"", () => {
-        expect(parseScript(`var a, {b: {c: a}} = (1);`)).to.eql({
+        assert.match<Program>(parseScript(`var a, {b: {c: a}} = (1);`), {
             type: "Program",
             body: [
                 {
@@ -3955,10 +3939,10 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"use strict\" within anonymous functions", () => {
-        expect(parseScript(`(function () {
-  "use strict";
-  return 1;
-});`)).to.eql({
+        assert.match<Program>(parseScript(`(function () {
+            "use strict";
+            return 1;
+        });`), {
             type: "Program",
             body: [
                 {
@@ -3997,11 +3981,11 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"use strict\" within named functions", () => {
-        expect(parseScript(`function a() {
-  "use strict";
-  return 1;
-}
-;`)).to.eql({
+        assert.match<Program>(parseScript(`function a() {
+            "use strict";
+            return 1;
+        }
+        ;`), {
             type: "Program",
             body: [
                 {
@@ -4043,7 +4027,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"[1];\"", () => {
-        expect(parseScript(`[1];`)).to.eql({
+        assert.match<Program>(parseScript(`[1];`), {
             type: "Program",
             body: [
                 {
@@ -4064,7 +4048,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"(a, b, [c]) => (1);\"", () => {
-        expect(parseScript(`(a, b, [c]) => (1);`)).to.eql({
+        assert.match<Program>(parseScript(`(a, b, [c]) => (1);`), {
             type: "Program",
             body: [
                 {
@@ -4106,7 +4090,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"try {} catch ({a = 1}) {}\"", () => {
-        expect(parseScript(`try {} catch ({a = 1}) {}`)).to.eql({
+        assert.match<Program>(parseScript(`try {} catch ({a = 1}) {}`), {
             type: "Program",
             body: [
                 {
@@ -4157,10 +4141,10 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"with\" with \"use\\x20strict\"", () => {
-        expect(parseScript(`(function () {
-  "use\\x20strict";
-  with (a) ;
-});`)).to.eql({
+        assert.match<Program>(parseScript(`(function () {
+            "use\\x20strict";
+            with (a) ;
+        });`), {
             type: "Program",
             body: [
                 {
@@ -4202,7 +4186,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({a}) => (1);\"", () => {
-        expect(parseScript(`({a}) => (1);`)).to.eql({
+        assert.match<Program>(parseScript(`({a}) => (1);`), {
             type: "Program",
             body: [
                 {
@@ -4247,7 +4231,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"() => (() => (1));\"", () => {
-        expect(parseScript(`() => (() => (1));`)).to.eql({
+        assert.match<Program>(parseScript(`() => (() => (1));`), {
             type: "Program",
             body: [
                 {
@@ -4279,7 +4263,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"(() => (1)), (2);\"", () => {
-        expect(parseScript(`(() => (1)), (2);`)).to.eql({
+        assert.match<Program>(parseScript(`(() => (1)), (2);`), {
             type: "Program",
             body: [
                 {
@@ -4312,9 +4296,9 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"use strict\" in arrow functions", () => {
-        expect(parseScript(`a => {
-  "use strict";
-};`)).to.eql({
+        assert.match<Program>(parseScript(`a => {
+            "use strict";
+        };`), {
             type: "Program",
             body: [
                 {
@@ -4351,7 +4335,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"eval => (\"use strict\");\"", () => {
-        expect(parseScript(`eval => ("use strict");`)).to.eql({
+        assert.match<Program>(parseScript(`eval => ("use strict");`), {
             type: "Program",
             body: [
                 {
@@ -4380,7 +4364,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"([a = 1], []) => (2);\"", () => {
-        expect(parseScript(`([a = 1], []) => (2);`)).to.eql({
+        assert.match<Program>(parseScript(`([a = 1], []) => (2);`), {
             type: "Program",
             body: [
                 {
@@ -4425,7 +4409,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"(a, {b = 1}) => (2);\"", () => {
-        expect(parseScript(`(a, {b = 1}) => (2);`)).to.eql({
+        assert.match<Program>(parseScript(`(a, {b = 1}) => (2);`), {
             type: "Program",
             body: [
                 {
@@ -4481,7 +4465,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"({a = 1}, {b = 2}, {c = 3}) => (4);\"", () => {
-        expect(parseScript(`({a = 1}, {b = 2}, {c = 3}) => (4);`)).to.eql({
+        assert.match<Program>(parseScript(`({a = 1}, {b = 2}, {c = 3}) => (4);`), {
             type: "Program",
             body: [
                 {
@@ -4587,7 +4571,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"yield => (1);\"", () => {
-        expect(parseScript(`yield => (1);`)).to.eql({
+        assert.match<Program>(parseScript(`yield => (1);`), {
             type: "Program",
             body: [
                 {
@@ -4616,7 +4600,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"a = (1);\"", () => {
-        expect(parseScript(`a = (1);`)).to.eql({
+        assert.match<Program>(parseScript(`a = (1);`), {
             type: "Program",
             body: [
                 {
@@ -4640,12 +4624,12 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse new expressions with normal expressions", () => {
-        expect(parseScript(`var a;
+        assert.match<Program>(parseScript(`var a;
 if (b()) {
-  new a(1);
+    new a(1);
 } else {
-  a(2);
-}`)).to.eql({
+    a(2);
+}`), {
             type: "Program",
             body: [
                 {
@@ -4721,10 +4705,10 @@ if (b()) {
     });
 
     it("should parse called member expressions", () => {
-        expect(parseScript(`var a = ({});
+        assert.match<Program>(parseScript(`var a = ({});
 a.b = (1);
 a.c = (2);
-(d.e)(a.c);`)).to.eql({
+(d.e)(a.c);`), {
             type: "Program",
             body: [
                 {
@@ -4828,23 +4812,21 @@ a.c = (2);
     });
 
     it("should parse \"var a = ((((((!a) || (!b)) || (!c)) || (!d)) || (!e)) || (!f));\"", () => {
-        expect(parseScript(`var a = ((((((!a) || (!b)) || (!c)) || (!d)) || (!e)) || (!f));`))
-        .to.eql({
-            type: "Program",
-            body: [
-                {
-                    type: "VariableDeclaration",
-                    declarations: [
-                        {
-                            type: "VariableDeclarator",
-                            id: {
-                                type: "Identifier",
-                                name: "a",
-                            },
-                            init: {
-                                type: "LogicalExpression",
-                                operator: "||",
-                                left: {
+        assert.match<Program>(
+            parseScript(`var a = ((((((!a) || (!b)) || (!c)) || (!d)) || (!e)) || (!f));`),
+            {
+                type: "Program",
+                body: [
+                    {
+                        type: "VariableDeclaration",
+                        declarations: [
+                            {
+                                type: "VariableDeclarator",
+                                id: {
+                                    type: "Identifier",
+                                    name: "a",
+                                },
+                                init: {
                                     type: "LogicalExpression",
                                     operator: "||",
                                     left: {
@@ -4857,20 +4839,33 @@ a.c = (2);
                                                 type: "LogicalExpression",
                                                 operator: "||",
                                                 left: {
-                                                    type: "UnaryExpression",
-                                                    operator: "!",
-                                                    argument: {
-                                                        type: "Identifier",
-                                                        name: "a",
+                                                    type: "LogicalExpression",
+                                                    operator: "||",
+                                                    left: {
+                                                        type: "UnaryExpression",
+                                                        operator: "!",
+                                                        argument: {
+                                                            type: "Identifier",
+                                                            name: "a",
+                                                        },
+                                                        prefix: true,
                                                     },
-                                                    prefix: true,
+                                                    right: {
+                                                        type: "UnaryExpression",
+                                                        operator: "!",
+                                                        argument: {
+                                                            type: "Identifier",
+                                                            name: "b",
+                                                        },
+                                                        prefix: true,
+                                                    },
                                                 },
                                                 right: {
                                                     type: "UnaryExpression",
                                                     operator: "!",
                                                     argument: {
                                                         type: "Identifier",
-                                                        name: "b",
+                                                        name: "c",
                                                     },
                                                     prefix: true,
                                                 },
@@ -4880,7 +4875,7 @@ a.c = (2);
                                                 operator: "!",
                                                 argument: {
                                                     type: "Identifier",
-                                                    name: "c",
+                                                    name: "d",
                                                 },
                                                 prefix: true,
                                             },
@@ -4890,7 +4885,7 @@ a.c = (2);
                                             operator: "!",
                                             argument: {
                                                 type: "Identifier",
-                                                name: "d",
+                                                name: "e",
                                             },
                                             prefix: true,
                                         },
@@ -4900,60 +4895,71 @@ a.c = (2);
                                         operator: "!",
                                         argument: {
                                             type: "Identifier",
-                                            name: "e",
+                                            name: "f",
                                         },
                                         prefix: true,
                                     },
                                 },
-                                right: {
-                                    type: "UnaryExpression",
-                                    operator: "!",
-                                    argument: {
-                                        type: "Identifier",
-                                        name: "f",
-                                    },
-                                    prefix: true,
-                                },
                             },
-                        },
-                    ],
-                    kind: "var",
-                },
-            ],
-            sourceType: "script",
-        });
+                        ],
+                        kind: "var",
+                    },
+                ],
+                sourceType: "script",
+            },
+        );
     });
 
     it("should parse \"var a = ((((!b) && ((!c) || d)) && ((!e) || f)) && (g()));\"", () => {
-        expect(parseScript(`var a = ((((!b) && ((!c) || d)) && ((!e) || f)) && (g()));`)).to.eql({
-            type: "Program",
-            body: [
-                {
-                    type: "VariableDeclaration",
-                    declarations: [
-                        {
-                            type: "VariableDeclarator",
-                            id: {
-                                type: "Identifier",
-                                name: "a",
-                            },
-                            init: {
-                                type: "LogicalExpression",
-                                operator: "&&",
-                                left: {
+        assert.match<Program>(
+            parseScript(`var a = ((((!b) && ((!c) || d)) && ((!e) || f)) && (g()));`),
+            {
+                type: "Program",
+                body: [
+                    {
+                        type: "VariableDeclaration",
+                        declarations: [
+                            {
+                                type: "VariableDeclarator",
+                                id: {
+                                    type: "Identifier",
+                                    name: "a",
+                                },
+                                init: {
                                     type: "LogicalExpression",
                                     operator: "&&",
                                     left: {
                                         type: "LogicalExpression",
                                         operator: "&&",
                                         left: {
-                                            type: "UnaryExpression",
-                                            operator: "!",
-                                            argument: {
-                                                type: "Identifier",
-                                                name: "b",
+                                            type: "LogicalExpression",
+                                            operator: "&&",
+                                            left: {
+                                                type: "UnaryExpression",
+                                                operator: "!",
+                                                argument: {
+                                                    type: "Identifier",
+                                                    name: "b",
+                                                },
+                                                prefix: true,
                                             },
-                                            prefix: true,
+                                            right: {
+                                                type: "LogicalExpression",
+                                                operator: "||",
+                                                left: {
+                                                    type: "UnaryExpression",
+                                                    operator: "!",
+                                                    argument: {
+                                                        type: "Identifier",
+                                                        name: "c",
+                                                    },
+                                                    prefix: true,
+                                                },
+                                                right: {
+                                                    type: "Identifier",
+                                                    name: "d",
+                                                },
+                                            },
                                         },
                                         right: {
                                             type: "LogicalExpression",
@@ -4963,55 +4969,37 @@ a.c = (2);
                                                 operator: "!",
                                                 argument: {
                                                     type: "Identifier",
-                                                    name: "c",
+                                                    name: "e",
                                                 },
                                                 prefix: true,
                                             },
                                             right: {
                                                 type: "Identifier",
-                                                name: "d",
+                                                name: "f",
                                             },
                                         },
                                     },
                                     right: {
-                                        type: "LogicalExpression",
-                                        operator: "||",
-                                        left: {
-                                            type: "UnaryExpression",
-                                            operator: "!",
-                                            argument: {
-                                                type: "Identifier",
-                                                name: "e",
-                                            },
-                                            prefix: true,
-                                        },
-                                        right: {
+                                        type: "CallExpression",
+                                        callee: {
                                             type: "Identifier",
-                                            name: "f",
+                                            name: "g",
                                         },
+                                        arguments: [],
                                     },
-                                },
-                                right: {
-                                    type: "CallExpression",
-                                    callee: {
-                                        type: "Identifier",
-                                        name: "g",
-                                    },
-                                    arguments: [],
                                 },
                             },
-                        },
-                    ],
-                    kind: "var",
-                },
-            ],
-            sourceType: "script",
-        });
+                        ],
+                        kind: "var",
+                    },
+                ],
+                sourceType: "script",
+            },
+        );
     });
 
     it("should parse nested sequences in callees", () => {
-        expect(parseScript(`(((1), (2)), a)();
-(((3), (4)), (b.a))();`)).to.eql({
+        assert.match<Program>(parseScript(`(((1), (2)), a)(); (((3), (4)), (b.a))();`), {
             type: "Program",
             body: [
                 {
@@ -5086,7 +5074,7 @@ a.c = (2);
     });
 
     it("should parse \"a = ({set b (c) {}});\"", () => {
-        expect(parseScript(`a = ({set b (c) {}});`)).to.eql({
+        assert.match<Program>(parseScript(`a = ({set b (c) {}});`), {
             type: "Program",
             body: [
                 {
@@ -5139,7 +5127,7 @@ a.c = (2);
     });
 
     it("should parse \"a = ({get b() {}});\"", () => {
-        expect(parseScript(`a = ({get b() {}});`)).to.eql({
+        assert.match<Program>(parseScript(`a = ({get b() {}});`), {
             type: "Program",
             body: [
                 {
@@ -5187,20 +5175,20 @@ a.c = (2);
     });
 
     it("should parse multiple classes", () => {
-        expect(parseScript(`class a {
-  constructor() {}
-  b() {}
+        assert.match<Program>(parseScript(`class a {
+    constructor() {}
+    b() {}
 }
 ;
 class c {
-  constructor(...d) {}
-  b() {}
+    constructor(...d) {}
+    b() {}
 }
 ;
 class e extends a {}
 ;
 var f = (class g {});
-var h = (class {});`)).to.eql({
+var h = (class {});`), {
             type: "Program",
             body: [
                 {
@@ -5254,7 +5242,7 @@ var h = (class {});`)).to.eql({
                                     expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -5297,7 +5285,6 @@ var h = (class {});`)).to.eql({
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
                                 kind: "constructor",
@@ -5319,10 +5306,9 @@ var h = (class {});`)).to.eql({
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -5402,8 +5388,7 @@ var h = (class {});`)).to.eql({
     });
 
     it("should parse parenthesized objects an object arguments", () => {
-        expect(parseScript(`var a = ({a: 1});
-a({a: 2});`)).to.eql({
+        assert.match<Program>(parseScript(`var a = ({a: 1}); a({a: 2});`), {
             type: "Program",
             body: [
                 {
@@ -5477,11 +5462,11 @@ a({a: 2});`)).to.eql({
     });
 
     it("should parse labeled call expressions", () => {
-        expect(parseScript(`function a() {}
+        assert.match<Program>(parseScript(`function a() {}
 var b = ("is a valid variable name");
 b = ({b: "is ok"});
 c.b;
-b: d();`)).to.eql({
+b: d();`), {
             type: "Program",
             body: [
                 {
@@ -5586,7 +5571,7 @@ b: d();`)).to.eql({
     });
 
     it("should parse \"(() => (null))();\"", () => {
-        expect(parseScript(`(() => (null))();`)).to.eql({
+        assert.match<Program>(parseScript(`(() => (null))();`), {
             type: "Program",
             body: [
                 {
@@ -5614,8 +5599,7 @@ b: d();`)).to.eql({
     });
 
     it("should parse parenthesized arrow functions", () => {
-        expect(parseScript(`a = (b => (false));
-a = (() => (false));`)).to.eql({
+        assert.match<Program>(parseScript(`a = (b => (false)); a = (() => (false));`), {
             type: "Program",
             body: [
                 {
@@ -5675,7 +5659,7 @@ a = (() => (false));`)).to.eql({
     });
 
     it("should parse \"a({[(\"b\") + (\"b\")]: 1});\"", () => {
-        expect(parseScript(`a({[("b") + ("b")]: 1});`)).to.eql({
+        assert.match<Program>(parseScript(`a({[("b") + ("b")]: 1});`), {
             type: "Program",
             body: [
                 {
@@ -5724,9 +5708,7 @@ a = (() => (false));`)).to.eql({
     });
 
     it("should parse functions with many parameters", () => {
-        expect(parseScript(`function a(b, c, d, e, f) {
-  return b + c;
-}`)).to.eql({
+        assert.match<Program>(parseScript(`function a(b, c, d, e, f) { return b + c; }`), {
             type: "Program",
             body: [
                 {
@@ -5787,8 +5769,7 @@ a = (() => (false));`)).to.eql({
     });
 
     it("should parse parenthesized member expression callees", () => {
-        expect(parseScript(`(a.b)("c");
-((a.b).d)(a, arguments);`)).to.eql({
+        assert.match<Program>(parseScript(`(a.b)("c"); ((a.b).d)(a, arguments);`), {
             type: "Program",
             body: [
                 {
@@ -5857,9 +5838,9 @@ a = (() => (false));`)).to.eql({
     });
 
     it("should parse `var` destructuring inside `for`", () => {
-        expect(parseScript(`for (var [a, b] in c) ;
+        assert.match<Program>(parseScript(`for (var [a, b] in c) ;
 for (var [d] = (1);;) ;
-for (var {e} of f) ;`)).to.eql({
+for (var {e} of f) ;`), {
             type: "Program",
             body: [
                 {
@@ -5972,9 +5953,7 @@ for (var {e} of f) ;`)).to.eql({
     });
 
     it("should parse object shorthand inside expressions", () => {
-        expect(parseScript(`({a, b});
-[{a}];
-a({x});`)).to.eql({
+        assert.match<Program>(parseScript(`({a, b}); [{a}]; a({x});`), {
             type: "Program",
             body: [
                 {
@@ -6081,7 +6060,7 @@ a({x});`)).to.eql({
     });
 
     it("should parse \"var [{a}, b] = (c);\"", () => {
-        expect(parseScript(`var [{a}, b] = (c);`)).to.eql({
+        assert.match<Program>(parseScript(`var [{a}, b] = (c);`), {
             type: "Program",
             body: [
                 {
@@ -6132,15 +6111,15 @@ a({x});`)).to.eql({
     });
 
     it("should parse unreachable statements after \"return\"", () => {
-        expect(parseScript(`function a() {
-  b();
-  c();
-  d = (1);
-  return;
-  if (d) {
-    e();
-  }
-}`)).to.eql({
+        assert.match<Program>(parseScript(`function a() {
+    b();
+    c();
+    d = (1);
+    return;
+    if (d) {
+        e();
+    }
+}`), {
             type: "Program",
             body: [
                 {
@@ -6230,22 +6209,22 @@ a({x});`)).to.eql({
     });
 
     it("should parse unreachable statements after \"throw\"", () => {
-        expect(parseScript(`function a() {
-  b();
-  c = (1);
-  throw "d";
-  if (c) {
-    e();
-    var c;
-    function b() {}
-    ;
-    ((function () {
-      var f;
-      function e() {}
-      ;
-    })());
-  }
-}`)).to.eql({
+        assert.match<Program>(parseScript(`function a() {
+    b();
+    c = (1);
+    throw "d";
+    if (c) {
+        e();
+        var c;
+        function b() {}
+        ;
+        ((function () {
+            var f;
+            function e() {}
+            ;
+        })());
+    }
+}`), {
             type: "Program",
             body: [
                 {
@@ -6411,7 +6390,7 @@ a({x});`)).to.eql({
     });
 
     it("should parse highly parenthesized expressions", () => {
-        expect(parseScript(`var a;
+        assert.match<Program>(parseScript(`var a;
 a = ((true) && b);
 a = ((1) && ((c.d)("a")));
 a = (((2) * (3)) && ((4) * b));
@@ -6437,7 +6416,7 @@ a = (b && (false));
 a = (((c.d)("f")) && NaN);
 a = (((c.d)("g")) && (30));
 a = (((31) * b) && h);
-a = ((b + (32)) && (null))`)).to.eql({
+a = ((b + (32)) && (null))`), {
             type: "Program",
             body: [
                 {
@@ -7335,9 +7314,9 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse member expressions with parenthesized objects", () => {
-        expect(parseScript(`if (a && b) {
-  (((c(a))[1]).b).d = (e());
-} else (((c(a))[2]).b).d = (f());`)).to.eql({
+        assert.match<Program>(parseScript(`if (a && b) {
+    (((c(a))[1]).b).d = (e());
+} else (((c(a))[2]).b).d = (f());`), {
             type: "Program",
             body: [
                 {
@@ -7470,7 +7449,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse \"with (1) ;\"", () => {
-        expect(parseScript(`with (1) ;`)).to.eql({
+        assert.match<Program>(parseScript(`with (1) ;`), {
             type: "Program",
             body: [
                 {
@@ -7489,7 +7468,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse basic `try`-`catch`-`finally`", () => {
-        expect(parseScript(`try {} catch (a) {} finally {}`)).to.eql({
+        assert.match<Program>(parseScript(`try {} catch (a) {} finally {}`), {
             type: "Program",
             body: [
                 {
@@ -7520,10 +7499,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse labeled `while` with unused label", () => {
-        expect(parseScript(`b: while (1) {
-  continue;
-  a;
-}`)).to.eql({
+        assert.match<Program>(parseScript(`b: while (1) { continue; a; }`), {
             type: "Program",
             body: [
                 {
@@ -7562,7 +7538,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse \"({[(1) * (2)]: 3});\"", () => {
-        expect(parseScript(`({[(1) * (2)]: 3});`)).to.eql({
+        assert.match<Program>(parseScript(`({[(1) * (2)]: 3});`), {
             type: "Program",
             body: [
                 {
@@ -7602,7 +7578,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse \"({[(\"a\") + (1)]: \"b\"});\"", () => {
-        expect(parseScript(`({[("a") + (1)]: "b"});`)).to.eql({
+        assert.match<Program>(parseScript(`({[("a") + (1)]: "b"});`), {
             type: "Program",
             body: [
                 {
@@ -7642,7 +7618,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse \"(0).a;\"", () => {
-        expect(parseScript(`(0).a;`)).to.eql({
+        assert.match<Program>(parseScript(`(0).a;`), {
             type: "Program",
             body: [
                 {
@@ -7666,7 +7642,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse \"((new a).b)();\"", () => {
-        expect(parseScript(`((new a).b)();`)).to.eql({
+        assert.match<Program>(parseScript(`((new a).b)();`), {
             type: "Program",
             body: [
                 {
@@ -7698,7 +7674,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse \"for (var a of [1, 2]) 3;\"", () => {
-        expect(parseScript(`for (var a of [1, 2]) 3;`)).to.eql({
+        assert.match<Program>(parseScript(`for (var a of [1, 2]) 3;`), {
             type: "Program",
             body: [
                 {
@@ -7745,9 +7721,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse parenthesized `yield` argument", () => {
-        expect(parseScript(`function* a() {
-  yield ("a");
-}`)).to.eql({
+        assert.match<Program>(parseScript(`function* a() { yield ("a"); }`), {
             type: "Program",
             body: [
                 {
@@ -7783,13 +7757,11 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse `super` within arrow functions inside constructors", () => {
-        expect(parseScript(`class a extends b {
-  constructor() {
-    () => {
-      super();
-    };
-  }
-}`)).to.eql({
+        assert.match<Program>(parseScript(`class a extends b {
+    constructor() {
+        () => { super(); };
+    }
+}`), {
             type: "Program",
             body: [
                 {
@@ -7848,7 +7820,6 @@ a = ((b + (32)) && (null))`)).to.eql({
                                         ],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
                                 kind: "constructor",
@@ -7863,7 +7834,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse \"({a, b});\"", () => {
-        expect(parseScript(`({a, b});`)).to.eql({
+        assert.match<Program>(parseScript(`({a, b});`), {
             type: "Program",
             body: [
                 {
@@ -7910,7 +7881,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse \"export const a = (1);\"", () => {
-        expect(parseModule(`export const a = (1);`)).to.eql({
+        assert.match<Program>(parseModule(`export const a = (1);`), {
             type: "Program",
             body: [
                 {
@@ -7941,7 +7912,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse \"export default (1) + (2);\"", () => {
-        expect(parseModule(`export default (1) + (2);`)).to.eql({
+        assert.match<Program>(parseModule(`export default (1) + (2);`), {
             type: "Program",
             body: [
                 {
@@ -7965,7 +7936,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse\"export var a = (function () {});\"", () => {
-        expect(parseModule(`export var a = (function () {});`)).to.eql({
+        assert.match<Program>(parseModule(`export var a = (function () {});`), {
             type: "Program",
             body: [
                 {
@@ -8004,7 +7975,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse \"export var a = (1);\"", () => {
-        expect(parseModule(`export var a = (1);`)).to.eql({
+        assert.match<Program>(parseModule(`export var a = (1);`), {
             type: "Program",
             body: [
                 {
@@ -8035,7 +8006,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse \"import {default as a} from \"foo\";\"", () => {
-        expect(parseModule(`import {default as a} from "foo";`)).to.eql({
+        assert.match<Program>(parseModule(`import {default as a} from "foo";`), {
             type: "Program",
             body: [
                 {
@@ -8064,7 +8035,7 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse \"import  * as a from \"foo\";\"", () => {
-        expect(parseModule(`import  * as a from "foo";`)).to.eql({
+        assert.match<Program>(parseModule(`import  * as a from "foo";`), {
             type: "Program",
             body: [
                 {
@@ -8089,10 +8060,10 @@ a = ((b + (32)) && (null))`)).to.eql({
     });
 
     it("should parse \"import  * as a from \"foo\";\"", () => {
-        expect(parseModule(`export default function a() {}
+        assert.match<Program>(parseModule(`export default function a() {}
 let b;
 export {b as a};
-`)).to.eql({
+`), {
             type: "Program",
             body: [
                 {
@@ -8151,9 +8122,7 @@ export {b as a};
     });
 
     it("should parse \"import  * as a from \"foo\";\"", () => {
-        expect(parseScript(`function* a() {
-  yield (typeof (0));
-}`)).to.eql({
+        assert.match<Program>(parseScript(`function* a() { yield (typeof (0)); }`), {
             type: "Program",
             body: [
                 {
@@ -8194,10 +8163,7 @@ export {b as a};
     });
 
     it("should parse \"import  * as a from \"foo\";\"", () => {
-        expect(parseScript(`function* a() {
-  yield (~(0));
-}
-`)).to.eql({
+        assert.match<Program>(parseScript(`function* a() { yield (~(0)); }`), {
             type: "Program",
             body: [
                 {
@@ -8238,7 +8204,7 @@ export {b as a};
     });
 
     it("should parse \"(a ** b).c = (0);\"", () => {
-        expect(parseScript(`(a ** b).c = (0);`)).to.eql({
+        assert.match<Program>(parseScript(`(a ** b).c = (0);`), {
             type: "Program",
             body: [
                 {
@@ -8278,7 +8244,7 @@ export {b as a};
     });
 
     it("should parse \"({a: b} = (0));\"", () => {
-        expect(parseScript(`({a: b} = (0));`)).to.eql({
+        assert.match<Program>(parseScript(`({a: b} = (0));`), {
             type: "Program",
             body: [
                 {
@@ -8318,7 +8284,7 @@ export {b as a};
     });
 
     it("should parse \"[a = (0)];", () => {
-        expect(parseScript(`[a = (0)];`)).to.eql({
+        assert.match<Program>(parseScript(`[a = (0)];`), {
             type: "Program",
             body: [
                 {
@@ -8347,7 +8313,7 @@ export {b as a};
     });
 
     it("should parse \"[a = (b = c)] = (0);\"", () => {
-        expect(parseScript(`[a = (b = c)] = (0);`)).to.eql({
+        assert.match<Program>(parseScript(`[a = (b = c)] = (0);`), {
             type: "Program",
             body: [
                 {
@@ -8391,8 +8357,7 @@ export {b as a};
     });
 
     it("should parse \"import  * as a from \"foo\";\"", () => {
-        expect(parseScript(`var a, b, c, d;
-a = ((b, c), d);`)).to.eql({
+        assert.match<Program>(parseScript(`var a, b, c, d; a = ((b, c), d);`), {
             type: "Program",
             body: [
                 {
@@ -8472,9 +8437,9 @@ a = ((b, c), d);`)).to.eql({
     });
 
     it("should parse \"import  * as a from \"foo\";\"", () => {
-        expect(parseScript(`var a, b, c, d;
+        assert.match<Program>(parseScript(`var a, b, c, d;
 a = ((((b()), (c())), (d())) ? (1) : (2));
-`)).to.eql({
+`), {
             type: "Program",
             body: [
                 {
@@ -8577,7 +8542,7 @@ a = ((((b()), (c())), (d())) ? (1) : (2));
     });
 
     it("should parse \"a[\"b\"] = (\"c\");\"", () => {
-        expect(parseScript(`a["b"] = ("c");`)).to.eql({
+        assert.match<Program>(parseScript(`a["b"] = ("c");`), {
             type: "Program",
             body: [
                 {
@@ -8609,13 +8574,13 @@ a = ((((b()), (c())), (d())) ? (1) : (2));
     });
 
     it("should parse \"import  * as a from \"foo\";\"", () => {
-        expect(parseScript(`a["b"] = ("c");
+        assert.match<Program>(parseScript(`a["b"] = ("c");
 a["if"] = ("if");
 a["*"] = ("d");
 a["ຳ"] = ("e");
 a[""] = ("f");
 a["1_1"] = ("b");
-`)).to.eql({
+`), {
             type: "Program",
             body: [
                 {
@@ -8762,15 +8727,15 @@ a["1_1"] = ("b");
     });
 
     it("should parse \"import  * as a from \"foo\";\"", () => {
-        expect(parseScript(`while (a) {
-  if (b) break;
-  (c.d)("a");
-}
-e: while (a) {
-  if (b) break e;
-  (c.d)("a");
-}
-`)).to.eql({
+        assert.match<Program>(parseScript(`while (a) {
+            if (b) break;
+            (c.d)("a");
+        }
+        e: while (a) {
+            if (b) break e;
+            (c.d)("a");
+        }
+        `), {
             type: "Program",
             body: [
                 {
@@ -8885,11 +8850,11 @@ e: while (a) {
     });
 
     it("should parse \"import  * as a from \"foo\";\"", () => {
-        expect(parseScript(`b: for (var a = (1); a < (2); ++a) {
-  if (a < (3)) continue b;
-  (c.d)(a);
-}
-`)).to.eql({
+        assert.match<Program>(parseScript(`b: for (var a = (1); a < (2); ++a) {
+            if (a < (3)) continue b;
+            (c.d)(a);
+        }
+        `), {
             type: "Program",
             body: [
                 {
@@ -8998,10 +8963,10 @@ e: while (a) {
     });
 
     it("should parse \"import  * as a from \"foo\";\"", () => {
-        expect(parseScript(`function a(b, c) {
-  return (b--) >>> c;
-}
-`)).to.eql({
+        assert.match<Program>(parseScript(`function a(b, c) {
+            return (b--) >>> c;
+        }
+        `), {
             type: "Program",
             body: [
                 {
@@ -9055,10 +9020,10 @@ e: while (a) {
     });
 
     it("should parse \"import  * as a from \"foo\";\"", () => {
-        expect(parseScript(`function a(b, c) {
-  return (b--) >> c;
-}
-`)).to.eql({
+        assert.match<Program>(parseScript(`function a(b, c) {
+            return (b--) >> c;
+        }
+        `), {
             type: "Program",
             body: [
                 {
@@ -9112,11 +9077,7 @@ e: while (a) {
     });
 
     it("should parse \"import  * as a from \"foo\";\"", () => {
-        expect(parseScript(`9;
-9;
-9;
-9;
-`)).to.eql({
+        assert.match<Program>(parseScript(`9; 9; 9; 9;`), {
             type: "Program",
             body: [
                 {
@@ -9153,12 +9114,11 @@ e: while (a) {
     });
 
     it("should parse \"import  * as a from \"foo\";\"", () => {
-        expect(parseScript(`function a() {
-  (class b {});
-  class c {}
-  ;
-}
-`)).to.eql({
+        assert.match<Program>(parseScript(`function a() {
+            (class b {});
+            class c {}
+            ;
+        }`), {
             type: "Program",
             body: [
                 {
@@ -9213,15 +9173,15 @@ e: while (a) {
     });
 
     it("should parse \"import  * as a from \"foo\";\"", () => {
-        expect(parseScript(`function a() {
-  try {
-    a();
-  } catch (b) {
-    var c = (1);
-  }
-  return c;
-}
-`)).to.eql({
+        assert.match<Program>(parseScript(`function a() {
+            try {
+                a();
+            } catch (b) {
+                var c = (1);
+            }
+            return c;
+        }
+        `), {
             type: "Program",
             body: [
                 {
@@ -9302,7 +9262,7 @@ e: while (a) {
     });
 
     it("should parse \"var {a, b} = ({a: 1, b: 2});\"", () => {
-        expect(parseScript(`var {a, b} = ({a: 1, b: 2});`)).to.eql({
+        assert.match<Program>(parseScript(`var {a, b} = ({a: 1, b: 2});`), {
             type: "Program",
             body: [
                 {
@@ -9390,7 +9350,7 @@ e: while (a) {
     });
 
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`var [a, b] = (c);`)).to.eql({
+        assert.match<Program>(parseScript(`var [a, b] = (c);`), {
             type: "Program",
             body: [
                 {
@@ -9425,7 +9385,7 @@ e: while (a) {
     });
 
     it("should parse \"(\"1\");\"", () => {
-        expect(parseScript(`("1");`)).to.eql({
+        assert.match<Program>(parseScript(`("1");`), {
             type: "Program",
             body: [
                 {
@@ -9441,7 +9401,7 @@ e: while (a) {
     });
 
     it("should parse \"(\")11\");\"", () => {
-        expect(parseScript(`(")11");`)).to.eql({
+        assert.match<Program>(parseScript(`(")11");`), {
             type: "Program",
             body: [
                 {
@@ -9455,8 +9415,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"(\"a\");\"", () => {
-        expect(parseScript(`("a");`)).to.eql({
+        assert.match<Program>(parseScript(`("a");`), {
             type: "Program",
             body: [
                 {
@@ -9470,8 +9431,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"a ^= (1);\"", () => {
-        expect(parseScript(`a ^= (1);`)).to.eql({
+        assert.match<Program>(parseScript(`a ^= (1);`), {
             type: "Program",
             body: [
                 {
@@ -9493,11 +9455,15 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
+    /*
     it("should parse \"function a(b = new.target) {}\"", () => {
-        expect(parseScript(`function a(b = new.target) {}`)).to.eql({});
+        assert.match<Program>(parseScript(`function a(b = new.target) {}`), {});
     });
+    */
+
     it("should parse \"({set a (b = new.target) {}});\"", () => {
-        expect(parseScript(`({set a (b = new.target) {}});`)).to.eql({
+        assert.match<Program>(parseScript(`({set a (b = new.target) {}});`), {
             body: [
                 {
                     expression: {
@@ -9554,10 +9520,9 @@ e: while (a) {
             type: "Program",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`({get a() {
-  new.target;
-}});`)).to.eql({
+        assert.match<Program>(parseScript(`({get a() { new.target; }});`), {
             type: "Program",
             body: [
                 {
@@ -9610,10 +9575,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`function a() {
-  new (new.target);
-}`)).to.eql({
+        assert.match<Program>(parseScript(`function a() { new (new.target); }`), {
             type: "Program",
             body: [
                 {
@@ -9654,10 +9618,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`function a() {
-  new (["b"]);
-}`)).to.eql({
+        assert.match<Program>(parseScript(`function a() { new (["b"]); }`), {
             type: "Program",
             body: [
                 {
@@ -9696,8 +9659,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"({if: 1});\"", () => {
-        expect(parseScript(`({if: 1});`)).to.eql({
+        assert.match<Program>(parseScript(`({if: 1});`), {
             type: "Program",
             body: [
                 {
@@ -9727,8 +9691,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"({null: 1});\"", () => {
-        expect(parseScript(`({null: 1});`)).to.eql({
+        assert.match<Program>(parseScript(`({null: 1});`), {
             type: "Program",
             body: [
                 {
@@ -9758,8 +9723,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"({get 10() {}});\"", () => {
-        expect(parseScript(`({get 10() {}});`)).to.eql({
+        assert.match<Program>(parseScript(`({get 10() {}});`), {
             type: "Program",
             body: [
                 {
@@ -9797,11 +9763,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`{
-  a();
-  b();
-}`)).to.eql({
+        assert.match<Program>(parseScript(`{ a(); b(); }`), {
             type: "Program",
             body: [
                 {
@@ -9835,8 +9799,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"({get: 1});\"", () => {
-        expect(parseScript(`({get: 1});`)).to.eql({
+        assert.match<Program>(parseScript(`({get: 1});`), {
             type: "Program",
             body: [
                 {
@@ -9868,7 +9833,7 @@ e: while (a) {
     });
 
     it("should parse \"({set: 1});\"", () => {
-        expect(parseScript(`({set: 1});`)).to.eql({
+        assert.match<Program>(parseScript(`({set: 1});`), {
             type: "Program",
             body: [
                 {
@@ -9900,7 +9865,7 @@ e: while (a) {
     });
 
     it("should parse \"({__proto__: 1});\"", () => {
-        expect(parseScript(`({__proto__: 1});`)).to.eql({
+        assert.match<Program>(parseScript(`({__proto__: 1});`), {
             type: "Program",
             body: [
                 {
@@ -9932,9 +9897,7 @@ e: while (a) {
     });
 
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`({a() {
-  let a;
-}});`)).to.eql({
+        assert.match<Program>(parseScript(`({a() { let a; }});`), {
             type: "Program",
             body: [
                 {
@@ -9987,8 +9950,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"({a() {}});\"", () => {
-        expect(parseScript(`({a() {}});`)).to.eql({
+        assert.match<Program>(parseScript(`({a() {}});`), {
             type: "Program",
             body: [
                 {
@@ -10026,8 +9990,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"((a.$).b).c;\"", () => {
-        expect(parseScript(`((a.$).b).c;`)).to.eql({
+        assert.match<Program>(parseScript(`((a.$).b).c;`), {
             type: "Program",
             body: [
                 {
@@ -10065,12 +10030,11 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`(class extends a {
-  constructor() {
-    super();
-  }
-});`)).to.eql({
+        assert.match<Program>(parseScript(`(class extends a {
+    constructor() { super(); }
+});`), {
             type: "Program",
             body: [
                 {
@@ -10112,7 +10076,6 @@ e: while (a) {
                                             ],
                                         },
                                         generator: false,
-                                        expression: false,
                                         async: false,
                                     },
                                     kind: "constructor",
@@ -10126,89 +10089,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`class a extends b {
-  constructor() {
-    () => {
-      super();
-    };
-  }
-}`)).to.eql({
-            type: "Program",
-            body: [
-                {
-                    type: "ClassDeclaration",
-                    id: {
-                        type: "Identifier",
-                        name: "a",
-                    },
-                    superClass: {
-                        type: "Identifier",
-                        name: "b",
-                    },
-                    body: {
-                        type: "ClassBody",
-                        body: [
-                            {
-                                type: "MethodDefinition",
-                                key: {
-                                    type: "Identifier",
-                                    name: "constructor",
-                                },
-                                computed: false,
-                                value: {
-                                    type: "FunctionExpression",
-                                    id: null,
-                                    params: [],
-                                    body: {
-                                        type: "BlockStatement",
-                                        body: [
-                                            {
-                                                type: "ExpressionStatement",
-                                                expression: {
-                                                    type: "ArrowFunctionExpression",
-                                                    id: null,
-                                                    params: [],
-                                                    body: {
-                                                        type: "BlockStatement",
-                                                        body: [
-                                                            {
-                                                                type: "ExpressionStatement",
-                                                                expression: {
-                                                                    type: "CallExpression",
-                                                                    callee: {
-                                                                        type: "Super",
-                                                                    },
-                                                                    arguments: [],
-                                                                },
-                                                            },
-                                                        ],
-                                                    },
-                                                    generator: false,
-                                                    expression: false,
-                                                    async: false,
-                                                },
-                                            },
-                                        ],
-                                    },
-                                    generator: false,
-                                    expression: false,
-                                    async: false,
-                                },
-                                kind: "constructor",
-                                static: false,
-                            },
-                        ],
-                    },
-                },
-            ],
-            sourceType: "script",
-        });
-    });
-    it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`({a() {
-  (super.b)();
-}});`)).to.eql({
+        assert.match<Program>(parseScript(`({a() { (super.b)(); }});`), {
             type: "Program",
             body: [
                 {
@@ -10265,10 +10148,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`({*a() {
-  super.b = (1);
-}});`)).to.eql({
+        assert.match<Program>(parseScript(`({*a() { super.b = (1); }});`), {
             type: "Program",
             body: [
                 {
@@ -10329,12 +10211,11 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`class a {
-  b() {
-    new (super.c);
-  }
-}`)).to.eql({
+        assert.match<Program>(parseScript(`class a {
+    b() { new (super.c); }
+}`), {
             type: "Program",
             body: [
                 {
@@ -10382,10 +10263,9 @@ e: while (a) {
                                         ],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -10395,10 +10275,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`try {} catch (a) {
-  var a = (1);
-}`)).to.eql({
+        assert.match<Program>(parseScript(`try {} catch (a) { var a = (1); }`), {
             type: "Program",
             body: [
                 {
@@ -10442,8 +10321,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"(a.b)(b, c);\"", () => {
-        expect(parseScript(`(a.b)(b, c);`)).to.eql({
+        assert.match<Program>(parseScript(`(a.b)(b, c);`), {
             type: "Program",
             body: [
                 {
@@ -10478,8 +10358,9 @@ e: while (a) {
             sourceType: "script",
         });
     });
+
     it("should parse \"((new a).b)();\"", () => {
-        expect(parseScript(`((new a).b)();`)).to.eql({
+        assert.match<Program>(parseScript(`((new a).b)();`), {
             type: "Program",
             body: [
                 {
@@ -10511,7 +10392,7 @@ e: while (a) {
     });
 
     it("should parse \"((a.b).c)(1);\"", () => {
-        expect(parseScript(`((a.b).c)(1);`)).to.eql({
+        assert.match<Program>(parseScript(`((a.b).c)(1);`), {
             type: "Program",
             body: [
                 {
@@ -10552,8 +10433,7 @@ e: while (a) {
     });
 
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`;
-a;`)).to.eql({
+        assert.match<Program>(parseScript(`; a;`), {
             type: "Program",
             body: [
                 {
@@ -10570,8 +10450,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"(a + b) * c;\"", () => {
-        expect(parseScript(`(a + b) * c;`)).to.eql({
+        assert.match<Program>(parseScript(`(a + b) * c;`), {
             type: "Program",
             body: [
                 {
@@ -10601,12 +10482,11 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`class a extends b {
-  c() {
-    [super.d] = e;
-  }
-}`)).to.eql({
+        assert.match<Program>(parseScript(`class a extends b {
+    c() { [super.d] = e; }
+}`), {
             type: "Program",
             body: [
                 {
@@ -10666,10 +10546,9 @@ a;`)).to.eql({
                                         ],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -10679,12 +10558,11 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`class a extends b {
-  c() {
-    ({d: super[e]} = f);
-  }
-}`)).to.eql({
+        assert.match<Program>(parseScript(`class a extends b {
+    c() { ({d: super[e]} = f); }
+}`), {
             type: "Program",
             body: [
                 {
@@ -10755,10 +10633,9 @@ a;`)).to.eql({
                                         ],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -10768,10 +10645,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`while (true) {
-  break;
-}`)).to.eql({
+        assert.match<Program>(parseScript(`while (true) { break; }`), {
             type: "Program",
             body: [
                 {
@@ -10794,10 +10670,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`function a() {
-  return;
-}`)).to.eql({
+        assert.match<Program>(parseScript(`function a() { return; }`), {
             type: "Program",
             body: [
                 {
@@ -10824,10 +10699,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`function* a() {
-  yield;
-}`)).to.eql({
+        assert.match<Program>(parseScript(`function* a() { yield; }`), {
             type: "Program",
             body: [
                 {
@@ -10860,7 +10734,7 @@ a;`)).to.eql({
     });
 
     it("should parse \"export {};\"", () => {
-        expect(parseModule(`export {};`)).to.eql({
+        assert.match<Program>(parseModule(`export {};`), {
             type: "Program",
             body: [
                 {
@@ -10873,8 +10747,9 @@ a;`)).to.eql({
             sourceType: "module",
         });
     });
+
     it("should parse \"export var a;\"", () => {
-        expect(parseModule(`export var a;`)).to.eql({
+        assert.match<Program>(parseModule(`export var a;`), {
             type: "Program",
             body: [
                 {
@@ -10900,9 +10775,9 @@ a;`)).to.eql({
             sourceType: "module",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseModule(`export {};
-1;`)).to.eql({
+    assert.match<Program>(parseModule(`export {}; 1;`), {
             type: "Program",
             body: [
                 {
@@ -10922,8 +10797,9 @@ a;`)).to.eql({
             sourceType: "module",
         });
     });
+
     it("should parse \"({Infinity: 1});\"", () => {
-        expect(parseScript(`({Infinity: 1});`)).to.eql({
+        assert.match<Program>(parseScript(`({Infinity: 1});`), {
             type: "Program",
             body: [
                 {
@@ -10953,8 +10829,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"({set a (b) {}});\"", () => {
-        expect(parseScript(`({set a (b) {}});`)).to.eql({
+        assert.match<Program>(parseScript(`({set a (b) {}});`), {
             type: "Program",
             body: [
                 {
@@ -10999,7 +10876,7 @@ a;`)).to.eql({
     });
 
     it("should parse \"v({set __proto__ (a) {}});\"", () => {
-        expect(parseScript(`({set __proto__ (a) {}});`)).to.eql({
+        assert.match<Program>(parseScript(`({set __proto__ (a) {}});`), {
             type: "Program",
             body: [
                 {
@@ -11044,7 +10921,7 @@ a;`)).to.eql({
     });
 
     it("should parse \"({[(\"a\") + (1)]: \"b\"});\"", () => {
-        expect(parseScript(`({[("a") + (1)]: "b"});`)).to.eql({
+        assert.match<Program>(parseScript(`({[("a") + (1)]: "b"});`), {
             type: "Program",
             body: [
                 {
@@ -11082,8 +10959,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"({get [(1) + (2)]() {}, set [(3) / (4)] (a) {}});\"", () => {
-        expect(parseScript(`({get [(1) + (2)]() {}, set [(3) / (4)] (a) {}});`)).to.eql({
+        assert.match<Program>(parseScript(`({get [(1) + (2)]() {}, set [(3) / (4)] (a) {}});`), {
             type: "Program",
             body: [
                 {
@@ -11165,8 +11043,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"({[(1) + (2)]() {}});\"", () => {
-        expect(parseScript(`({[(1) + (2)]() {}});`)).to.eql({
+        assert.match<Program>(parseScript(`({[(1) + (2)]() {}});`), {
             type: "Program",
             body: [
                 {
@@ -11212,8 +11091,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"({a() {}});\"", () => {
-        expect(parseScript(`({a() {}});`)).to.eql({
+        assert.match<Program>(parseScript(`({a() {}});`), {
             type: "Program",
             body: [
                 {
@@ -11251,8 +11131,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"({a(b, c, d) {}});\"", () => {
-        expect(parseScript(`({a(b, c, d) {}});`)).to.eql({
+        assert.match<Program>(parseScript(`({a(b, c, d) {}});`), {
             type: "Program",
             body: [
                 {
@@ -11303,8 +11184,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"a: do continue a; while (1);\"", () => {
-        expect(parseScript(`a: do continue a; while (1);`)).to.eql({
+        assert.match<Program>(parseScript(`a: do continue a; while (1);`), {
             type: "Program",
             body: [
                 {
@@ -11332,49 +11214,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
-    it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`b: while (1) {
-  continue;
-  a;
-}`)).to.eql({
-            type: "Program",
-            body: [
-                {
-                    type: "LabeledStatement",
-                    label: {
-                        type: "Identifier",
-                        name: "b",
-                    },
-                    body: {
-                        type: "WhileStatement",
-                        test: {
-                            type: "Literal",
-                            value: 1,
-                        },
-                        body: {
-                            type: "BlockStatement",
-                            body: [
-                                {
-                                    type: "ContinueStatement",
-                                    label: null,
-                                },
-                                {
-                                    type: "ExpressionStatement",
-                                    expression: {
-                                        type: "Identifier",
-                                        name: "a",
-                                    },
-                                },
-                            ],
-                        },
-                    },
-                },
-            ],
-            sourceType: "script",
-        });
-    });
+
     it("should parse \"for ({a = 1} in b) ;\"", () => {
-        expect(parseScript(`for ({a = 1} in b)`)).to.eql({
+        assert.match<Program>(parseScript(`for ({a = 1} in b)`), {
             type: "Program",
             body: [
                 {
@@ -11418,8 +11260,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"for (var a; b; c) ;\"", () => {
-        expect(parseScript(`for (var a; b; c) ;`)).to.eql({
+        assert.match<Program>(parseScript(`for (var a; b; c) ;`), {
             type: "Program",
             body: [
                 {
@@ -11454,8 +11297,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"for (var a = (1); b; c) ;\"", () => {
-        expect(parseScript(`for (var a = (1); b; c) ;`)).to.eql({
+        assert.match<Program>(parseScript(`for (var a = (1); b; c) ;`), {
             type: "Program",
             body: [
                 {
@@ -11493,10 +11337,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"var [a, b] = (c);\"", () => {
-        expect(parseScript(`for (var a = (1);;) {
-  let a;
-}`)).to.eql({
+        assert.match<Program>(parseScript(`for (var a = (1);;) { let a; }`), {
             type: "Program",
             body: [
                 {
@@ -11544,8 +11387,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"if (a) b;\"", () => {
-        expect(parseScript(`if (a) b;;`)).to.eql({
+        assert.match<Program>(parseScript(`if (a) b;;`), {
             type: "Program",
             body: [
                 {
@@ -11567,8 +11411,9 @@ a;`)).to.eql({
             sourceType: "script",
         });
     });
+
     it("should parse \"try {} catch (a) {}\"", () => {
-        expect(parseScript(`try {} catch (a) {}`)).to.eql({
+        assert.match<Program>(parseScript(`try {} catch (a) {}`), {
             type: "Program",
             body: [
                 {
@@ -11596,164 +11441,162 @@ a;`)).to.eql({
     });
 
     it("should parse \"for (let x of list) process(x);\"", () => {
-       expect(parseScript(`for (let x of list) process(x);`)).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ForOfStatement",
-            left: {
-                type: "VariableDeclaration",
-                declarations: [
-                    {
-                        type: "VariableDeclarator",
-                        id: {
-                            type: "Identifier",
-                            name: "x",
-                        },
-                        init: null,
-                    },
-                ],
-                kind: "let",
-            },
-            right: {
-                type: "Identifier",
-                name: "list",
-            },
-            await: false,
-            body: {
-                type: "ExpressionStatement",
-                expression: {
-                    type: "CallExpression",
-                    callee: {
-                        type: "Identifier",
-                        name: "process",
-                    },
-                    arguments: [
-                        {
-                            type: "Identifier",
-                            name: "x",
-                        },
-                    ],
-                },
-            },
-        },
-    ],
-    sourceType: "script",
-});
-     });
-
-    it("should parse \"\"use strict\"; (class A {constructor() { super() }})\"", () => {
-       expect(parseScript(`"use strict"; (class A {constructor() { super() }})`)).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ExpressionStatement",
-            expression: {
-                type: "Literal",
-                value: "use strict",
-            },
-        },
-        {
-            type: "ExpressionStatement",
-            expression: {
-                type: "ClassExpression",
-                id: {
-                    type: "Identifier",
-                    name: "A",
-                },
-                superClass: null,
-                body: {
-                    type: "ClassBody",
-                    body: [
-                        {
-                            type: "MethodDefinition",
-                            key: {
-                                type: "Identifier",
-                                name: "constructor",
-                            },
-                            computed: false,
-                            value: {
-                                type: "FunctionExpression",
-                                id: null,
-                                params: [],
-                                body: {
-                                    type: "BlockStatement",
-                                    body: [
-                                        {
-                                            type: "ExpressionStatement",
-                                            expression: {
-                                                type: "CallExpression",
-                                                callee: {
-                                                    type: "Super",
-                                                },
-                                                arguments: [],
-                                            },
-                                        },
-                                    ],
-                                },
-                                generator: false,
-                                expression: false,
-                                async: false,
-                            },
-                            kind: "constructor",
-                            static: false,
-                        },
-                    ],
-                },
-            },
-        },
-    ],
-    sourceType: "script",
-});
-       });
-
-    it("should parse \"var {propName: localVar = defaultValue} = obj\"", () => {
-       expect(parseScript(`var {propName: localVar = defaultValue} = obj`)).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "VariableDeclaration",
-            declarations: [
+        assert.match<Program>(parseScript(`for (let x of list) process(x);`), {
+            type: "Program",
+            body: [
                 {
-                    type: "VariableDeclarator",
-                    id: {
-                        type: "ObjectPattern",
-                        properties: [
+                    type: "ForOfStatement",
+                    left: {
+                        type: "VariableDeclaration",
+                        declarations: [
                             {
-                                type: "Property",
-                                key: {
+                                type: "VariableDeclarator",
+                                id: {
                                     type: "Identifier",
-                                    name: "propName",
+                                    name: "x",
                                 },
-                                computed: false,
-                                value: {
-                                    type: "AssignmentPattern",
-                                    left: {
-                                        type: "Identifier",
-                                        name: "localVar",
-                                    },
-                                    right: {
-                                        type: "Identifier",
-                                        name: "defaultValue",
-                                    },
-                                },
-                                kind: "init",
-                                method: false,
-                                shorthand: false,
+                                init: null,
                             },
                         ],
+                        kind: "let",
                     },
-                    init: {
+                    right: {
                         type: "Identifier",
-                        name: "obj",
+                        name: "list",
+                    },
+                    await: false,
+                    body: {
+                        type: "ExpressionStatement",
+                        expression: {
+                            type: "CallExpression",
+                            callee: {
+                                type: "Identifier",
+                                name: "process",
+                            },
+                            arguments: [
+                                {
+                                    type: "Identifier",
+                                    name: "x",
+                                },
+                            ],
+                        },
                     },
                 },
             ],
-            kind: "var",
-        },
-    ],
-    sourceType: "script",
-});
-      });
+            sourceType: "script",
+        });
+    });
 
+    it("should parse \"\"use strict\"; (class A {constructor() { super() }})\"", () => {
+        assert.match<Program>(parseScript(`"use strict"; (class A {constructor() { super() }})`), {
+            type: "Program",
+            body: [
+                {
+                    type: "ExpressionStatement",
+                    expression: {
+                        type: "Literal",
+                        value: "use strict",
+                    },
+                },
+                {
+                    type: "ExpressionStatement",
+                    expression: {
+                        type: "ClassExpression",
+                        id: {
+                            type: "Identifier",
+                            name: "A",
+                        },
+                        superClass: null,
+                        body: {
+                            type: "ClassBody",
+                            body: [
+                                {
+                                    type: "MethodDefinition",
+                                    key: {
+                                        type: "Identifier",
+                                        name: "constructor",
+                                    },
+                                    computed: false,
+                                    value: {
+                                        type: "FunctionExpression",
+                                        id: null,
+                                        params: [],
+                                        body: {
+                                            type: "BlockStatement",
+                                            body: [
+                                                {
+                                                    type: "ExpressionStatement",
+                                                    expression: {
+                                                        type: "CallExpression",
+                                                        callee: {
+                                                            type: "Super",
+                                                        },
+                                                        arguments: [],
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                        generator: false,
+                                        async: false,
+                                    },
+                                    kind: "constructor",
+                                    static: false,
+                                },
+                            ],
+                        },
+                    },
+                },
+            ],
+            sourceType: "script",
+        });
+    });
+
+    it("should parse \"var {propName: localVar = defaultValue} = obj\"", () => {
+        assert.match<Program>(parseScript(`var {propName: localVar = defaultValue} = obj`), {
+            type: "Program",
+            body: [
+                {
+                    type: "VariableDeclaration",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "ObjectPattern",
+                                properties: [
+                                    {
+                                        type: "Property",
+                                        key: {
+                                            type: "Identifier",
+                                            name: "propName",
+                                        },
+                                        computed: false,
+                                        value: {
+                                            type: "AssignmentPattern",
+                                            left: {
+                                                type: "Identifier",
+                                                name: "localVar",
+                                            },
+                                            right: {
+                                                type: "Identifier",
+                                                name: "defaultValue",
+                                            },
+                                        },
+                                        kind: "init",
+                                        method: false,
+                                        shorthand: false,
+                                    },
+                                ],
+                            },
+                            init: {
+                                type: "Identifier",
+                                name: "obj",
+                            },
+                        },
+                    ],
+                    kind: "var",
+                },
+            ],
+            sourceType: "script",
+        });
+    });
 });

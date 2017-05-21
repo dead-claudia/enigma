@@ -1,62 +1,46 @@
-import { parseScript, parseModule } from "../../../src";
-import {expect} from "chai";
+import {parseScript, parseModule} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Statements - `for`", () => {
-
     it("should throw if missing initializers", () => {
-        expect(() => { parseScript("for (let [x = let];;) {}"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("for (let [x = let];;) {}"); });
     });
 
     it("should throw on \"for(;;) function a(){}\"", () => {
-        expect(() => {
-            parseScript(`for(;;) function a(){}`);
-        }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`for(;;) function a(){}`); });
     });
 
     it("should throw on \"for(;;) function a(){}\"", () => {
-        expect(() => {
-            parseScript(`for(;;) function a(){}`);
-        }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`for(;;) function a(){}`); });
     });
 
     it("should throw on \"for(let of 0);\"", () => {
-        expect(() => {
-            parseScript(`for(let of 0);`);
-        }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`for(let of 0);`); });
     });
 
     it("should throw on \"for(this of 0);\"\"", () => {
-        expect(() => {
-            parseScript(`for(this of 0);`);
-        }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`for(this of 0);`); });
     });
 
     it("should throw on \"for(var a = 0 of b);\"", () => {
-        expect(() => {
-            parseScript(`for(var a = 0 of b);`);
-        }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`for(var a = 0 of b);`); });
     });
 
     it("should throw on \"for(([a]) of 0);", () => {
-        expect(() => {
-            parseScript(`for(([a]) of 0);`);
-        }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`for(([a]) of 0);`); });
     });
 
     it("should throw on \"for(var a of b, c);\"", () => {
-        expect(() => {
-            parseScript(`for(var a of b, c);`);
-        }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`for(var a of b, c);`); });
     });
 
     it("should throw on \"for(a of b, c);", () => {
-        expect(() => {
-            parseScript(`for(a of b, c);`);
-        }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`for(a of b, c);`); });
     });
 
     it("should parse \"for(const a of b);\"", () => {
-        expect(parseScript(`for(x, y;;);`)).to.eql({
+        assert.match<Program>(parseScript(`for(x, y;;);`), {
             type: "Program",
             body: [
                 {
@@ -87,7 +71,7 @@ describe.skip("Statements - `for`", () => {
     });
 
     it("should parse \"for(x = 0;;);\"", () => {
-        expect(parseScript(`for(x = 0;;);`)).to.eql({
+        assert.match<Program>(parseScript(`for(x = 0;;);`), {
             type: "Program",
             body: [
                 {
@@ -117,7 +101,7 @@ describe.skip("Statements - `for`", () => {
     });
 
     it("should parse \"for(var x = 0;;);\"", () => {
-        expect(parseScript(`for(var x = 0;;);`)).to.eql({
+        assert.match<Program>(parseScript(`for(var x = 0;;);`), {
             type: "Program",
             body: [
                 {
@@ -152,7 +136,7 @@ describe.skip("Statements - `for`", () => {
     });
 
     it("should parse \"for(let x = 0;;);\"", () => {
-        expect(parseScript(`for(let x = 0;;);`)).to.eql({
+        assert.match<Program>(parseScript(`for(let x = 0;;);`), {
             type: "Program",
             body: [
                 {
@@ -187,7 +171,7 @@ describe.skip("Statements - `for`", () => {
     });
 
     it("should parse \"for(var x = 0, y = 1;;);\"", () => {
-        expect(parseScript(`for(var x = 0, y = 1;;);`)).to.eql({
+        assert.match<Program>(parseScript(`for(var x = 0, y = 1;;);`), {
             type: "Program",
             body: [
                 {
@@ -233,7 +217,7 @@ describe.skip("Statements - `for`", () => {
     });
 
     it("should parse \"for(x; x < 0;);\"", () => {
-        expect(parseScript(`for(x; x < 0;);`)).to.eql({
+        assert.match<Program>(parseScript(`for(x; x < 0;);`), {
             type: "Program",
             body: [
                 {
@@ -266,7 +250,7 @@ describe.skip("Statements - `for`", () => {
     });
 
     it("should parse \"for(x; x < 0; x++);\"", () => {
-        expect(parseScript(`for(x; x < 0; x++);`)).to.eql({
+        assert.match<Program>(parseScript(`for(x; x < 0; x++);`), {
             type: "Program",
             body: [
                 {
@@ -306,7 +290,7 @@ describe.skip("Statements - `for`", () => {
     });
 
     it("should parse \"for(x; x < 0; x++) process(x);\"", () => {
-        expect(parseScript(`for(x; x < 0; x++) process(x);`)).to.eql({
+        assert.match<Program>(parseScript(`for(x; x < 0; x++) process(x);`), {
             type: "Program",
             body: [
                 {
@@ -359,7 +343,7 @@ describe.skip("Statements - `for`", () => {
     });
 
     it("should parse \"for(a;b;c);\"", () => {
-        expect(parseScript(`for(a;b;c);`)).to.eql({
+        assert.match<Program>(parseScript(`for(a;b;c);`), {
             type: "Program",
             body: [
                 {
@@ -386,7 +370,7 @@ describe.skip("Statements - `for`", () => {
     });
 
     it("should parse \"for(var a;b;c);\"", () => {
-        expect(parseScript(`for(var a;b;c);`)).to.eql({
+        assert.match<Program>(parseScript(`for(var a;b;c);`), {
             type: "Program",
             body: [
                 {
@@ -423,7 +407,7 @@ describe.skip("Statements - `for`", () => {
     });
 
     it("should parse \"for(var a = 0;b;c);\"", () => {
-        expect(parseScript(`for(var a = 0;b;c);`)).to.eql({
+        assert.match<Program>(parseScript(`for(var a = 0;b;c);`), {
             type: "Program",
             body: [
                 {
@@ -463,7 +447,7 @@ describe.skip("Statements - `for`", () => {
     });
 
     it("should parse \"for(var a = 0;;) { let a; }\"", () => {
-        expect(parseScript(`for(var a = 0;;) { let a; }`)).to.eql({
+        assert.match<Program>(parseScript(`for(var a = 0;;) { let a; }`), {
             type: "Program",
             body: [
                 {
@@ -513,7 +497,7 @@ describe.skip("Statements - `for`", () => {
     });
 
     it("should parse \"for(;b;c);\"", () => {
-        expect(parseScript(`for(;b;c);`)).to.eql({
+        assert.match<Program>(parseScript(`for(;b;c);`), {
             type: "Program",
             body: [
                 {
@@ -537,7 +521,7 @@ describe.skip("Statements - `for`", () => {
     });
 
     it("should parse \"for(let of;;);\"", () => {
-        expect(parseScript(`for(let of;;);`)).to.eql({
+        assert.match<Program>(parseScript(`for(let of;;);`), {
             type: "Program",
             body: [
                 {
@@ -568,7 +552,7 @@ describe.skip("Statements - `for`", () => {
     });
 
     it("should parse \"for(let a;;); let a;\"", () => {
-        expect(parseScript(`for(let a;;); let a;`)).to.eql({
+        assert.match<Program>(parseScript(`for(let a;;); let a;`), {
             type: "Program",
             body: [
                 {
@@ -613,7 +597,7 @@ describe.skip("Statements - `for`", () => {
     });
 
     it("should parse \"for (() => { this in null };;);\"", () => {
-        expect(parseScript(`for (() => { this in null };;);`)).to.eql({
+        assert.match<Program>(parseScript(`for (() => { this in null };;);`), {
             type: "Program",
             body: [
                 {
@@ -655,5 +639,4 @@ describe.skip("Statements - `for`", () => {
             sourceType: "script",
         });
     });
-
 });

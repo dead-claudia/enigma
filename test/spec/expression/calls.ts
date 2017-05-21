@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Calls", () => {
-
     it("should parse \"a(b,c)\"", () => {
-        expect(parseScript("a(b,c)")).to.eql({
+        assert.match<Program>(parseScript("a(b,c)"), {
             type: "Program",
             body: [
                 {
@@ -33,7 +33,7 @@ describe.skip("Expressions - Calls", () => {
     });
 
     it("should parse \"foo(bar, baz)\"", () => {
-        expect(parseScript("foo(bar, baz)")).to.eql({
+        assert.match<Program>(parseScript("foo(bar, baz)"), {
             type: "Program",
             body: [
                 {
@@ -62,7 +62,7 @@ describe.skip("Expressions - Calls", () => {
     });
 
     it("should parse \"(    foo  )()\"", () => {
-        expect(parseScript("(    foo  )()")).to.eql({
+        assert.match<Program>(parseScript("(    foo  )()"), {
             type: "Program",
             body: [
                 {
@@ -82,7 +82,7 @@ describe.skip("Expressions - Calls", () => {
     });
 
     it("should parse \"f(...a)\"", () => {
-        expect(parseScript("f(...a)")).to.eql({
+        assert.match<Program>(parseScript("f(...a)"), {
             type: "Program",
             body: [
                 {
@@ -110,7 +110,7 @@ describe.skip("Expressions - Calls", () => {
     });
 
     it("should parse \"f(...a = b)\"", () => {
-        expect(parseScript("f(...a = b)")).to.eql({
+        assert.match<Program>(parseScript("f(...a = b)"), {
             type: "Program",
             body: [
                 {
@@ -146,7 +146,7 @@ describe.skip("Expressions - Calls", () => {
     });
 
     it("should parse \"f(...a, ...b)\"", () => {
-        expect(parseScript("f(...a, ...b)")).to.eql({
+        assert.match<Program>(parseScript("f(...a, ...b)"), {
             type: "Program",
             body: [
                 {
@@ -181,7 +181,7 @@ describe.skip("Expressions - Calls", () => {
     });
 
     it("should parse \"f(a, ...b, c)\"", () => {
-        expect(parseScript("f(a, ...b, c)")).to.eql({
+        assert.match<Program>(parseScript("f(a, ...b, c)"), {
             type: "Program",
             body: [
                 {
@@ -217,7 +217,7 @@ describe.skip("Expressions - Calls", () => {
     });
 
     it("should parse \"f(...a, b, ...c)\"", () => {
-        expect(parseScript("f(...a, b, ...c)")).to.eql({
+        assert.match<Program>(parseScript("f(...a, b, ...c)"), {
             type: "Program",
             body: [
                 {
@@ -256,7 +256,7 @@ describe.skip("Expressions - Calls", () => {
     });
 
     it("should parse \"f(....0)\"", () => {
-        expect(parseScript("f(....0)")).to.eql({
+        assert.match<Program>(parseScript("f(....0)"), {
             type: "Program",
             body: [
                 {
@@ -284,7 +284,7 @@ describe.skip("Expressions - Calls", () => {
     });
 
     it("should parse \"f(.0)\"", () => {
-        expect(parseScript("f(.0)")).to.eql({
+        assert.match<Program>(parseScript("f(.0)"), {
             type: "Program",
             body: [
                 {
@@ -309,15 +309,14 @@ describe.skip("Expressions - Calls", () => {
     });
 
     it("should parse \"f(..a)\"", () => {
-        expect(() => { parseScript("f(..a)"); }).throw();
+        assert.throws(SyntaxError, () => { parseScript("f(..a)"); });
     });
 
     it("should parse \"f(....a)\"", () => {
-        expect(() => { parseScript("f(....a)"); }).throw();
+        assert.throws(SyntaxError, () => { parseScript("f(....a)"); });
     });
 
     it("should parse \"f(... ... a)\"", () => {
-        expect(() => { parseScript("f(... ... a)"); }).throw();
+        assert.throws(SyntaxError, () => { parseScript("f(... ... a)"); });
     });
-
 });

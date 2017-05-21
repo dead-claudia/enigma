@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Statements - Labeled", () => {
-
     it("should parse \"start: for (;;) break start\"", () => {
-        expect(parseScript("start: for (;;) break start")).to.eql({
+        assert.match<Program>(parseScript("start: for (;;) break start"), {
             type: "Program",
             body: [
                 {
@@ -33,7 +33,7 @@ describe.skip("Statements - Labeled", () => {
     });
 
     it("should parse \"start: while (true) break start\"", () => {
-        expect(parseScript("start: while (true) break start")).to.eql({
+        assert.match<Program>(parseScript("start: while (true) break start"), {
             type: "Program",
             body: [
                 {
@@ -63,7 +63,7 @@ describe.skip("Statements - Labeled", () => {
     });
 
     it("should parse \"a:{break a;}\"", () => {
-        expect(parseScript("a:{break a;}")).to.eql({
+        assert.match<Program>(parseScript("a:{break a;}"), {
             type: "Program",
             body: [
                 {
@@ -91,7 +91,7 @@ describe.skip("Statements - Labeled", () => {
     });
 
     it("should parse a: function b() {}", () => {
-        expect(parseScript("a: function b() {}")).to.eql({
+        assert.match<Program>(parseScript("a: function b() {}"), {
             type: "Program",
             body: [
                 {
@@ -122,7 +122,7 @@ describe.skip("Statements - Labeled", () => {
     });
 
     it("should parse start: for (;;) break start", () => {
-        expect(parseScript("start: for (;;) break start")).to.eql({
+        assert.match<Program>(parseScript("start: for (;;) break start"), {
             type: "Program",
             body: [
                 {
@@ -151,7 +151,7 @@ describe.skip("Statements - Labeled", () => {
     });
 
     it("should parse start: while (true) break start", () => {
-        expect(parseScript("start: while (true) break start")).to.eql({
+        assert.match<Program>(parseScript("start: while (true) break start"), {
             type: "Program",
             body: [
                 {
@@ -181,7 +181,7 @@ describe.skip("Statements - Labeled", () => {
     });
 
     it("should parse__proto__: test", () => {
-        expect(parseScript("__proto__: test")).to.eql({
+        assert.match<Program>(parseScript("__proto__: test"), {
             type: "Program",
             body: [
                 {

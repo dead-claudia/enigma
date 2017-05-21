@@ -1,9 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Statements - `debugger`", () => {
     it("should parse \"\"debugger;\"", () => {
-        expect(parseScript("debugger;")).to.eql({
+        assert.match<Program>(parseScript("debugger;"), {
             type: "Program",
             body: [
                 {
@@ -15,21 +16,21 @@ describe.skip("Statements - `debugger`", () => {
     });
 
     it("should parse \"while (false) debugger;\"", () => {
-        expect(parseScript("while (false) debugger;")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "WhileStatement",
-            test: {
-                type: "Literal",
-                value: false,
-            },
-            body: {
-                type: "DebuggerStatement",
-            },
-        },
-    ],
-    sourceType: "script",
-});
+        assert.match<Program>(parseScript("while (false) debugger;"), {
+            type: "Program",
+            body: [
+                {
+                    type: "WhileStatement",
+                    test: {
+                        type: "Literal",
+                        value: false,
+                    },
+                    body: {
+                        type: "DebuggerStatement",
+                    },
+                },
+            ],
+            sourceType: "script",
+        });
     });
 });

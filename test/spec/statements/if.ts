@@ -1,31 +1,32 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Statements - `if`", () => {
-
     it("should parse \"if (true) const x = null; else ;\"", () => {
-        expect(() => { parseScript(`if (true) const x = null; else ;`); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`if (true) const x = null; else ;`); });
     });
 
     it("should parse \"if (false) label1: label2: function test262() {} else ;\"", () => {
-        expect(() => { parseScript(`if (false) label1: label2: function test262() {} else ;`); })
-        .to.throw();
+        assert.throws(SyntaxError, () => {
+            parseScript(`if (false) label1: label2: function test262() {} else ;`);
+        });
     });
 
     it("should parse \"if (true) let x;\"", () => {
-        expect(() => { parseScript(`if (true) let x;`); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`if (true) let x;`); });
     });
 
     it("should parse \"if (true) class C {}\"", () => {
-        expect(() => { parseScript(`if (true) class C {}`); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`if (true) class C {}`); });
     });
 
     it("should parse \"if (true) class C {} else class D {}\"", () => {
-        expect(() => { parseScript(`if (true) class C {} else class D {}`); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript(`if (true) class C {} else class D {}`); });
     });
 
     it("should parse \"if (morning) (function(){})\"", () => {
-        expect(parseScript(`if (morning) (function(){})`)).to.eql({
+        assert.match<Program>(parseScript(`if (morning) (function(){})`), {
             type: "Program",
             body: [
                 {
@@ -57,7 +58,7 @@ describe.skip("Statements - `if`", () => {
     });
 
     it("should parse \"if(a)b;\"", () => {
-        expect(parseScript(`if(a)b;`)).to.eql({
+        assert.match<Program>(parseScript(`if(a)b;`), {
             type: "Program",
             body: [
                 {
@@ -81,7 +82,7 @@ describe.skip("Statements - `if`", () => {
     });
 
     it("should parse \"if (false) L: async function l() {}\"", () => {
-        expect(parseScript(`if (false) L: async function l() {}`)).to.eql({
+        assert.match<Program>(parseScript(`if (false) L: async function l() {}`), {
             type: "Program",
             body: [
                 {
@@ -120,7 +121,7 @@ describe.skip("Statements - `if`", () => {
     });
 
     it("should parse \"if(a)b;else c;\"", () => {
-        expect(parseScript("if(a)b;else c;")).to.eql({
+        assert.match<Program>(parseScript("if(a)b;else c;"), {
             type: "Program",
             body: [
                 {
@@ -150,7 +151,7 @@ describe.skip("Statements - `if`", () => {
     });
 
     it("should parse if (morning) goodMorning()", () => {
-        expect(parseScript("if (morning) goodMorning()")).to.eql({
+        assert.match<Program>(parseScript("if (morning) goodMorning()"), {
             type: "Program",
             body: [
                 {
@@ -178,7 +179,7 @@ describe.skip("Statements - `if`", () => {
     });
 
     it("should parse start: while (true) break start", () => {
-        expect(parseScript("start: while (true) break start")).to.eql({
+        assert.match<Program>(parseScript("start: while (true) break start"), {
             type: "Program",
             body: [
                 {
@@ -208,7 +209,7 @@ describe.skip("Statements - `if`", () => {
     });
 
     it("should parse if (morning) var x = 0;", () => {
-        expect(parseScript("if (morning) var x = 0;")).to.eql({
+        assert.match<Program>(parseScript("if (morning) var x = 0;"), {
             type: "Program",
             body: [
                 {
@@ -242,7 +243,7 @@ describe.skip("Statements - `if`", () => {
     });
 
     it("should parse if (morning) function a(){}", () => {
-        expect(parseScript("if (morning) function a(){}")).to.eql({
+        assert.match<Program>(parseScript("if (morning) function a(){}"), {
             type: "Program",
             body: [
                 {
@@ -274,7 +275,7 @@ describe.skip("Statements - `if`", () => {
     });
 
     it("should parse if (morning) goodMorning(); else goodDay()", () => {
-        expect(parseScript("if (morning) goodMorning(); else goodDay()")).to.eql({
+        assert.match<Program>(parseScript("if (morning) goodMorning(); else goodDay()"), {
             type: "Program",
             body: [
                 {
@@ -312,8 +313,7 @@ describe.skip("Statements - `if`", () => {
     });
 
     it("should parse if (morning) var x = 0;", () => {
-        expect(parseScript(`if (true) that()
-        ; else;`)).to.eql({
+        assert.match<Program>(parseScript(`if (true) that()\n; else;`), {
             type: "Program",
             body: [
                 {
@@ -343,7 +343,7 @@ describe.skip("Statements - `if`", () => {
     });
 
     it("should parse if (true) that(); else;", () => {
-        expect(parseScript("if (true) that(); else;")).to.eql({
+        assert.match<Program>(parseScript("if (true) that(); else;"), {
             type: "Program",
             body: [
                 {

@@ -1,9 +1,10 @@
-import { parseScript } from "../../../src";
-import { expect } from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Templates", () => {
     it("should parse escaped backslash", () => {
-        expect(parseScript("(`\\\\\\'`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\\\\\'`)"), {
             body: [
                 {
                     type: "ExpressionStatement",
@@ -29,7 +30,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `Hello012World`", () => {
-        expect(parseScript("`Hello\\012World`")).to.eql({
+        assert.match<Program>(parseScript("`Hello\\012World`"), {
             type: "Program",
             body: [
                 {
@@ -55,7 +56,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `Hello\\122World`", () => {
-        expect(parseScript("`Hello\\122World`")).to.eql({
+        assert.match<Program>(parseScript("`Hello\\122World`"), {
             type: "Program",
             body: [
                 {
@@ -81,7 +82,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `Hello\\0122World`", () => {
-        expect(parseScript("`Hello\\0122World`")).to.eql({
+        assert.match<Program>(parseScript("`Hello\\0122World`"), {
             type: "Program",
             body: [
                 {
@@ -107,7 +108,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `Hello\\312World`", () => {
-        expect(parseScript("`Hello\\312World`")).to.eql({
+        assert.match<Program>(parseScript("`Hello\\312World`"), {
             type: "Program",
             body: [
                 {
@@ -133,7 +134,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `Hello\\412World`", () => {
-        expect(parseScript("`Hello\\412World`")).to.eql({
+        assert.match<Program>(parseScript("`Hello\\412World`"), {
             type: "Program",
             body: [
                 {
@@ -159,7 +160,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `Hello\\712World`", () => {
-        expect(parseScript("`Hello\\712World`")).to.eql({
+        assert.match<Program>(parseScript("`Hello\\712World`"), {
             type: "Program",
             body: [
                 {
@@ -185,7 +186,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `Hello\\0World`", () => {
-        expect(parseScript("`Hello\\0World`")).to.eql({
+        assert.match<Program>(parseScript("`Hello\\0World`"), {
             type: "Program",
             body: [
                 {
@@ -211,7 +212,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `Hello\\1World`", () => {
-        expect(parseScript("`Hello\\1World`")).to.eql({
+        assert.match<Program>(parseScript("`Hello\\1World`"), {
             type: "Program",
             body: [
                 {
@@ -237,7 +238,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\0`", () => {
-        expect(parseScript("(`\\0`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\0`)"), {
             type: "Program",
             body: [
                 {
@@ -263,7 +264,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\7a`", () => {
-        expect(parseScript("(`\\7a`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\7a`)"), {
             type: "Program",
             body: [
                 {
@@ -289,15 +290,15 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should not parse unmatched single `", () => {
-        expect(() => parseScript("`")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("`"); });
     });
 
     it("should not parse parenthesized unmatched single `", () => {
-        expect(() => parseScript("(`)")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(`)"); });
     });
 
     it("should parse `\\8`", () => {
-        expect(parseScript("(`\\8`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\8`)"), {
             type: "Program",
             body: [
                 {
@@ -323,37 +324,15 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should not parse `\\9`", () => {
-        expect(() => parseScript("(`\\9`)")).to.eql({
-            type: "Program",
-            body: [
-                {
-                    expression: {
-                        type: "TemplateLiteral",
-                        expressions: [],
-                        quasis: [
-                            {
-                                type: "TemplateElement",
-                                value: {
-                                    cooked: "9",
-                                    raw: "\\9",
-                                },
-                                tail: true,
-                            },
-                        ],
-                    },
-                    type: "ExpressionStatement",
-                },
-            ],
-            sourceType: "script",
-        });
+        assert.throws(SyntaxError, () => { parseScript("(`\\9`)"); });
     });
 
     it("should parse `\\x0`", () => {
-        expect(() => parseScript("(`\\x0`)")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(`\\x0`)"); });
     });
 
     it("should parse `\u2028`", () => {
-        expect(parseScript("(`\u2028`)")).to.eql({
+        assert.match<Program>(parseScript("(`\u2028`)"), {
             type: "Program",
             body: [
                 {
@@ -379,7 +358,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\u2029`", () => {
-        expect(parseScript("(`\u2029`)")).to.eql({
+        assert.match<Program>(parseScript("(`\u2029`)"), {
             type: "Program",
             body: [
                 {
@@ -405,39 +384,39 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\u{2028`", () => {
-        expect(() => parseScript("(`\\u{2028`)")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(`\\u{2028`)"); });
     });
 
     it("should parse strict `\\1`", () => {
-        expect(() => parseScript("'use strict'; (`\\1`)")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("'use strict'; (`\\1`)"); });
     });
 
     it("should parse strict `\\4`", () => {
-        expect(() => parseScript("'use strict'; (`\\4`)")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("'use strict'; (`\\4`)"); });
     });
 
     it("should parse strict `\\11`", () => {
-        expect(() => parseScript("'use strict'; (`\\11`)")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("'use strict'; (`\\11`)"); });
     });
 
     it("should parse strict `\\000`", () => {
-        expect(() => parseScript("'use strict'; (`\\000`)")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("'use strict'; (`\\000`)"); });
     });
 
     it("should parse strict `\\123`", () => {
-        expect(() => parseScript("'use strict'; (`\\123`)")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("'use strict'; (`\\123`)"); });
     });
 
     it("should parse `\\u{110000}`", () => {
-        expect(() => parseScript("(`\\u{110000}`)")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(`\\u{110000}`)"); });
     });
 
     it("should parse `\\u{FFFFFFF}`", () => {
-        expect(() => parseScript("(`\\u{FFFFFFF}`)")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(`\\u{FFFFFFF}`)"); });
     });
 
     it("should parse Unicode escape", () => {
-        expect(parseScript("`\u2E2F;`")).to.eql({
+        assert.match<Program>(parseScript("`\u2E2F;`"), {
             body: [
                 {
 
@@ -464,7 +443,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse carrian letter ES2015", () => {
-        expect(parseScript("`\u{102A7};`")).to.eql({
+        assert.match<Program>(parseScript("`\u{102A7};`"), {
             body: [
                 {
                     expression: {
@@ -490,7 +469,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `Hello`", () => {
-        expect(parseScript("`Hello`")).to.eql({
+        assert.match<Program>(parseScript("`Hello`"), {
             type: "Program",
             body: [
                 {
@@ -516,7 +495,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\n\r\t\v\b\f\\'\\\"\0`", () => {
-        expect(parseScript("`\n\r\t\v\b\f\\'\\\"\0`")).to.eql({
+        assert.match<Program>(parseScript("`\n\r\t\v\b\f\\'\\\"\0`"), {
             type: "Program",
             body: [
                 {
@@ -542,7 +521,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\u0061`", () => {
-        expect(parseScript("var source = `\\u0061`;")).to.eql({
+        assert.match<Program>(parseScript("var source = `\\u0061`;"), {
             type: "Program",
             body: [
                 {
@@ -578,7 +557,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\x61`", () => {
-        expect(parseScript("`\\x61`;")).to.eql({
+        assert.match<Program>(parseScript("`\\x61`;"), {
             type: "Program",
             body: [
                 {
@@ -604,7 +583,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `Hello\\02World`", () => {
-        expect(parseScript("`Hello\\02World`")).to.eql({
+        assert.match<Program>(parseScript("`Hello\\02World`"), {
             type: "Program",
             body: [
                 {
@@ -630,7 +609,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `Hello\\0World`", () => {
-        expect(parseScript("`Hello\\0World`")).to.eql({
+        assert.match<Program>(parseScript("`Hello\\0World`"), {
             type: "Program",
             body: [
                 {
@@ -656,7 +635,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `x`", () => {
-        expect(parseScript("(`x`)")).to.eql({
+        assert.match<Program>(parseScript("(`x`)"), {
             type: "Program",
             body: [
                 {
@@ -682,7 +661,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\u{0000000000F8}`", () => {
-        expect(parseScript("(`\\u{0000000000F8}`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\u{0000000000F8}`)"), {
             type: "Program",
             body: [
                 {
@@ -708,7 +687,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\u{10FFFF}`", () => {
-        expect(parseScript("(`\\u{10FFFF}`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\u{10FFFF}`)"), {
             type: "Program",
             body: [
                 {
@@ -734,7 +713,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\u{0}`", () => {
-        expect(parseScript("(`\\u{0}`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\u{0}`)"), {
             type: "Program",
             body: [
                 {
@@ -760,7 +739,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\u{00F8}`", () => {
-        expect(parseScript("(`\\u{00F8}`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\u{00F8}`)"), {
             type: "Program",
             body: [
                 {
@@ -786,7 +765,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\a`", () => {
-        expect(parseScript("(`\\a`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\a`)"), {
             type: "Program",
             body: [
                 {
@@ -812,7 +791,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\u202a`", () => {
-        expect(parseScript("(`\u202a`)")).to.eql({
+        assert.match<Program>(parseScript("(`\u202a`)"), {
             type: "Program",
             body: [
                 {
@@ -838,7 +817,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\\\\\``", () => {
-        expect(parseScript("(`\\\\\\``)")).to.eql({
+        assert.match<Program>(parseScript("(`\\\\\\``)"), {
             type: "Program",
             body: [
                 {
@@ -864,7 +843,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\5111`", () => {
-        expect(parseScript("(`\\5111`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\5111`)"), {
             type: "Program",
             body: [
                 {
@@ -890,7 +869,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\2111`", () => {
-        expect(parseScript("(`\\2111`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\2111`)"), {
             type: "Program",
             body: [
                 {
@@ -916,7 +895,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\11`", () => {
-        expect(parseScript("(`\\11`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\11`)"), {
             type: "Program",
             body: [
                 {
@@ -942,7 +921,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\111`", () => {
-        expect(parseScript("(`\\111`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\111`)"), {
             type: "Program",
             body: [
                 {
@@ -968,7 +947,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\1111`", () => {
-        expect(parseScript("(`\\1111`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\1111`)"), {
             type: "Program",
             body: [
                 {
@@ -994,7 +973,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse strict `\\0`", () => {
-        expect(parseScript("'use strict'; (`\\0`)")).to.eql({
+        assert.match<Program>(parseScript("'use strict'; (`\\0`)"), {
             body: [
                 {
                     expression: {
@@ -1027,7 +1006,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse use strict 0x", () => {
-        expect(parseScript("'use strict'; (`\\0x`)")).to.eql({
+        assert.match<Program>(parseScript("'use strict'; (`\\0x`)"), {
             body: [
                 {
                     expression: {
@@ -1060,7 +1039,7 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("should parse `\\<CR>`", () => {
-        expect(parseScript("(`\\\r`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\\r`)"), {
             type: "Program",
             body: [
                 {
@@ -1086,56 +1065,56 @@ describe.skip("Expressions - Templates", () => {
     });
 
     it("expect \"u2029\" to throw", () => {
-        expect(() => parseScript("('\u2029')")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("('\u2029')"); });
     });
 
     it("expect \"u2028\" to throw", () => {
-        expect(() => parseScript("('\u2028')")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("('\u2028')"); });
     });
 
     it("expect \"u{2028\" to throw", () => {
-        expect(() => parseScript("('\\u{2028')")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("('\\u{2028')"); });
     });
 
     it("expect \"9\"\" to throw", () => {
-        expect(() => parseScript("('\\9')")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("('\\9')"); });
     });
 
     it("expect invalid hex to throw", () => {
-        expect(() => parseScript("\\xFG")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("\\xFG"); });
     });
 
     it("expect invalid escaped hex to throw", () => {
-        expect(() => parseScript("\\u00FG")).to.throw();
-        expect(() => parseScript("('\\u00FG')")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("\\u00FG"); });
+        assert.throws(SyntaxError, () => { parseScript("('\\u00FG')"); });
     });
 
     it("expect \"8\"\" to throw", () => {
-        expect(() => parseScript("('\\8')")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("('\\8')"); });
     });
 
     it("expect \"u\"\" to throw", () => {
-        expect(() => parseScript("('\\u')")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("('\\u')"); });
     });
 
     it("expect \"x\"\" to throw", () => {
-        expect(() => parseScript("('\\x')")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("('\\x')"); });
     });
 
     it("expect \"n\"\" to throw", () => {
-        expect(() => parseScript("('\n')")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("('\n')"); });
     });
 
     it("expect slash to throw", () => {
-        expect(() => parseScript("(')")).to.throw();
-        expect(() => parseScript("'")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(')"); });
+        assert.throws(SyntaxError, () => { parseScript("'"); });
     });
 
     it("expect \" to throw", () => {
-        expect(() => parseScript("\"")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("\""); });
     });
 
     it("expect \"u2E2F\" to throw", () => {
-        expect(() => parseScript("\u2E2F")).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("\u2E2F"); });
     });
 });

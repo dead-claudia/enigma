@@ -1,50 +1,50 @@
 import {parseScript, parseModule} from "../../../src";
-import {expect} from "chai";
+import * as assert from "clean-assert";
 
 describe.skip("Destructuring - Assignment", () => {
     describe("Object", () => {
         it("should not parse \"({a = 0})\"", () => {
-            expect(() => parseScript("({a = 0})")).to.throw();
+            assert.throws(SyntaxError, () => parseScript("({a = 0})"));
         });
 
         it("should not parse \"({a} += 0);\"", () => {
-            expect(() => parseScript("({a} += 0);")).to.throw();
+            assert.throws(SyntaxError, () => parseScript("({a} += 0);"));
         });
 
         it("should not parse \"({a,,} = 0)\"", () => {
-            expect(() => parseScript("({a,,} = 0)")).to.throw();
+            assert.throws(SyntaxError, () => parseScript("({a,,} = 0)"));
         });
 
         it("should not parse \"({,a,} = 0)\"", () => {
-            expect(() => parseScript("({,a,} = 0)")).to.throw();
+            assert.throws(SyntaxError, () => parseScript("({,a,} = 0)"));
         });
 
         it("should not parse \"({0} = 0)\"", () => {
-            expect(() => parseScript("({0} = 0)")).to.throw();
+            assert.throws(SyntaxError, () => parseScript("({0} = 0)"));
         });
 
         it("should not parse \"({a:function} = 0)\"", () => {
-            expect(() => parseScript("({a:function} = 0)")).to.throw();
+            assert.throws(SyntaxError, () => parseScript("({a:function} = 0)"));
         });
 
         it("should not parse \"({a:for} = 0)\"", () => {
-            expect(() => parseScript("({a:for} = 0)")).to.throw();
+            assert.throws(SyntaxError, () => parseScript("({a:for} = 0)"));
         });
 
         it("should not parse \"({var} = 0)\"", () => {
-            expect(() => parseScript("({var} = 0)")).to.throw();
+            assert.throws(SyntaxError, () => parseScript("({var} = 0)"));
         });
 
         it("should not parse \"({a:this}=0)\"", () => {
-            expect(() => parseScript("({a:this}=0)")).to.throw();
+            assert.throws(SyntaxError, () => parseScript("({a:this}=0)"));
         });
 
         it("should not parse \"({a: this} = 0);\"", () => {
-            expect(() => parseScript("({a: this} = 0);")).to.throw();
+            assert.throws(SyntaxError, () => parseScript("({a: this} = 0);"));
         });
 
         it("should not parse \"({get a(){}})=0\"", () => {
-            expect(() => parseScript("({get a(){}})=0")).to.throw();
+            assert.throws(SyntaxError, () => parseScript("({get a(){}})=0"));
         });
         it("should parse \"({x} = 0)\"", () => {
             expect(parseScript("({x} = 0)")).to.eql({
@@ -2065,7 +2065,7 @@ describe.skip("Destructuring - Assignment", () => {
      });
 
     it("should not parse \"[x] += 0\"", () => {
-        expect(() => parseScript("[x] += 0")).to.throw();
+        assert.throws(SyntaxError, () => parseScript("[x] += 0"));
     });
 
     it("should parse \"[, x, ...y,] = 0\"", () => {
@@ -2085,15 +2085,15 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should not parse \"[{a=0},{b=0},0] = 0\"", () => {
-        expect(() => parseScript("[{a=0},{b=0},0] = 0")).to.throw();
+        assert.throws(SyntaxError, () => parseScript("[{a=0},{b=0},0] = 0"));
     });
 
     it("should not parse \"[{a=0},...0]\"", () => {
-        expect(() => parseScript("[{a=0},...0]")).to.throw();
+        assert.throws(SyntaxError, () => parseScript("[{a=0},...0]"));
     });
 
     it("should not parse \"[2] = 42\"", () => {
-        expect(() => parseScript("[2] = 42")).to.throw();
+        assert.throws(SyntaxError, () => parseScript("[2] = 42"));
     });
 
     it("should parse \"{a = [...b, c]} = 0\"", () => {
@@ -2105,7 +2105,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should not parse \"[0] = 0\"", () => {
-        expect(() => parseScript("[0] = 0")).to.throw();
+        assert.throws(SyntaxError, () => parseScript("[0] = 0"));
     });
 
     it("should parse \"[...{a=0},]=0\"", () => {
@@ -2119,5 +2119,4 @@ describe.skip("Destructuring - Assignment", () => {
     it("should parse \"[a, ...b, {c=0}]\"", () => {
         parseScript("[a, ...b, {c=0}]");
     });
-
 });

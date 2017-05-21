@@ -1,10 +1,11 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2015 - `for ... of`", () => {
 
 it("should parse \"for (const {x, y} of z);\"", () => {
-        expect(parseScript("for (const {x, y} of z);")).to.eql({
+        assert.match<Program>(parseScript("for (const {x, y} of z);"), {
     type: "Program",
     body: [
         {
@@ -69,7 +70,7 @@ it("should parse \"for (const {x, y} of z);\"", () => {
 });
 
 it("should parse \"for (var {x, y} of z);\"", () => {
-        expect(parseScript("for (var {x, y} of z);")).to.eql({
+        assert.match<Program>(parseScript("for (var {x, y} of z);"), {
     type: "Program",
     body: [
         {
@@ -134,7 +135,7 @@ it("should parse \"for (var {x, y} of z);\"", () => {
 });
 
 it("should parse \"for (const y of list);\"", () => {
-        expect(parseScript("for (const y of list);")).to.eql({
+        assert.match<Program>(parseScript("for (const y of list);"), {
     type: "Program",
     body: [
         {
@@ -168,7 +169,7 @@ it("should parse \"for (const y of list);\"", () => {
 });
 
 it("should parse \"for (var [p, q] of r);\"", () => {
-        expect(parseScript("for (var [p, q] of r);")).to.eql({
+        assert.match<Program>(parseScript("for (var [p, q] of r);"), {
     type: "Program",
     body: [
         {
@@ -211,7 +212,7 @@ it("should parse \"for (var [p, q] of r);\"", () => {
 });
 
 it("should parse \"for (p of q);\"", () => {
-        expect(parseScript("for (p of q);")).to.eql({
+        assert.match<Program>(parseScript("for (p of q);"), {
     type: "Program",
     body: [
         {
@@ -235,7 +236,7 @@ it("should parse \"for (p of q);\"", () => {
 });
 
 it("should parse \"for (let of of xyz);\"", () => {
-        expect(parseScript("for (let of of xyz);")).to.eql({
+        assert.match<Program>(parseScript("for (let of of xyz);"), {
     type: "Program",
     body: [
         {
@@ -267,25 +268,5 @@ it("should parse \"for (let of of xyz);\"", () => {
     sourceType: "script",
 });
 });
-/*
-it('should parse "function f(a = 1) {}"', function() {
-        expect(parseScript('function f(a = 1) {}')).to.eql({});
-});
-
-it('should parse "function f(a = 1) {}"', function() {
-        expect(parseScript('function f(a = 1) {}')).to.eql({});
-});
-
-it('should parse "function f(a = 1) {}"', function() {
-        expect(parseScript('function f(a = 1) {}')).to.eql({});
-});
-
-it('should parse "function f(a = 1) {}"', function() {
-        expect(parseScript('function f(a = 1) {}')).to.eql({});
-});
-
-it('should parse "function f(a = 1) {}"', function() {
-        expect(parseScript('function f(a = 1) {}')).to.eql({});
-});*/
 
 });

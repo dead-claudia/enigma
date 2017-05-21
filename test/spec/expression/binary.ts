@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Binary", () => {
-
     it("should parse \"1+2;\"", () => {
-        expect(parseScript("1+2;")).to.eql({
+        assert.match<Program>(parseScript("1+2;"), {
             type: "Program",
             body: [
                 {
@@ -28,7 +28,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x & y\"", () => {
-        expect(parseScript("x & y")).to.eql({
+        assert.match<Program>(parseScript("x & y"), {
             type: "Program",
             body: [
                 {
@@ -52,7 +52,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x ^ y\"", () => {
-        expect(parseScript("x ^ y")).to.eql({
+        assert.match<Program>(parseScript("x ^ y"), {
             type: "Program",
             body: [
                 {
@@ -76,7 +76,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x | y\"", () => {
-        expect(parseScript("x | y")).to.eql({
+        assert.match<Program>(parseScript("x | y"), {
             type: "Program",
             body: [
                 {
@@ -100,7 +100,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x || y ^ z\"", () => {
-        expect(parseScript("x || y ^ z")).to.eql({
+        assert.match<Program>(parseScript("x || y ^ z"), {
             type: "Program",
             body: [
                 {
@@ -132,7 +132,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x * y\"", () => {
-        expect(parseScript("x * y")).to.eql({
+        assert.match<Program>(parseScript("x * y"), {
             type: "Program",
             body: [
                 {
@@ -156,7 +156,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x / y\"", () => {
-        expect(parseScript("x / y")).to.eql({
+        assert.match<Program>(parseScript("x / y"), {
             type: "Program",
             body: [
                 {
@@ -180,7 +180,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"(-x) ** y\"", () => {
-        expect(parseScript("(-x) ** y")).to.eql({
+        assert.match<Program>(parseScript("(-x) ** y"), {
             body: [
                 {
                     expression: {
@@ -209,7 +209,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"-(x ** y)\"", () => {
-        expect(parseScript("-(x ** y)")).to.eql({
+        assert.match<Program>(parseScript("-(x ** y)"), {
             type: "Program",
             body: [
                 {
@@ -238,7 +238,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x < y\"", () => {
-        expect(parseScript("x < y")).to.eql({
+        assert.match<Program>(parseScript("x < y"), {
             type: "Program",
             body: [
                 {
@@ -262,7 +262,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x <= y\"", () => {
-        expect(parseScript("x <= y")).to.eql({
+        assert.match<Program>(parseScript("x <= y"), {
             type: "Program",
             body: [
                 {
@@ -286,7 +286,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x != y\"", () => {
-        expect(parseScript("x != y")).to.eql({
+        assert.match<Program>(parseScript("x != y"), {
             type: "Program",
             body: [
                 {
@@ -310,7 +310,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x !== y\"", () => {
-        expect(parseScript("x !== y")).to.eql({
+        assert.match<Program>(parseScript("x !== y"), {
             type: "Program",
             body: [
                 {
@@ -334,7 +334,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x + y + z\"", () => {
-        expect(parseScript("x + y + z")).to.eql({
+        assert.match<Program>(parseScript("x + y + z"), {
             type: "Program",
             body: [
                 {
@@ -366,7 +366,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x - y + z\"", () => {
-        expect(parseScript("x - y + z")).to.eql({
+        assert.match<Program>(parseScript("x - y + z"), {
             type: "Program",
             body: [
                 {
@@ -398,7 +398,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x + y - z\"", () => {
-        expect(parseScript("x + y - z")).to.eql({
+        assert.match<Program>(parseScript("x + y - z"), {
             type: "Program",
             body: [
                 {
@@ -430,7 +430,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x - y - z\"", () => {
-        expect(parseScript("x - y - z")).to.eql({
+        assert.match<Program>(parseScript("x - y - z"), {
             type: "Program",
             body: [
                 {
@@ -462,7 +462,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x + y * z\"", () => {
-        expect(parseScript("x + y * z")).to.eql({
+        assert.match<Program>(parseScript("x + y * z"), {
             type: "Program",
             body: [
                 {
@@ -494,7 +494,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x + y / z\"", () => {
-        expect(parseScript("x + y / z")).to.eql({
+        assert.match<Program>(parseScript("x + y / z"), {
             type: "Program",
             body: [
                 {
@@ -526,7 +526,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x - y % z\"", () => {
-        expect(parseScript("x - y % z")).to.eql({
+        assert.match<Program>(parseScript("x - y % z"), {
             type: "Program",
             body: [
                 {
@@ -558,7 +558,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x * y * z\"", () => {
-        expect(parseScript("x * y * z")).to.eql({
+        assert.match<Program>(parseScript("x * y * z"), {
             type: "Program",
             body: [
                 {
@@ -590,7 +590,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x * y / z\"", () => {
-        expect(parseScript("x * y / z")).to.eql({
+        assert.match<Program>(parseScript("x * y / z"), {
             type: "Program",
             body: [
                 {
@@ -622,7 +622,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x * y % z\"", () => {
-        expect(parseScript("x * y % z")).to.eql({
+        assert.match<Program>(parseScript("x * y % z"), {
             type: "Program",
             body: [
                 {
@@ -654,7 +654,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x % y * z\"", () => {
-        expect(parseScript("x % y * z")).to.eql({
+        assert.match<Program>(parseScript("x % y * z"), {
             type: "Program",
             body: [
                 {
@@ -686,7 +686,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x << y << z\"", () => {
-        expect(parseScript("x << y << z")).to.eql({
+        assert.match<Program>(parseScript("x << y << z"), {
             type: "Program",
             body: [
                 {
@@ -718,7 +718,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x | y | z\"", () => {
-        expect(parseScript("x | y | z")).to.eql({
+        assert.match<Program>(parseScript("x | y | z"), {
             type: "Program",
             body: [
                 {
@@ -750,7 +750,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x & y & z\"", () => {
-        expect(parseScript("x & y & z")).to.eql({
+        assert.match<Program>(parseScript("x & y & z"), {
             type: "Program",
             body: [
                 {
@@ -782,7 +782,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x ^ y ^ z\"", () => {
-        expect(parseScript("x ^ y ^ z")).to.eql({
+        assert.match<Program>(parseScript("x ^ y ^ z"), {
             type: "Program",
             body: [
                 {
@@ -814,7 +814,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x & y | z\"", () => {
-        expect(parseScript("x & y | z")).to.eql({
+        assert.match<Program>(parseScript("x & y | z"), {
             type: "Program",
             body: [
                 {
@@ -846,7 +846,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x | y ^ z\"", () => {
-        expect(parseScript("x | y ^ z")).to.eql({
+        assert.match<Program>(parseScript("x | y ^ z"), {
             type: "Program",
             body: [
                 {
@@ -878,7 +878,7 @@ describe.skip("Expressions - Binary", () => {
     });
 
     it("should parse \"x | y & z\"", () => {
-        expect(parseScript("x | y & z")).to.eql({
+        assert.match<Program>(parseScript("x | y & z"), {
             type: "Program",
             body: [
                 {

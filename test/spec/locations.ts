@@ -1,9 +1,10 @@
 import { parseScript, parseModule } from "../../src";
-import {expect} from "chai";
+import {Program} from "../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Locations", () => {
     it("should parse \"var a = 1;\" with ranges", () => {
-        expect(parseScript(`var a = 1;`, { ranges: true})).to.eql({
+        assert.match<Program>(parseScript(`var a = 1;`, { ranges: true}), {
             body: [
                 {
                     declarations: [

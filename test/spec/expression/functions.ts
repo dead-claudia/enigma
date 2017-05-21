@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Functions", () => {
-
     it("should parse \"(function(){})\"", () => {
-        expect(parseScript("(function(){})")).to.eql({
+        assert.match<Program>(parseScript("(function(){})"), {
             type: "Program",
             body: [
                 {
@@ -28,7 +28,7 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should parse \"(function x() { y; z() });\"", () => {
-        expect(parseScript("(function x() { y; z() });")).to.eql({
+        assert.match<Program>(parseScript("(function x() { y; z() });"), {
             type: "Program",
             body: [
                 {
@@ -74,7 +74,7 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should parse \"(function eval() { });\"", () => {
-        expect(parseScript("(function eval() { });")).to.eql({
+        assert.match<Program>(parseScript("(function eval() { });"), {
             type: "Program",
             body: [
                 {
@@ -101,7 +101,7 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should parse \"(function arguments() { });\"", () => {
-        expect(parseScript("(function arguments() { });")).to.eql({
+        assert.match<Program>(parseScript("(function arguments() { });"), {
             type: "Program",
             body: [
                 {
@@ -128,7 +128,7 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should parse \"(function x(y, z) { })\"", () => {
-        expect(parseScript("(function x(y, z) { })")).to.eql({
+        assert.match<Program>(parseScript("(function x(y, z) { })"), {
             type: "Program",
             body: [
                 {
@@ -164,7 +164,7 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should parse \"(function(a = b){})\"", () => {
-        expect(parseScript("(function(a = b){})")).to.eql({
+        assert.match<Program>(parseScript("(function(a = b){})"), {
             type: "Program",
             body: [
                 {
@@ -200,7 +200,7 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should parse \"(function(...a){})\"", () => {
-        expect(parseScript("(function(...a){})")).to.eql({
+        assert.match<Program>(parseScript("(function(...a){})"), {
             type: "Program",
             body: [
                 {
@@ -232,7 +232,7 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should parse \"(function(a, ...b){})\"", () => {
-        expect(parseScript("(function(a, ...b){})")).to.eql({
+        assert.match<Program>(parseScript("(function(a, ...b){})"), {
             type: "Program",
             body: [
                 {
@@ -268,7 +268,7 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should parse \"(function({a}){})\"", () => {
-        expect(parseScript("(function({a}){})")).to.eql({
+        assert.match<Program>(parseScript("(function({a}){})"), {
             type: "Program",
             body: [
                 {
@@ -313,7 +313,7 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should parse \"(function([a]){})\"", () => {
-        expect(parseScript("(function([a]){})")).to.eql({
+        assert.match<Program>(parseScript("(function([a]){})"), {
             type: "Program",
             body: [
                 {
@@ -347,7 +347,7 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should parse \"label: !function(){ label:; };\"", () => {
-        expect(parseScript("label: !function(){ label:; };")).to.eql({
+        assert.match<Program>(parseScript("label: !function(){ label:; };"), {
             type: "Program",
             body: [
                 {
@@ -394,7 +394,7 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should parse \"(function([]){})\"", () => {
-        expect(parseScript("(function([]){})")).to.eql({
+        assert.match<Program>(parseScript("(function([]){})"), {
             type: "Program",
             body: [
                 {
@@ -423,7 +423,7 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should parse \"(function(a){\"use strict\"})\"", () => {
-        expect(parseScript("(function(a){\"use strict\"})")).to.eql({
+        assert.match<Program>(parseScript("(function(a){\"use strict\"})"), {
             type: "Program",
             body: [
                 {
@@ -460,7 +460,7 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should parse \"(function([]){\"use strict\"})\"", () => {
-        expect(parseScript("(function([]){\"use strict\"})")).to.eql({
+        assert.match<Program>(parseScript("(function([]){\"use strict\"})"), {
             type: "Program",
             body: [
                 {
@@ -497,31 +497,31 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should not parse \"(function(a){\"use strict\"})\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("(function(a, ...rest){\"use strict\"})");
-        }).to.throw();
+        });
     });
 
     it("should not parse \"(function(a){\"use strict\"})\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("(function(a, ...[foo]){\"use strict\"})");
-        }).to.throw();
+        });
     });
 
     it("should not parse \"(function([]){\"use strict\"})\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("(function([], ...rest){\"use strict\"})");
-        }).to.throw();
+        });
     });
 
     it("should not parse \"(function([]){\"use strict\"})\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("(function([], ...[foo]){\"use strict\"})");
-        }).to.throw();
+        });
     });
 
     it("should parse \"\"use strict\";(function([]){})\"", () => {
-        expect(parseScript("\"use strict\";(function([]){})")).to.eql({
+        assert.match<Program>(parseScript("\"use strict\";(function([]){})"), {
             type: "Program",
             body: [
                 {
@@ -557,7 +557,7 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should parse \"\"use strict\";(function(a){\"use strict\"})\"", () => {
-        expect(parseScript("\"use strict\";(function(a){\"use strict\"})")).to.eql({
+        assert.match<Program>(parseScript("\"use strict\";(function(a){\"use strict\"})"), {
             type: "Program",
             body: [
                 {
@@ -601,7 +601,7 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should parse \"\"use strict\";(function([]){\"use strict\"})\"", () => {
-        expect(parseScript("\"use strict\";(function([]){\"use strict\"})")).to.eql({
+        assert.match<Program>(parseScript("\"use strict\";(function([]){\"use strict\"})"), {
             type: "Program",
             body: [
                 {
@@ -645,26 +645,26 @@ describe.skip("Expressions - Functions", () => {
     });
 
     it("should not parse \"\"use strict\";(function(a){\"use strict\"})\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("\"use strict\";(function(a, ...rest){\"use strict\"})");
-        }).to.throw();
+        });
     });
 
     it("should not parse \"\"use strict\";(function(a){\"use strict\"})\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("\"use strict\";(function(a, ...[foo]){\"use strict\"})");
-        }).to.throw();
+        });
     });
 
     it("should not parse \"\"use strict\";(function([]){\"use strict\"})\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("\"use strict\";(function([], ...rest){\"use strict\"})");
-        }).to.throw();
+        });
     });
 
     it("should not parse \"\"use strict\";(function([]){\"use strict\"})\"", () => {
-        expect(() => {
+        assert.throws(SyntaxError, () => {
             parseScript("\"use strict\";(function([], ...[foo]){\"use strict\"})");
-        }).to.throw();
+        });
     });
 });

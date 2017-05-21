@@ -1,12 +1,12 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Statements - `for await ... of`", () => {
     it("should parse \";\"", () => {
-        expect(parseScript(`async function fn() {
-  for await (const {} of [obj]) {
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function fn() {
+    for await (const {} of [obj]) {}
+}`, {next: true}), {
             body: [
                 {
                     async: true,
@@ -62,10 +62,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function fn() {
-  for await (const { gen = function* () {}, xGen = function* x() {} } of [{}]) {
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function fn() {
+    for await (const { gen = function* () {}, xGen = function* x() {} } of [{}]) {}
+}`, {next: true}), {
             body: [
                 {
                     async: true,
@@ -185,10 +184,11 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function fn() {
-  for await (const { w: { x, y, z } = { x: 4, y: 5, z: 6 } } of [{ w: { x: undefined, z: 7 } }]) {
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function fn() {
+    for await (
+        const { w: { x, y, z } = { x: 4, y: 5, z: 6 } } of [{ w: { x: undefined, z: 7 } }]
+    ) {}
+}`, {next: true}), {
             body: [
                 {
                     async: true,
@@ -406,10 +406,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function fn() {
-  for await (let [...x, y] of [[1, 2, 3]]) {
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function fn() {
+    for await (let [...x, y] of [[1, 2, 3]]) {}
+}`, {next: true}), {
             body: [
                 {
                     async: true,
@@ -490,10 +489,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse var with hole", () => {
-        expect(parseScript(`async function fn() {
-  for await (var [x = 23] of [[,]]) {
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function fn() {
+    for await (var [x = 23] of [[,]]) {}
+}`, {next: true}), {
             body: [
                 {
                     async: true,
@@ -563,12 +561,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function *fn() {
-  for await (let [] of [iter]) {
-
-
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function *fn() {
+    for await (let [] of [iter]) {}
+}`, {next: true}), {
             body: [
                 {
                     async: true,
@@ -624,11 +619,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function *fn() {
-  for await (var [] of [iter]) {
-
-  }
-}`, { next: true})).to.eql(
+        assert.match<Program>(parseScript(`async function *fn() {
+    for await (var [] of [iter]) {}
+}`, {next: true}),
             {
                 body: [
                     {
@@ -685,10 +678,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function *fn() {
-  for await (var { fn = function () {}, xFn = function x() {} } of [{}]) {
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function *fn() {
+    for await (var { fn = function () {}, xFn = function x() {} } of [{}]) {}
+}`, {next: true}), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -808,11 +800,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function *fn() {
-  for await (var { x: y } of [{ x: 23 }]) {
-
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function *fn() {
+    for await (var { x: y } of [{ x: 23 }]) {}
+}`, {next: true}), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -900,11 +890,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function *fn() {
-  for await (var [{ x, y, z } = { x: 44, y: 55, z: 66 }] of [[]]) {
-
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function *fn() {
+    for await (var [{ x, y, z } = { x: 44, y: 55, z: 66 }] of [[]]) {}
+}`, {next: true}), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -1064,11 +1052,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function *fn() {
-  for await (let {...x} of [{ get v() { count++; return 2; } }]) {
-
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function *fn() {
+    for await (let {...x} of [{ get v() { count++; return 2; } }]) {}
+}`, {next: true}), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -1176,11 +1162,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function *fn() {
-  for await (let { x: y = 33 } of [{ }]) {
-
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function *fn() {
+    for await (let { x: y = 33 } of [{ }]) {}
+}`, {next: true}), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -1259,11 +1243,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function *fn() {
-  for await (let { fn = function () {}, xFn = function x() {} } of [{}]) {
-
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function *fn() {
+    for await (let { fn = function () {}, xFn = function x() {} } of [{}]) {}
+}`, {next: true}), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -1383,11 +1365,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function *fn() {
-  for await (let [...x, y] of [[1, 2, 3]]) {
-
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function *fn() {
+    for await (let [...x, y] of [[1, 2, 3]]) {}
+}`, {next: true}), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -1468,11 +1448,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function *fn() {
-  for await (const [...{ x }, y] of [[1, 2, 3]]) {
-
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function *fn() {
+    for await (const [...{ x }, y] of [[1, 2, 3]]) {}
+}`, {next: true}), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -1569,11 +1547,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function *fn() {
-  for await (const [, , ...x] of [[1, 2]]) {
-
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function *fn() {
+    for await (const [, , ...x] of [[1, 2]]) {}
+}`, {next: true}), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -1648,11 +1624,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function *fn() {
-  for await (const [x, y, z] of [[1, 2, 3]]) {
-
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function *fn() {
+    for await (const [x, y, z] of [[1, 2, 3]]) {}
+}`, {next: true}), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -1734,11 +1708,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function *fn() {
-  for await (const [x = 23] of [[,]]) {
-
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function *fn() {
+    for await (const [x = 23] of [[,]]) {}
+}`, {next: true}), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -1808,12 +1780,10 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function *fn() {
-  for await (const [arrow = () => {}] of [[]]) {
-
-  }
+        assert.match<Program>(parseScript(`async function *fn() {
+    for await (const [arrow = () => {}] of [[]]) {}
 }
-`, { next: true})).to.eql({
+`, {next: true}), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -1889,11 +1859,9 @@ describe.skip("Statements - `for await ... of`", () => {
     });
 
     it("should parse \";\"", () => {
-        expect(parseScript(`async function fn() {
-  for await (var [ , , ...x] of [values]) {
-
-  }
-}`, { next: true})).to.eql({
+        assert.match<Program>(parseScript(`async function fn() {
+    for await (var [ , , ...x] of [values]) {}
+}`, {next: true}), {
             type: "Program",
             sourceType: "script",
             body: [

@@ -1,217 +1,218 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Statements - `try ... catch`", () => {
-
-it("should parse \"try { } catch (eval) { }\"", () => {
-        expect(parseScript(`try {
-    throw [];
-  } catch ([ x = unresolvableReference ]) {}`)).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "TryStatement",
-            block: {
-                type: "BlockStatement",
+    it("should parse \"try { } catch (eval) { }\"", () => {
+        assert.match<Program>(
+            parseScript(`try { throw []; } catch ([ x = unresolvableReference ]) {}`),
+            {
+                type: "Program",
                 body: [
                     {
-                        type: "ThrowStatement",
-                        argument: {
-                            type: "ArrayExpression",
-                            elements: [],
-                        },
-                    },
-                ],
-            },
-            handler: {
-                type: "CatchClause",
-                param: {
-                    type: "ArrayPattern",
-                    elements: [
-                        {
-                            type: "AssignmentPattern",
-                            left: {
-                                type: "Identifier",
-                                name: "x",
-                            },
-                            right: {
-                                type: "Identifier",
-                                name: "unresolvableReference",
-                            },
-                        },
-                    ],
-                },
-                body: {
-                    type: "BlockStatement",
-                    body: [],
-                },
-            },
-            finalizer: null,
-        },
-    ],
-    sourceType: "script",
-});
-});
-
-it("should parse \"try { } catch (eval) { }\"", () => {
-        expect(parseScript("try { } catch (eval) { }")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "TryStatement",
-            block: {
-                type: "BlockStatement",
-                body: [],
-            },
-            handler: {
-                type: "CatchClause",
-                param: {
-                    type: "Identifier",
-                    name: "eval",
-                },
-                body: {
-                    type: "BlockStatement",
-                    body: [],
-                },
-            },
-            finalizer: null,
-        },
-    ],
-    sourceType: "script",
-});
-    });
-
-it("should parse \"try { } catch (arguments) { }\"", () => {
-        expect(parseScript("try { } catch (arguments) { }")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "TryStatement",
-            block: {
-                type: "BlockStatement",
-                body: [],
-            },
-            handler: {
-                type: "CatchClause",
-                param: {
-                    type: "Identifier",
-                    name: "arguments",
-                },
-                body: {
-                    type: "BlockStatement",
-                    body: [],
-                },
-            },
-            finalizer: null,
-        },
-    ],
-    sourceType: "script",
-});
-    });
-
-it("should parse \"try { doThat(); } catch (e) { say(e) }\"", () => {
-        expect(parseScript("try { doThat(); } catch (e) { say(e) }")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "TryStatement",
-            block: {
-                type: "BlockStatement",
-                body: [
-                    {
-                        type: "ExpressionStatement",
-                        expression: {
-                            type: "CallExpression",
-                            callee: {
-                                type: "Identifier",
-                                name: "doThat",
-                            },
-                            arguments: [],
-                        },
-                    },
-                ],
-            },
-            handler: {
-                type: "CatchClause",
-                param: {
-                    type: "Identifier",
-                    name: "e",
-                },
-                body: {
-                    type: "BlockStatement",
-                    body: [
-                        {
-                            type: "ExpressionStatement",
-                            expression: {
-                                type: "CallExpression",
-                                callee: {
-                                    type: "Identifier",
-                                    name: "say",
+                        type: "TryStatement",
+                        block: {
+                            type: "BlockStatement",
+                            body: [
+                                {
+                                    type: "ThrowStatement",
+                                    argument: {
+                                        type: "ArrayExpression",
+                                        elements: [],
+                                    },
                                 },
-                                arguments: [
+                            ],
+                        },
+                        handler: {
+                            type: "CatchClause",
+                            param: {
+                                type: "ArrayPattern",
+                                elements: [
                                     {
-                                        type: "Identifier",
-                                        name: "e",
+                                        type: "AssignmentPattern",
+                                        left: {
+                                            type: "Identifier",
+                                            name: "x",
+                                        },
+                                        right: {
+                                            type: "Identifier",
+                                            name: "unresolvableReference",
+                                        },
                                     },
                                 ],
                             },
+                            body: {
+                                type: "BlockStatement",
+                                body: [],
+                            },
                         },
-                    ],
-                },
+                        finalizer: null,
+                    },
+                ],
+                sourceType: "script",
             },
-            finalizer: null,
-        },
-    ],
-    sourceType: "script",
-});
+        );
     });
 
-it("should parse \"try { } catch (e) { let a; }\"", () => {
-        expect(parseScript("try { } catch (e) { let a; }")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "TryStatement",
-            block: {
-                type: "BlockStatement",
-                body: [],
-            },
-            handler: {
-                type: "CatchClause",
-                param: {
-                    type: "Identifier",
-                    name: "e",
+    it("should parse \"try { } catch (eval) { }\"", () => {
+        assert.match<Program>(parseScript("try { } catch (eval) { }"), {
+            type: "Program",
+            body: [
+                {
+                    type: "TryStatement",
+                    block: {
+                        type: "BlockStatement",
+                        body: [],
+                    },
+                    handler: {
+                        type: "CatchClause",
+                        param: {
+                            type: "Identifier",
+                            name: "eval",
+                        },
+                        body: {
+                            type: "BlockStatement",
+                            body: [],
+                        },
+                    },
+                    finalizer: null,
                 },
-                body: {
-                    type: "BlockStatement",
-                    body: [
-                        {
-                            type: "VariableDeclaration",
-                            declarations: [
-                                {
-                                    type: "VariableDeclarator",
-                                    id: {
+            ],
+            sourceType: "script",
+        });
+    });
+
+    it("should parse \"try { } catch (arguments) { }\"", () => {
+        assert.match<Program>(parseScript("try { } catch (arguments) { }"), {
+            type: "Program",
+            body: [
+                {
+                    type: "TryStatement",
+                    block: {
+                        type: "BlockStatement",
+                        body: [],
+                    },
+                    handler: {
+                        type: "CatchClause",
+                        param: {
+                            type: "Identifier",
+                            name: "arguments",
+                        },
+                        body: {
+                            type: "BlockStatement",
+                            body: [],
+                        },
+                    },
+                    finalizer: null,
+                },
+            ],
+            sourceType: "script",
+        });
+    });
+
+    it("should parse \"try { doThat(); } catch (e) { say(e) }\"", () => {
+        assert.match<Program>(parseScript("try { doThat(); } catch (e) { say(e) }"), {
+            type: "Program",
+            body: [
+                {
+                    type: "TryStatement",
+                    block: {
+                        type: "BlockStatement",
+                        body: [
+                            {
+                                type: "ExpressionStatement",
+                                expression: {
+                                    type: "CallExpression",
+                                    callee: {
                                         type: "Identifier",
-                                        name: "a",
+                                        name: "doThat",
                                     },
-                                    init: null,
+                                    arguments: [],
+                                },
+                            },
+                        ],
+                    },
+                    handler: {
+                        type: "CatchClause",
+                        param: {
+                            type: "Identifier",
+                            name: "e",
+                        },
+                        body: {
+                            type: "BlockStatement",
+                            body: [
+                                {
+                                    type: "ExpressionStatement",
+                                    expression: {
+                                        type: "CallExpression",
+                                        callee: {
+                                            type: "Identifier",
+                                            name: "say",
+                                        },
+                                        arguments: [
+                                            {
+                                                type: "Identifier",
+                                                name: "e",
+                                            },
+                                        ],
+                                    },
                                 },
                             ],
-                            kind: "let",
                         },
-                    ],
+                    },
+                    finalizer: null,
                 },
-            },
-            finalizer: null,
-        },
-    ],
-    sourceType: "script",
-});
+            ],
+            sourceType: "script",
+        });
     });
 
-it("should parse \"try { } catch (e) { }\"", () => {
+    it("should parse \"try { } catch (e) { let a; }\"", () => {
+        assert.match<Program>(parseScript("try { } catch (e) { let a; }"), {
+            type: "Program",
+            body: [
+                {
+                    type: "TryStatement",
+                    block: {
+                        type: "BlockStatement",
+                        body: [],
+                    },
+                    handler: {
+                        type: "CatchClause",
+                        param: {
+                            type: "Identifier",
+                            name: "e",
+                        },
+                        body: {
+                            type: "BlockStatement",
+                            body: [
+                                {
+                                    type: "VariableDeclaration",
+                                    declarations: [
+                                        {
+                                            type: "VariableDeclarator",
+                                            id: {
+                                                type: "Identifier",
+                                                name: "a",
+                                            },
+                                            init: null,
+                                        },
+                                    ],
+                                    kind: "let",
+                                },
+                            ],
+                        },
+                    },
+                    finalizer: null,
+                },
+            ],
+            sourceType: "script",
+        });
+    });
 
-        expect(parseScript("try { } catch (e) { }")).to.eql({
+    it("should parse \"try { } catch (e) { }\"", () => {
+
+        assert.match<Program>(parseScript("try { } catch (e) { }"), {
             type: "Program",
             body: [
                 {
@@ -237,7 +238,7 @@ it("should parse \"try { } catch (e) { }\"", () => {
             sourceType: "script",
         });
 
-        expect(parseScript("try { } catch (e) { say(e) }")).to.eql({
+        assert.match<Program>(parseScript("try { } catch (e) { say(e) }"), {
             type: "Program",
             body: [
                 {
@@ -279,43 +280,40 @@ it("should parse \"try { } catch (e) { }\"", () => {
             ],
             sourceType: "script",
         });
-
     });
 
-it("should parse strict simple catch\"", () => {
-        expect(parseScript(`"use strict";
-try {} catch (evil) {}`)).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ExpressionStatement",
-            expression: {
-                type: "Literal",
-                value: "use strict",
-            },
-        },
-        {
-            type: "TryStatement",
-            block: {
-                type: "BlockStatement",
-                body: [],
-            },
-            handler: {
-                type: "CatchClause",
-                param: {
-                    type: "Identifier",
-                    name: "evil",
+    it("should parse strict simple catch\"", () => {
+        assert.match<Program>(parseScript(`"use strict"; try {} catch (evil) {}`), {
+            type: "Program",
+            body: [
+                {
+                    type: "ExpressionStatement",
+                    expression: {
+                        type: "Literal",
+                        value: "use strict",
+                    },
                 },
-                body: {
-                    type: "BlockStatement",
-                    body: [],
+                {
+                    type: "TryStatement",
+                    block: {
+                        type: "BlockStatement",
+                        body: [],
+                    },
+                    handler: {
+                        type: "CatchClause",
+                        param: {
+                            type: "Identifier",
+                            name: "evil",
+                        },
+                        body: {
+                            type: "BlockStatement",
+                            body: [],
+                        },
+                    },
+                    finalizer: null,
                 },
-            },
-            finalizer: null,
-        },
-    ],
-    sourceType: "script",
-});
+            ],
+            sourceType: "script",
+        });
     });
-
 });

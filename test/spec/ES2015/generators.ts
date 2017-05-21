@@ -1,290 +1,290 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2015 - Generators", () => {
-
- it("should parse \"function* f([x, y, z]) {}\"", () => {
-        expect(parseScript("function* f([x, y, z]) {}")).to.eql({
-    type: "Program",
-    sourceType: "script",
-    body: [
-        {
-            type: "FunctionDeclaration",
-            params: [
+    it("should parse \"function* f([x, y, z]) {}\"", () => {
+        assert.match<Program>(parseScript("function* f([x, y, z]) {}"), {
+            type: "Program",
+            sourceType: "script",
+            body: [
                 {
-                    type: "ArrayPattern",
-                    elements: [
+                    type: "FunctionDeclaration",
+                    params: [
                         {
-                            type: "Identifier",
-                            name: "x",
-                        },
-                        {
-                            type: "Identifier",
-                            name: "y",
-                        },
-                        {
-                            type: "Identifier",
-                            name: "z",
+                            type: "ArrayPattern",
+                            elements: [
+                                {
+                                    type: "Identifier",
+                                    name: "x",
+                                },
+                                {
+                                    type: "Identifier",
+                                    name: "y",
+                                },
+                                {
+                                    type: "Identifier",
+                                    name: "z",
+                                },
+                            ],
                         },
                     ],
+                    body: {
+                        type: "BlockStatement",
+                        body: [],
+                    },
+                    async: false,
+                    generator: true,
+                    expression: false,
+                    id: {
+                        type: "Identifier",
+                        name: "f",
+                    },
                 },
             ],
-            body: {
-                type: "BlockStatement",
-                body: [],
-            },
-            async: false,
-            generator: true,
-            expression: false,
-            id: {
-                type: "Identifier",
-                name: "f",
-            },
-        },
-    ],
-});
- });
+        });
+    });
 
- it("should parse \"function* f([[...x] = function() {  }()]) {}\"", () => {
-        expect(parseScript("function* f([[...x] = function() {  }()]) {}")).to.eql({
-    type: "Program",
-    sourceType: "script",
-    body: [
-        {
-            type: "FunctionDeclaration",
-            params: [
+    it("should parse \"function* f([[...x] = function() {  }()]) {}\"", () => {
+        assert.match<Program>(parseScript("function* f([[...x] = function() {  }()]) {}"), {
+            type: "Program",
+            sourceType: "script",
+            body: [
                 {
-                    type: "ArrayPattern",
-                    elements: [
+                    type: "FunctionDeclaration",
+                    params: [
+                        {
+                            type: "ArrayPattern",
+                            elements: [
+                                {
+                                    type: "AssignmentPattern",
+                                    left: {
+                                        type: "ArrayPattern",
+                                        elements: [
+                                            {
+                                                type: "RestElement",
+                                                argument: {
+                                                    type: "Identifier",
+                                                    name: "x",
+                                                },
+                                            },
+                                        ],
+                                    },
+                                    right: {
+                                        type: "CallExpression",
+                                        arguments: [],
+                                        callee: {
+                                            type: "FunctionExpression",
+                                            params: [],
+                                            body: {
+                                                type: "BlockStatement",
+                                                body: [],
+                                            },
+                                            async: false,
+                                            generator: false,
+                                            expression: false,
+                                            id: null,
+                                        },
+                                    },
+                                },
+                            ],
+                        },
+                    ],
+                    body: {
+                        type: "BlockStatement",
+                        body: [],
+                    },
+                    async: false,
+                    generator: true,
+                    expression: false,
+                    id: {
+                        type: "Identifier",
+                        name: "f",
+                    },
+                },
+            ],
+        });
+    });
+
+    it("should parse \"function* f([x]) {}\"", () => {
+        assert.match<Program>(parseScript("function* f([x]) {}"), {
+            type: "Program",
+            sourceType: "script",
+            body: [
+                {
+                    type: "FunctionDeclaration",
+                    params: [
+                        {
+                            type: "ArrayPattern",
+                            elements: [
+                                {
+                                    type: "Identifier",
+                                    name: "x",
+                                },
+                            ],
+                        },
+                    ],
+                    body: {
+                        type: "BlockStatement",
+                        body: [],
+                    },
+                    async: false,
+                    generator: true,
+                    expression: false,
+                    id: {
+                        type: "Identifier",
+                        name: "f",
+                    },
+                },
+            ],
+        });
+    });
+
+    it("should parse \"function* f([x, y, z] = [1, 2, 3]) {}\"", () => {
+        assert.match<Program>(parseScript("function* f([x, y, z] = [1, 2, 3]) {}"), {
+            type: "Program",
+            sourceType: "script",
+            body: [
+                {
+                    type: "FunctionDeclaration",
+                    params: [
                         {
                             type: "AssignmentPattern",
                             left: {
                                 type: "ArrayPattern",
                                 elements: [
                                     {
-                                        type: "RestElement",
-                                        argument: {
-                                            type: "Identifier",
-                                            name: "x",
-                                        },
+                                        type: "Identifier",
+                                        name: "x",
+                                    },
+                                    {
+                                        type: "Identifier",
+                                        name: "y",
+                                    },
+                                    {
+                                        type: "Identifier",
+                                        name: "z",
                                     },
                                 ],
                             },
                             right: {
-                                type: "CallExpression",
-                                arguments: [],
-                                callee: {
-                                    type: "FunctionExpression",
-                                    params: [],
-                                    body: {
-                                        type: "BlockStatement",
-                                        body: [],
+                                type: "ArrayExpression",
+                                elements: [
+                                    {
+                                        type: "Literal",
+                                        value: 1,
                                     },
-                                    async: false,
-                                    generator: false,
-                                    expression: false,
-                                    id: null,
-                                },
+                                    {
+                                        type: "Literal",
+                                        value: 2,
+                                    },
+                                    {
+                                        type: "Literal",
+                                        value: 3,
+                                    },
+                                ],
                             },
                         },
                     ],
+                    body: {
+                        type: "BlockStatement",
+                        body: [],
+                    },
+                    async: false,
+                    generator: true,
+                    expression: false,
+                    id: {
+                        type: "Identifier",
+                        name: "f",
+                    },
                 },
             ],
-            body: {
-                type: "BlockStatement",
-                body: [],
-            },
-            async: false,
-            generator: true,
-            expression: false,
-            id: {
-                type: "Identifier",
-                name: "f",
-            },
-        },
-    ],
-});
- });
+        });
+    });
 
- it("should parse \"function* f([x]) {}\"", () => {
-        expect(parseScript("function* f([x]) {}")).to.eql({
-    type: "Program",
-    sourceType: "script",
-    body: [
-        {
-            type: "FunctionDeclaration",
-            params: [
-                {
-                    type: "ArrayPattern",
-                    elements: [
-                        {
+    it("should parse \"function* f([fn = function () {}, xFn = function x() {}] = []) {}\"", () => {
+        assert.match<Program>(
+            parseScript("function* f([fn = function () {}, xFn = function x() {}] = []) {}"),
+            {
+                type: "Program",
+                sourceType: "script",
+                body: [
+                    {
+                        type: "FunctionDeclaration",
+                        params: [
+                            {
+                                type: "AssignmentPattern",
+                                left: {
+                                    type: "ArrayPattern",
+                                    elements: [
+                                        {
+                                            type: "AssignmentPattern",
+                                            left: {
+                                                type: "Identifier",
+                                                name: "fn",
+                                            },
+                                            right: {
+                                                type: "FunctionExpression",
+                                                params: [],
+                                                body: {
+                                                    type: "BlockStatement",
+                                                    body: [],
+                                                },
+                                                async: false,
+                                                generator: false,
+                                                expression: false,
+                                                id: null,
+                                            },
+                                        },
+                                        {
+                                            type: "AssignmentPattern",
+                                            left: {
+                                                type: "Identifier",
+                                                name: "xFn",
+                                            },
+                                            right: {
+                                                type: "FunctionExpression",
+                                                params: [],
+                                                body: {
+                                                    type: "BlockStatement",
+                                                    body: [],
+                                                },
+                                                async: false,
+                                                generator: false,
+                                                expression: false,
+                                                id: {
+                                                    type: "Identifier",
+                                                    name: "x",
+                                                },
+                                            },
+                                        },
+                                    ],
+                                },
+                                right: {
+                                    type: "ArrayExpression",
+                                    elements: [],
+                                },
+                            },
+                        ],
+                        body: {
+                            type: "BlockStatement",
+                            body: [],
+                        },
+                        async: false,
+                        generator: true,
+                        expression: false,
+                        id: {
                             type: "Identifier",
-                            name: "x",
+                            name: "f",
                         },
-                    ],
-                },
-            ],
-            body: {
-                type: "BlockStatement",
-                body: [],
+                    },
+                ],
             },
-            async: false,
-            generator: true,
-            expression: false,
-            id: {
-                type: "Identifier",
-                name: "f",
-            },
-        },
-    ],
-});
- });
+        );
+    });
 
- it("should parse \"function* f([x, y, z] = [1, 2, 3]) {}\"", () => {
-        expect(parseScript("function* f([x, y, z] = [1, 2, 3]) {}")).to.eql({
-    type: "Program",
-    sourceType: "script",
-    body: [
-        {
-            type: "FunctionDeclaration",
-            params: [
-                {
-                    type: "AssignmentPattern",
-                    left: {
-                        type: "ArrayPattern",
-                        elements: [
-                            {
-                                type: "Identifier",
-                                name: "x",
-                            },
-                            {
-                                type: "Identifier",
-                                name: "y",
-                            },
-                            {
-                                type: "Identifier",
-                                name: "z",
-                            },
-                        ],
-                    },
-                    right: {
-                        type: "ArrayExpression",
-                        elements: [
-                            {
-                                type: "Literal",
-                                value: 1,
-                            },
-                            {
-                                type: "Literal",
-                                value: 2,
-                            },
-                            {
-                                type: "Literal",
-                                value: 3,
-                            },
-                        ],
-                    },
-                },
-            ],
-            body: {
-                type: "BlockStatement",
-                body: [],
-            },
-            async: false,
-            generator: true,
-            expression: false,
-            id: {
-                type: "Identifier",
-                name: "f",
-            },
-        },
-    ],
-});
- });
-
- it("should parse \"function* f([fn = function () {}, xFn = function x() {}] = []) {}\"", () => {
-        /* tslint:disable max-line-length */
-        expect(parseScript("function* f([fn = function () {}, xFn = function x() {}] = []) {}"))
-        /* tslint:enable max-line-length */
-        .to.eql({
-    type: "Program",
-    sourceType: "script",
-    body: [
-        {
-            type: "FunctionDeclaration",
-            params: [
-                {
-                    type: "AssignmentPattern",
-                    left: {
-                        type: "ArrayPattern",
-                        elements: [
-                            {
-                                type: "AssignmentPattern",
-                                left: {
-                                    type: "Identifier",
-                                    name: "fn",
-                                },
-                                right: {
-                                    type: "FunctionExpression",
-                                    params: [],
-                                    body: {
-                                        type: "BlockStatement",
-                                        body: [],
-                                    },
-                                    async: false,
-                                    generator: false,
-                                    expression: false,
-                                    id: null,
-                                },
-                            },
-                            {
-                                type: "AssignmentPattern",
-                                left: {
-                                    type: "Identifier",
-                                    name: "xFn",
-                                },
-                                right: {
-                                    type: "FunctionExpression",
-                                    params: [],
-                                    body: {
-                                        type: "BlockStatement",
-                                        body: [],
-                                    },
-                                    async: false,
-                                    generator: false,
-                                    expression: false,
-                                    id: {
-                                        type: "Identifier",
-                                        name: "x",
-                                    },
-                                },
-                            },
-                        ],
-                    },
-                    right: {
-                        type: "ArrayExpression",
-                        elements: [],
-                    },
-                },
-            ],
-            body: {
-                type: "BlockStatement",
-                body: [],
-            },
-            async: false,
-            generator: true,
-            expression: false,
-            id: {
-                type: "Identifier",
-                name: "f",
-            },
-        },
-    ],
-});
- });
-
- it("should parse \"function* a(){}\"", () => {
-        expect(parseScript("function* a(){}")).to.eql({
+    it("should parse \"function* a(){}\"", () => {
+        assert.match<Program>(parseScript("function* a(){}"), {
             type: "Program",
             body: [
                 {
@@ -307,8 +307,8 @@ describe.skip("ES2015 - Generators", () => {
         });
     });
 
- it("should parse generator method with params", () => {
-        expect(parseScript("function* a(){({[yield]:a}=0)}")).to.eql({
+    it("should parse generator method with params", () => {
+        assert.match<Program>(parseScript("function* a(){({[yield]:a}=0)}"), {
             type: "Program",
             body: [
                 {
@@ -364,8 +364,8 @@ describe.skip("ES2015 - Generators", () => {
         });
     });
 
- it("should parse \"function* a() {} function a() {}\"", () => {
-        expect(parseScript("function* a() {} function a() {}")).to.eql({
+    it("should parse \"function* a() {} function a() {}\"", () => {
+        assert.match<Program>(parseScript("function* a() {} function a() {}"), {
             type: "Program",
             body: [
                 {
@@ -403,8 +403,8 @@ describe.skip("ES2015 - Generators", () => {
         });
     });
 
- it("should parse \"function a() { function* a() {} function a() {} }\"", () => {
-        expect(parseScript("function a() { function* a() {} function a() {} }")).to.eql({
+    it("should parse \"function a() { function* a() {} function a() {} }\"", () => {
+        assert.match<Program>(parseScript("function a() { function* a() {} function a() {} }"), {
             type: "Program",
             body: [
                 {
@@ -458,8 +458,8 @@ describe.skip("ES2015 - Generators", () => {
         });
     });
 
- it("should parse generator method with params", () => {
-        expect(parseScript("({ *foo(x, y, z) {} })")).to.eql({
+    it("should parse generator method with params", () => {
+        assert.match<Program>(parseScript("({ *foo(x, y, z) {} })"), {
             type: "Program",
             body: [
                 {
@@ -511,8 +511,8 @@ describe.skip("ES2015 - Generators", () => {
         });
     });
 
- it("should parse generator declaration with params", () => {
-        expect(parseScript("({ *foo() { yield 3; } })")).to.eql({
+    it("should parse generator declaration with params", () => {
+        assert.match<Program>(parseScript("({ *foo() { yield 3; } })"), {
             type: "Program",
             body: [
                 {
@@ -563,8 +563,8 @@ describe.skip("ES2015 - Generators", () => {
         });
     });
 
- it("should parse generator declaration with params", () => {
-        expect(parseScript("({ *foo() { yield; } })")).to.eql({
+    it("should parse generator declaration with params", () => {
+        assert.match<Program>(parseScript("({ *foo() { yield; } })"), {
             type: "Program",
             body: [
                 {
@@ -612,8 +612,8 @@ describe.skip("ES2015 - Generators", () => {
         });
     });
 
- it("should parse static generator method", () => {
-        expect(parseScript("class Foo { static *foo() {} }")).to.eql({
+    it("should parse static generator method", () => {
+        assert.match<Program>(parseScript("class Foo { static *foo() {} }"), {
             type: "Program",
             body: [
                 {
@@ -642,10 +642,9 @@ describe.skip("ES2015 - Generators", () => {
                                         body: [],
                                     },
                                     generator: true,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                         ],
@@ -655,8 +654,8 @@ describe.skip("ES2015 - Generators", () => {
             sourceType: "script",
         });
     });
- it("should parse generator declaration with params", () => {
-        expect(parseScript("function *foo(x, y, z) {}")).to.eql({
+    it("should parse generator declaration with params", () => {
+        assert.match<Program>(parseScript("function *foo(x, y, z) {}"), {
             type: "Program",
             body: [
                 {
@@ -692,8 +691,8 @@ describe.skip("ES2015 - Generators", () => {
         });
     });
 
- it("should parse generator declaration with yield delegate", () => {
-        expect(parseScript("function *foo() { yield* 3; }")).to.eql({
+    it("should parse generator declaration with yield delegate", () => {
+        assert.match<Program>(parseScript("function *foo() { yield* 3; }"), {
             type: "Program",
             body: [
                 {
@@ -728,8 +727,8 @@ describe.skip("ES2015 - Generators", () => {
         });
     });
 
- it("should parse generator declaration", () => {
-        expect(parseScript("function *foo() {}")).to.eql({
+    it("should parse generator declaration", () => {
+        assert.match<Program>(parseScript("function *foo() {}"), {
             type: "Program",
             body: [
                 {
@@ -752,8 +751,8 @@ describe.skip("ES2015 - Generators", () => {
         });
     });
 
- it("should parse generator expression rest param", () => {
-        expect(parseScript("(function*(...x) {})")).to.eql({
+    it("should parse generator expression rest param", () => {
+        assert.match<Program>(parseScript("(function*(...x) {})"), {
             type: "Program",
             body: [
                 {
@@ -784,8 +783,8 @@ describe.skip("ES2015 - Generators", () => {
         });
     });
 
- it("should parse generator expression with params", () => {
-        expect(parseScript("(function*(x, y, z) {})")).to.eql({
+    it("should parse generator expression with params", () => {
+        assert.match<Program>(parseScript("(function*(x, y, z) {})"), {
             type: "Program",
             body: [
                 {
@@ -821,8 +820,8 @@ describe.skip("ES2015 - Generators", () => {
         });
     });
 
- it("should parse generator expression", () => {
-        expect(parseScript("(function*() {})")).to.eql({
+    it("should parse generator expression", () => {
+        assert.match<Program>(parseScript("(function*() {})"), {
             type: "Program",
             body: [
                 {
@@ -845,38 +844,40 @@ describe.skip("ES2015 - Generators", () => {
         });
     });
 
- it("should throw on \"function*g() { var yield; }\"", () => {
-        expect(() => { parseScript("function*g() { var yield; }"); }).to.throw();
+    it("should throw on \"function*g() { var yield; }\"", () => {
+        assert.throws(SyntaxError, () => { parseScript("function*g() { var yield; }"); });
     });
 
- it("should throw on \"function*g() { let yield; }\"", () => {
-        expect(() => { parseScript("function*g() { let yield; }"); }).to.throw();
+    it("should throw on \"function*g() { let yield; }\"", () => {
+        assert.throws(SyntaxError, () => { parseScript("function*g() { let yield; }"); });
     });
 
- it("should throw on \"function*g() { try {} catch (yield) {} }\"", () => {
-        expect(() => { parseScript("function*g() { try {} catch (yield) {} }"); }).to.throw();
+    it("should throw on \"function*g() { try {} catch (yield) {} }\"", () => {
+        assert.throws(SyntaxError, () => {
+            parseScript("function*g() { try {} catch (yield) {} }");
+        });
     });
 
- it("should throw on \"function*g() { ({yield}); }\"", () => {
-        expect(() => { parseScript("function*g() { ({yield}); }"); }).to.throw();
+    it("should throw on \"function*g() { ({yield}); }\"", () => {
+        assert.throws(SyntaxError, () => { parseScript("function*g() { ({yield}); }"); });
     });
 
- it("should throw on \"function*g() { ({yield} = 0); }\"", () => {
-        expect(() => { parseScript("function*g() { ({yield} = 0); }"); }).to.throw();
+    it("should throw on \"function*g() { ({yield} = 0); }\"", () => {
+        assert.throws(SyntaxError, () => { parseScript("function*g() { ({yield} = 0); }"); });
     });
 
- it("should throw on \"function*g() { var {yield} = 0; }\"", () => {
-        expect(() => { parseScript("function*g() { var {yield} = 0; }"); }).to.throw();
+    it("should throw on \"function*g() { var {yield} = 0; }\"", () => {
+        assert.throws(SyntaxError, () => { parseScript("function*g() { var {yield} = 0; }"); });
     });
 
- it("should throw on \"function*g() { var {yield = 0} = 0; }\"", () => {
-        expect(() => { parseScript("function*g() { var {yield = 0} = 0; }"); }).to.throw();
+    it("should throw on \"function*g() { var {yield = 0} = 0; }\"", () => {
+        assert.throws(SyntaxError, () => { parseScript("function*g() { var {yield = 0} = 0; }"); });
     });
- it("should throw on \"function* f(...x = []) {}\"", () => {
-        expect(() => { parseScript("function* f(...x = []) {}"); }).to.throw();
+    it("should throw on \"function* f(...x = []) {}\"", () => {
+        assert.throws(SyntaxError, () => { parseScript("function* f(...x = []) {}"); });
     });
- it("should throw on \"function* f([...[ x ] = []]) {}\"", () => {
-        expect(() => { parseScript("function* f([...[ x ] = []]) {}"); }).to.throw();
+    it("should throw on \"function* f([...[ x ] = []]) {}\"", () => {
+        assert.throws(SyntaxError, () => { parseScript("function* f([...[ x ] = []]) {}"); });
     });
 
 });

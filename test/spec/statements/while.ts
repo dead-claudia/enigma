@@ -1,174 +1,124 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Statements - `while`", () => {
-
-  it("should parse \"while (x < 10) { x++; y--; }\"", () => {
-        expect(parseScript("while (x < 10) { x++; y--; }")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "WhileStatement",
-            test: {
-                type: "BinaryExpression",
-                operator: "<",
-                left: {
-                    type: "Identifier",
-                    name: "x",
-                },
-                right: {
-                    type: "Literal",
-                    value: 10,
-                },
-            },
-            body: {
-                type: "BlockStatement",
-                body: [
-                    {
-                        type: "ExpressionStatement",
-                        expression: {
-                            type: "UpdateExpression",
-                            operator: "++",
-                            argument: {
-                                type: "Identifier",
-                                name: "x",
-                            },
-                            prefix: false,
-                        },
+    it("should parse \"while(1);\"", () => {
+        assert.match<Program>(parseScript(`while(1);`), {
+            body: [
+                {
+                    body: {
+                        type: "EmptyStatement",
                     },
-                    {
-                        type: "ExpressionStatement",
-                        expression: {
-                            type: "UpdateExpression",
-                            operator: "--",
-                            argument: {
-                                type: "Identifier",
-                                name: "y",
-                            },
-                            prefix: false,
-                        },
-
+                    test: {
+                        type: "Literal",
+                        value: 1,
                     },
-                ],
-            },
-        },
-    ],
-    sourceType: "script",
-});
+                    type: "WhileStatement",
+                },
+            ],
+            sourceType: "script",
+            type: "Program",
         });
+    });
 
-  it("should handle While statement", () => {
-
-        expect(parseScript(`while(1);`)).to.eql({
-        body: [
-          {
-           body: {
-              type: "EmptyStatement",
-           },
-            test: {
-              type: "Literal",
-              value: 1,
-            },
-            type: "WhileStatement",
-          },
-        ],
-        sourceType: "script",
-        type: "Program",
-      });
-
-        expect(parseScript(`while (true) {}`)).to.eql({
-        body: [
-          {
-            body: {
-              body: [],
-              type: "BlockStatement",
-            },
-            test: {
-              type: "Literal",
-              value: true,
-            },
-            type: "WhileStatement",
-          },
-        ],
-        sourceType: "script",
-        type: "Program",
-      });
-
-        expect(parseScript(`while (true) doSomething()`)).to.eql({
-        body: [
-          {
-            body: {
-              expression: {
-                arguments: [],
-                callee: {
-                  name: "doSomething",
-                  type: "Identifier",
+    it("should parse \"while (true) {}\"", () => {
+        assert.match<Program>(parseScript(`while (true) {}`), {
+            body: [
+                {
+                    body: {
+                        body: [],
+                        type: "BlockStatement",
+                    },
+                    test: {
+                        type: "Literal",
+                        value: true,
+                    },
+                    type: "WhileStatement",
                 },
-                type: "CallExpression",
-              },
-              type: "ExpressionStatement",
-            },
-            test: {
-              type: "Literal",
-              value: true,
-            },
-            type: "WhileStatement",
-          },
-        ],
-        sourceType: "script",
-        type: "Program",
-      });
+            ],
+            sourceType: "script",
+            type: "Program",
+        });
+    });
 
-        expect(parseScript(`while (x < 10) { x++; y--; }`)).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "WhileStatement",
-            test: {
-                type: "BinaryExpression",
-                operator: "<",
-                left: {
-                    type: "Identifier",
-                    name: "x",
-                },
-                right: {
-                    type: "Literal",
-                    value: 10,
-                },
-            },
-            body: {
-                type: "BlockStatement",
-                body: [
-                    {
-                        type: "ExpressionStatement",
+    it("should parse \"while (true) doSomething()\"", () => {
+        assert.match<Program>(parseScript(`while (true) doSomething()`), {
+            body: [
+                {
+                    body: {
                         expression: {
-                            type: "UpdateExpression",
-                            operator: "++",
-                            argument: {
+                            arguments: [],
+                            callee: {
+                                name: "doSomething",
                                 type: "Identifier",
-                                name: "x",
                             },
-                            prefix: false,
+                            type: "CallExpression",
+                        },
+                        type: "ExpressionStatement",
+                    },
+                    test: {
+                        type: "Literal",
+                        value: true,
+                    },
+                    type: "WhileStatement",
+                },
+            ],
+            sourceType: "script",
+            type: "Program",
+        });
+    });
+
+    it("should parse \"while (x < 10) { x++; y--; }\"", () => {
+        assert.match<Program>(parseScript(`while (x < 10) { x++; y--; }`), {
+            type: "Program",
+            body: [
+                {
+                    type: "WhileStatement",
+                    test: {
+                        type: "BinaryExpression",
+                        operator: "<",
+                        left: {
+                            type: "Identifier",
+                            name: "x",
+                        },
+                        right: {
+                            type: "Literal",
+                            value: 10,
                         },
                     },
-                    {
-                        type: "ExpressionStatement",
-                        expression: {
-                            type: "UpdateExpression",
-                            operator: "--",
-                            argument: {
-                                type: "Identifier",
-                                name: "y",
+                    body: {
+                        type: "BlockStatement",
+                        body: [
+                            {
+                                type: "ExpressionStatement",
+                                expression: {
+                                    type: "UpdateExpression",
+                                    operator: "++",
+                                    argument: {
+                                        type: "Identifier",
+                                        name: "x",
+                                    },
+                                    prefix: false,
+                                },
                             },
-                            prefix: false,
-                        },
+                            {
+                                type: "ExpressionStatement",
+                                expression: {
+                                    type: "UpdateExpression",
+                                    operator: "--",
+                                    argument: {
+                                        type: "Identifier",
+                                        name: "y",
+                                    },
+                                    prefix: false,
+                                },
+                            },
+                        ],
                     },
-                ],
-            },
-        },
-    ],
-    sourceType: "script",
-});
-
+                },
+            ],
+            sourceType: "script",
+        });
     });
 });

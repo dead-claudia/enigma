@@ -9,7 +9,7 @@
         "skipLibCheck": true,
         "strict": true,
         "target": "es2015",
-        "types": ["chai", "mocha"]
+        "types": ["mocha"]
     },
     "compileOnSave": false,
     "buildOnSave": false

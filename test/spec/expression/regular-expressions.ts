@@ -1,10 +1,10 @@
-import { parseScript, parseModule } from "../../../src";
-import {expect} from "chai";
+import {parseScript, parseModule} from "../../../src";
+import {Program, RegExpLiteral} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Regular Expressions", () => {
-
     it("should parse \"/a/i\"", () => {
-        expect(parseScript(`/a/i`)).to.eql({
+        assert.match<Program>(parseScript(`/a/i`), {
             type: "Program",
             body: [
                 {
@@ -16,7 +16,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                             pattern: "a",
                             flags: "i",
                         },
-                    },
+                    } as RegExpLiteral,
                 },
             ],
             sourceType: "script",
@@ -24,7 +24,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/[--]/\"", () => {
-        expect(parseScript(`/[--]/`)).to.eql({
+        assert.match<Program>(parseScript(`/[--]/`), {
             type: "Program",
             body: [
                 {
@@ -36,7 +36,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                             pattern: "[--]",
                             flags: "",
                         },
-                    },
+                    } as RegExpLiteral,
                 },
             ],
             sourceType: "script",
@@ -44,7 +44,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/\\uD834\\uDF06\\u{1d306}/u\"", () => {
-        expect(parseScript(`/\\uD834\\uDF06\\u{1d306}/u`)).to.eql({
+        assert.match<Program>(parseScript(`/\\uD834\\uDF06\\u{1d306}/u`), {
             type: "Program",
             body: [
                 {
@@ -56,7 +56,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                             pattern: "\\uD834\\uDF06\\u{1d306}",
                             flags: "u",
                         },
-                    },
+                    } as RegExpLiteral,
                 },
             ],
             sourceType: "script",
@@ -64,7 +64,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/((((((((((((.))))))))))))\\12/;\"", () => {
-        expect(parseScript(`/((((((((((((.))))))))))))\\12/;`)).to.eql({
+        assert.match<Program>(parseScript(`/((((((((((((.))))))))))))\\12/;`), {
             type: "Program",
             body: [
                 {
@@ -76,7 +76,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                             pattern: "((((((((((((.))))))))))))\\12",
                             flags: "",
                         },
-                    },
+                    } as RegExpLiteral,
                 },
             ],
             sourceType: "script",
@@ -84,7 +84,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/foo\\/bar/\"", () => {
-        expect(parseScript(`/foo\\/bar/`)).to.eql({
+        assert.match<Program>(parseScript(`/foo\\/bar/`), {
             body: [
                 {
                     expression: {
@@ -94,7 +94,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                         },
                         type: "Literal",
                         value: /foo\/bar/,
-                    },
+                    } as RegExpLiteral,
                     type: "ExpressionStatement",
                 },
             ],
@@ -104,7 +104,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/[P QR]/i\"", () => {
-        expect(parseScript(`/[P QR]/i`)).to.eql({
+        assert.match<Program>(parseScript(`/[P QR]/i`), {
             type: "Program",
             body: [
                 {
@@ -116,7 +116,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                             pattern: "[P QR]",
                             flags: "i",
                         },
-                    },
+                    } as RegExpLiteral,
                 },
             ],
             sourceType: "script",
@@ -124,7 +124,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/[a-c]/i\"", () => {
-        expect(parseScript(`/[a-c]/i`)).to.eql({
+        assert.match<Program>(parseScript(`/[a-c]/i`), {
             type: "Program",
             body: [
                 {
@@ -136,7 +136,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                             pattern: "[a-c]",
                             flags: "i",
                         },
-                    },
+                    } as RegExpLiteral,
                 },
             ],
             sourceType: "script",
@@ -144,7 +144,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/[a-z]/i\"", () => {
-        expect(parseScript(`/[a-z]/i`)).to.eql({
+        assert.match<Program>(parseScript(`/[a-z]/i`), {
             type: "Program",
             body: [
                 {
@@ -156,7 +156,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                             pattern: "[a-z]",
                             flags: "i",
                         },
-                    },
+                    } as RegExpLiteral,
                 },
             ],
             sourceType: "script",
@@ -164,7 +164,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/a/i;\"", () => {
-        expect(parseScript(`/a/i;`)).to.eql({
+        assert.match<Program>(parseScript(`/a/i;`), {
             type: "Program",
             body: [
                 {
@@ -176,7 +176,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                             pattern: "a",
                             flags: "i",
                         },
-                    },
+                    } as RegExpLiteral,
                 },
             ],
             sourceType: "script",
@@ -184,7 +184,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/\\1/u\"", () => {
-        expect(parseScript(`/\\1/u`)).to.eql({
+        assert.match<Program>(parseScript(`/\\1/u`), {
             type: "Program",
             body: [
                 {
@@ -196,7 +196,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                             pattern: "\\1",
                             flags: "u",
                         },
-                    },
+                    } as RegExpLiteral,
                 },
             ],
             sourceType: "script",
@@ -204,7 +204,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"var x = /[x-z]/i\"", () => {
-        expect(parseScript(`var x = /[x-z]/i`)).to.eql({
+        assert.match<Program>(parseScript(`var x = /[x-z]/i`), {
             type: "Program",
             body: [
                 {
@@ -223,7 +223,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                                     pattern: "ar x = /[x-z]",
                                     flags: "i",
                                 },
-                            },
+                            } as RegExpLiteral,
                         },
                     ],
                     kind: "var",
@@ -234,7 +234,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/(?!.){0,}?/u\"", () => {
-        expect(parseScript(`/\\uD834/u`)).to.eql({
+        assert.match<Program>(parseScript(`/\\uD834/u`), {
             body: [
                 {
                     expression: {
@@ -244,7 +244,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                         },
                         type: "Literal",
                         value: /\uD834/u,
-                    },
+                    } as RegExpLiteral,
                     type: "ExpressionStatement",
                 },
             ],
@@ -254,7 +254,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/[a-z]/i\"", () => {
-        expect(parseScript(`/[a-z]/i`)).to.eql({
+        assert.match<Program>(parseScript(`/[a-z]/i`), {
             body: [
                 {
                     expression: {
@@ -264,7 +264,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                         },
                         type: "Literal",
                         value: /[a-z]/i,
-                    },
+                    } as RegExpLiteral,
                     type: "ExpressionStatement",
                 },
             ],
@@ -274,7 +274,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/[\\]/]/\"", () => {
-        expect(parseScript(`/[\\]/]/`)).to.eql({
+        assert.match<Program>(parseScript(`/[\\]/]/`), {
             body: [
                 {
                     expression: {
@@ -284,7 +284,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                         },
                         type: "Literal",
                         value: /[\]\/]/,
-                    },
+                    } as RegExpLiteral,
                     type: "ExpressionStatement",
                 },
             ],
@@ -294,7 +294,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/(()(?:\\2)((\\4)))/;\"", () => {
-        expect(parseScript(`/(()(?:\\2)((\\4)))/;`)).to.eql({
+        assert.match<Program>(parseScript(`/(()(?:\\2)((\\4)))/;`), {
             type: "Program",
             body: [
                 {
@@ -306,7 +306,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                             pattern: "(()(?:\\2)((\\4)))",
                             flags: "",
                         },
-                    },
+                    } as RegExpLiteral,
                 },
             ],
             sourceType: "script",
@@ -314,7 +314,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/[-a-]/\"", () => {
-        expect(parseScript(`/[-a-]/`)).to.eql({
+        assert.match<Program>(parseScript(`/[-a-]/`), {
             type: "Program",
             body: [
                 {
@@ -326,7 +326,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                             pattern: "[-a-]",
                             flags: "",
                         },
-                    },
+                    } as RegExpLiteral,
                 },
             ],
             sourceType: "script",
@@ -334,7 +334,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/{/;\"", () => {
-        expect(parseScript(`/{/;`)).to.eql({
+        assert.match<Program>(parseScript(`/{/;`), {
             type: "Program",
             body: [
                 {
@@ -346,7 +346,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                             pattern: "{",
                             flags: "",
                         },
-                    },
+                    } as RegExpLiteral,
                 },
             ],
             sourceType: "script",
@@ -354,7 +354,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/}/\"", () => {
-        expect(parseScript(`/}/`)).to.eql({
+        assert.match<Program>(parseScript(`/}/`), {
             type: "Program",
             body: [
                 {
@@ -366,7 +366,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                             pattern: "}",
                             flags: "",
                         },
-                    },
+                    } as RegExpLiteral,
                 },
             ],
             sourceType: "script",
@@ -374,7 +374,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/.{.}/;\"", () => {
-        expect(parseScript(`/.{.}/;`)).to.eql({
+        assert.match<Program>(parseScript(`/.{.}/;`), {
             type: "Program",
             body: [
                 {
@@ -386,7 +386,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                             pattern: ".{.}",
                             flags: "",
                         },
-                    },
+                    } as RegExpLiteral,
                 },
             ],
             sourceType: "script",
@@ -394,7 +394,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/[\\w-\\s]/;\"", () => {
-        expect(parseScript(`/[\\w-\\s]/;`)).to.eql({
+        assert.match<Program>(parseScript(`/[\\w-\\s]/;`), {
             body: [
                 {
                     expression: {
@@ -404,7 +404,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                         },
                         type: "Literal",
                         value: /[\w-\s]/,
-                    },
+                    } as RegExpLiteral,
                     type: "ExpressionStatement",
                 },
             ],
@@ -414,7 +414,7 @@ describe.skip("Expressions - Regular Expressions", () => {
     });
 
     it("should parse \"/(?!.){0,}?/;\"", () => {
-        expect(parseScript(`/(?!.){0,}?/;`)).to.eql({
+        assert.match<Program>(parseScript(`/(?!.){0,}?/;`), {
             type: "Program",
             body: [
                 {
@@ -426,7 +426,7 @@ describe.skip("Expressions - Regular Expressions", () => {
                             pattern: "(?!.){0,}?",
                             flags: "",
                         },
-                    },
+                    } as RegExpLiteral,
                 },
             ],
             sourceType: "script",

@@ -1,47 +1,46 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import * as ESTree from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2015 - `class`", () => {
-
     it("should throw on invalid setter method rest\"", () => {
-        expect(() => { parseScript("class X { set f(...y) {} }"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("class X { set f(...y) {} }"); });
     });
 
     it("should throw on invalid setter method rest\"", () => {
-        expect(() => { parseScript("(class {a:0})"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(class {a:0})"); });
     });
 
     it("should throw on \"(class {a=0})\"\"", () => {
-        expect(() => { parseScript("(class {a=0})"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(class {a=0})"); });
     });
 
     it("should throw on \"(class {3:0})\"", () => {
-        expect(() => { parseScript("(class {3:0})"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(class {3:0})"); });
     });
 
     it("should throw on \"(class {)\"", () => {
-        expect(() => { parseScript("(class {)"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(class {)"); });
     });
 
     it("should throw on \"(class extends a,b {})\"", () => {
-        expect(() => { parseScript("(class extends a,b {})"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(class extends a,b {})"); });
     });
 
     it("should throw on \"(class extends !a {})\"", () => {
-        expect(() => { parseScript("(class extends !a {})"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(class extends !a {})"); });
     });
 
     it("should throw on \"(class [a] {})\"", () => {
-        expect(() => { parseScript("(class [a] {})"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("(class [a] {})"); });
     });
 
-    it("should throw on \"(class {[a,b](){}})\"", () => {
-        expect(() => { parseScript("(class {[a,b](){}})"); }).to.not.throw();
+    it("should not throw on \"(class {[a,b](){}})\"", () => {
+        parseScript("(class {[a,b](){}})");
     });
 
     it("should parse \"class A {;}\"", () => {
-
-        expect(parseScript("class A {;}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {;}"), {
             type: "Program",
             body: [
                 {
@@ -62,7 +61,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {a(){}}\"", () => {
-        expect(parseScript("class A {a(){}}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {a(){}}"), {
             type: "Program",
             body: [
                 {
@@ -91,10 +90,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -106,7 +104,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {a(){}b(){}}\"", () => {
-        expect(parseScript("class A {a(){}b(){}}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {a(){}b(){}}"), {
             type: "Program",
             body: [
                 {
@@ -135,10 +133,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                             {
@@ -157,10 +154,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -172,7 +168,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {;a(){};b(){};}\"", () => {
-        expect(parseScript("class A {;a(){};b(){};}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {;a(){};b(){};}"), {
             type: "Program",
             body: [
                 {
@@ -201,10 +197,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                             {
@@ -223,10 +218,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -238,7 +232,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {prototype(){}}\"", () => {
-        expect(parseScript("class A {prototype(){}}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {prototype(){}}"), {
             type: "Program",
             body: [
                 {
@@ -267,10 +261,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -282,7 +275,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"(class A {})\"", () => {
-        expect(parseScript("(class A {})")).to.eql({
+        assert.match<ESTree.Program>(parseScript("(class A {})"), {
             type: "Program",
             body: [
                 {
@@ -306,7 +299,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"(class extends 0{})\"", () => {
-        expect(parseScript("(class extends 0{})")).to.eql({
+        assert.match<ESTree.Program>(parseScript("(class extends 0{})"), {
             type: "Program",
             body: [
                 {
@@ -330,7 +323,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"(class A extends 0{})\"", () => {
-        expect(parseScript("(class A extends 0{})")).to.eql({
+        assert.match<ESTree.Program>(parseScript("(class A extends 0{})"), {
             type: "Program",
             body: [
                 {
@@ -357,7 +350,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {}\"", () => {
-        expect(parseScript("class A {}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {}"), {
             type: "Program",
             body: [
                 {
@@ -378,7 +371,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {a(eval){}}\"", () => {
-        expect(parseScript("class A {a(eval){}}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {a(eval){}}"), {
             body: [
                 {
                     body: {
@@ -389,7 +382,7 @@ describe.skip("ES2015 - `class`", () => {
                                     name: "a",
                                     type: "Identifier",
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                                 type: "MethodDefinition",
                                 value: {
@@ -398,7 +391,6 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                         type: "BlockStatement",
                                     },
-                                    expression: false,
                                     generator: false,
                                     id: null,
                                     params: [
@@ -427,7 +419,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {;a(){};b(){};}\"", () => {
-        expect(parseScript("class A {;a(){};b(){};}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {;a(){};b(){};}"), {
             type: "Program",
             body: [
                 {
@@ -456,10 +448,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                             {
@@ -478,10 +469,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -493,7 +483,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {a(){};b(){};}\"", () => {
-        expect(parseScript("class A {a(){};b(){};}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {a(){};b(){};}"), {
             type: "Program",
             body: [
                 {
@@ -522,10 +512,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                             {
@@ -544,10 +533,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -559,7 +547,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {static(){};}\"", () => {
-        expect(parseScript("class A {static(){};}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {static(){};}"), {
             type: "Program",
             body: [
                 {
@@ -588,10 +576,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -603,7 +590,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {get a(){} set b(c){};}\"", () => {
-        expect(parseScript("class A {get a(){} set b(c){};}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {get a(){} set b(c){};}"), {
             type: "Program",
             body: [
                 {
@@ -632,7 +619,6 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
                                 kind: "get",
@@ -659,7 +645,6 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
                                 kind: "set",
@@ -674,7 +659,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {static[a](){}; static[b](){}}\"", () => {
-        expect(parseScript("class A {static[a](){}; static[b](){}}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {static[a](){}; static[b](){}}"), {
             type: "Program",
             body: [
                 {
@@ -703,10 +688,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                             {
@@ -725,10 +709,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                         ],
@@ -740,7 +723,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {static [a](){};}\"", () => {
-        expect(parseScript("class A {static [a](){};}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {static [a](){};}"), {
             type: "Program",
             body: [
                 {
@@ -769,10 +752,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                         ],
@@ -784,7 +766,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {static a(){};}\"", () => {
-        expect(parseScript("class A {static a(){};}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {static a(){};}"), {
             type: "Program",
             body: [
                 {
@@ -813,10 +795,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                         ],
@@ -828,7 +809,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {static static(){};}\"", () => {
-        expect(parseScript("class A {static static(){};}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {static static(){};}"), {
             type: "Program",
             body: [
                 {
@@ -857,10 +838,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: true,
                             },
                         ],
@@ -872,7 +852,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"var x = class A extends 0{}\"", () => {
-        expect(parseScript("var x = class A extends 0{}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("var x = class A extends 0{}"), {
             type: "Program",
             body: [
                 {
@@ -909,7 +889,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {prototype(){}}\"", () => {
-        expect(parseScript("class A {prototype(){}}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {prototype(){}}"), {
             type: "Program",
             body: [
                 {
@@ -938,10 +918,9 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -953,7 +932,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {constructor(){}}\"", () => {
-        expect(parseScript("class A {constructor(){}}")).to.eql({
+        assert.match<ESTree.Program>(parseScript("class A {constructor(){}}"), {
             type: "Program",
             body: [
                 {
@@ -982,7 +961,6 @@ describe.skip("ES2015 - `class`", () => {
                                         body: [],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
                                 kind: "constructor",
@@ -997,73 +975,74 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {\"constructor\"(){} [\"constructor\"](){}}\"", () => {
-        expect(parseScript("class A {\"constructor\"(){} [\"constructor\"](){}}")).to.eql({
-            type: "Program",
-            body: [
-                {
-                    type: "ClassDeclaration",
-                    id: {
-                        type: "Identifier",
-                        name: "A",
-                    },
-                    superClass: null,
-                    body: {
-                        type: "ClassBody",
-                        body: [
-                            {
-                                type: "MethodDefinition",
-                                key: {
-                                    type: "Literal",
-                                    value: "constructor",
-                                },
-                                computed: false,
-                                value: {
-                                    type: "FunctionExpression",
-                                    id: null,
-                                    params: [],
-                                    body: {
-                                        type: "BlockStatement",
-                                        body: [],
+        assert.match<ESTree.Program>(
+            parseScript("class A {\"constructor\"(){} [\"constructor\"](){}}"),
+            {
+                type: "Program",
+                body: [
+                    {
+                        type: "ClassDeclaration",
+                        id: {
+                            type: "Identifier",
+                            name: "A",
+                        },
+                        superClass: null,
+                        body: {
+                            type: "ClassBody",
+                            body: [
+                                {
+                                    type: "MethodDefinition",
+                                    key: {
+                                        type: "Literal",
+                                        value: "constructor",
                                     },
-                                    generator: false,
-                                    expression: false,
-                                    async: false,
-                                },
-                                kind: "constructor",
-                                static: false,
-                            },
-                            {
-                                type: "MethodDefinition",
-                                key: {
-                                    type: "Literal",
-                                    value: "constructor",
-                                },
-                                computed: true,
-                                value: {
-                                    type: "FunctionExpression",
-                                    id: null,
-                                    params: [],
-                                    body: {
-                                        type: "BlockStatement",
-                                        body: [],
+                                    computed: false,
+                                    value: {
+                                        type: "FunctionExpression",
+                                        id: null,
+                                        params: [],
+                                        body: {
+                                            type: "BlockStatement",
+                                            body: [],
+                                        },
+                                        generator: false,
+                                        async: false,
                                     },
-                                    generator: false,
-                                    expression: false,
-                                    async: false,
+                                    kind: "constructor",
+                                    static: false,
                                 },
-                                kind: "method",
-                                static: false,
-                            },
-                        ],
+                                {
+                                    type: "MethodDefinition",
+                                    key: {
+                                        type: "Literal",
+                                        value: "constructor",
+                                    },
+                                    computed: true,
+                                    value: {
+                                        type: "FunctionExpression",
+                                        id: null,
+                                        params: [],
+                                        body: {
+                                            type: "BlockStatement",
+                                            body: [],
+                                        },
+                                        generator: false,
+                                        async: false,
+                                    },
+                                    kind: "init",
+                                    static: false,
+                                },
+                            ],
+                        },
                     },
-                },
-            ],
-            sourceType: "script",
-        });
+                ],
+                sourceType: "script",
+            },
+        );
     });
 
     it("should parse \"(class A extends 0{})\"", () => {
-        expect(parseScript("(class A extends 0{})")).to.eql({
+        assert.match<ESTree.Program>(parseScript("(class A extends 0{})"), {
             type: "Program",
             body: [
                 {
@@ -1090,7 +1069,8 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {a(eval){}}\"", () => {
-        expect(parseScript("class A {a(eval){}}")).to.eql(
+        assert.match<ESTree.Program>(
+            parseScript("class A {a(eval){}}"),
             {
                 body: [
                     {
@@ -1102,7 +1082,7 @@ describe.skip("ES2015 - `class`", () => {
                                         name: "a",
                                         type: "Identifier",
                                     },
-                                    kind: "method",
+                                    kind: "init",
                                     static: false,
                                     type: "MethodDefinition",
                                     value: {
@@ -1111,7 +1091,6 @@ describe.skip("ES2015 - `class`", () => {
                                             body: [],
                                             type: "BlockStatement",
                                         },
-                                        expression: false,
                                         generator: false,
                                         id: null,
                                         params: [

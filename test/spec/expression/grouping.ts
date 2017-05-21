@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Grouping", () => {
-
     it("should parse \"(a)\"", () => {
-        expect(parseScript("(a)")).to.eql({
+        assert.match<Program>(parseScript("(a)"), {
             type: "Program",
             body: [
                 {
@@ -20,7 +20,7 @@ describe.skip("Expressions - Grouping", () => {
     });
 
     it("should parse \"(0, a)\"", () => {
-        expect(parseScript("(0, a)")).to.eql({
+        assert.match<Program>(parseScript("(0, a)"), {
             type: "Program",
             body: [
                 {
@@ -45,7 +45,7 @@ describe.skip("Expressions - Grouping", () => {
     });
 
     it("should parse \"(a, 0)\"", () => {
-        expect(parseScript("(a, 0)")).to.eql({
+        assert.match<Program>(parseScript("(a, 0)"), {
             type: "Program",
             body: [
                 {
@@ -70,7 +70,7 @@ describe.skip("Expressions - Grouping", () => {
     });
 
     it("should parse \"(a,a)\"", () => {
-        expect(parseScript("(a,a)")).to.eql({
+        assert.match<Program>(parseScript("(a,a)"), {
             type: "Program",
             body: [
                 {
@@ -95,7 +95,7 @@ describe.skip("Expressions - Grouping", () => {
     });
 
     it("should parse \"((a,a),(a,a))\"", () => {
-        expect(parseScript("((a,a),(a,a))")).to.eql({
+        assert.match<Program>(parseScript("((a,a),(a,a))"), {
             type: "Program",
             body: [
                 {
@@ -139,25 +139,27 @@ describe.skip("Expressions - Grouping", () => {
 
     /* tslint:disable max-line-length */
     it("should parse \"((((((((((((((((((((((((((((((((((((((((a))))))))))))))))))))))))))))))))))))))))\"", () => {
-        expect(parseScript("((((((((((((((((((((((((((((((((((((((((a))))))))))))))))))))))))))))))))))))))))"))
+        assert.match<Program>(
+            parseScript("((((((((((((((((((((((((((((((((((((((((a))))))))))))))))))))))))))))))))))))))))"),
         /* tslint:enable max-line-length */
-        .to.eql({
-            type: "Program",
-            body: [
-                {
-                    type: "ExpressionStatement",
-                    expression: {
-                        type: "Identifier",
-                        name: "a",
+            {
+                type: "Program",
+                body: [
+                    {
+                        type: "ExpressionStatement",
+                        expression: {
+                            type: "Identifier",
+                            name: "a",
+                        },
                     },
-                },
-            ],
-            sourceType: "script",
-        });
+                ],
+                sourceType: "script",
+            },
+        );
     });
 
     it("should parse \"void (a)\"", () => {
-        expect(parseScript("void (a)")).to.eql({
+        assert.match<Program>(parseScript("void (a)"), {
             type: "Program",
             body: [
                 {

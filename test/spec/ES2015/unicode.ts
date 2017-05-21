@@ -1,10 +1,11 @@
-import { parseScript, parseModule } from "../../../src";
-import {expect} from "chai";
+import {parseScript, parseModule} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2015 - Unicode", () => {
     it("should pass", () => {
 
-        expect(parseScript("\"I \u2661 JavaScript!\"")).to.eql({
+        assert.match<Program>(parseScript("\"I \u2661 JavaScript!\""), {
             type: "Program",
             body: [
                 {
@@ -18,7 +19,7 @@ describe.skip("ES2015 - Unicode", () => {
             sourceType: "script",
         });
 
-        expect(parseScript("\"\u0041\u0042\u0043\"")).to.eql({
+        assert.match<Program>(parseScript("\"\u0041\u0042\u0043\""), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -32,7 +33,7 @@ describe.skip("ES2015 - Unicode", () => {
             ],
         });
 
-        expect(parseScript("\"\u{41}\u{42}\u{43}\"")).to.eql({
+        assert.match<Program>(parseScript("\"\u{41}\u{42}\u{43}\""), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -46,7 +47,7 @@ describe.skip("ES2015 - Unicode", () => {
             ],
         });
 
-        expect(parseScript("\"\uD83D\uDCA9\"")).to.eql({
+        assert.match<Program>(parseScript("\"\uD83D\uDCA9\""), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -60,7 +61,7 @@ describe.skip("ES2015 - Unicode", () => {
             ],
         });
 
-        expect(parseScript("\"\u0041\"")).to.eql({
+        assert.match<Program>(parseScript("\"\u0041\""), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -73,7 +74,7 @@ describe.skip("ES2015 - Unicode", () => {
             ],
         });
 
-        expect(parseScript("\"\uD835\uDC00\"")).to.eql({
+        assert.match<Program>(parseScript("\"\uD835\uDC00\""), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -87,7 +88,7 @@ describe.skip("ES2015 - Unicode", () => {
             ],
         });
 
-        expect(parseScript("\"\x41\x42\x43\"")).to.eql({
+        assert.match<Program>(parseScript("\"\x41\x42\x43\""), {
             body: [
                 {
                     expression: {
@@ -102,7 +103,7 @@ describe.skip("ES2015 - Unicode", () => {
             type: "Program",
         });
 
-        expect(parseScript("\"/[\uD83D\uDCA9-\uD83D\uDCAB]/\"")).to.eql({
+        assert.match<Program>(parseScript("\"/[\uD83D\uDCA9-\uD83D\uDCAB]/\""), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -116,7 +117,7 @@ describe.skip("ES2015 - Unicode", () => {
             ],
         });
 
-        expect(parseScript("\"\u{1F4AA}\"")).to.eql({
+        assert.match<Program>(parseScript("\"\u{1F4AA}\""), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -128,7 +129,7 @@ describe.skip("ES2015 - Unicode", () => {
                 },
             ],
         });
-        expect(parseScript("\x41\x42\x43")).to.eql({
+        assert.match<Program>(parseScript("\x41\x42\x43"), {
             body: [
                 {
                     expression: {
@@ -142,7 +143,7 @@ describe.skip("ES2015 - Unicode", () => {
             type: "Program",
         });
 
-        expect(parseScript("日本語 = []")).to.eql({
+        assert.match<Program>(parseScript("日本語 = []"), {
             body: [
                 {
                     expression: {
@@ -164,7 +165,7 @@ describe.skip("ES2015 - Unicode", () => {
             type: "Program",
         });
 
-        expect(parseScript("T\u203F = []")).to.eql({
+        assert.match<Program>(parseScript("T\u203F = []"), {
             body: [
                 {
                     expression: {
@@ -186,7 +187,7 @@ describe.skip("ES2015 - Unicode", () => {
             type: "Program",
         });
 
-        expect(parseScript("\u2163\u2161\u200A=\u2009[]")).to.eql({
+        assert.match<Program>(parseScript("\u2163\u2161\u200A=\u2009[]"), {
             body: [
                 {
                     expression: {
@@ -208,7 +209,7 @@ describe.skip("ES2015 - Unicode", () => {
             type: "Program",
         });
 
-        expect(parseScript("日本語 = []")).to.eql({
+        assert.match<Program>(parseScript("日本語 = []"), {
             body: [
                 {
                     expression: {
@@ -230,7 +231,7 @@ describe.skip("ES2015 - Unicode", () => {
             type: "Program",
         });
 
-        expect(parseScript("\x7A")).to.eql({
+        assert.match<Program>(parseScript("\x7A"), {
             body: [
                 {
                     expression: {
@@ -244,7 +245,7 @@ describe.skip("ES2015 - Unicode", () => {
             type: "Program",
         });
 
-        expect(parseScript("\u{7A}")).to.eql({
+        assert.match<Program>(parseScript("\u{7A}"), {
             type: "Program",
             sourceType: "script",
             body: [
@@ -258,7 +259,7 @@ describe.skip("ES2015 - Unicode", () => {
             ],
         });
 
-        expect(parseScript("\u007A")).to.eql({
+        assert.match<Program>(parseScript("\u007A"), {
             body: [
                 {
                     expression: {
@@ -272,7 +273,7 @@ describe.skip("ES2015 - Unicode", () => {
             type: "Program",
         });
 
-        expect(parseScript("\"hell\u{6F}\"")).to.eql({
+        assert.match<Program>(parseScript("\"hell\u{6F}\""), {
             body: [
                 {
                     expression: {
@@ -286,7 +287,7 @@ describe.skip("ES2015 - Unicode", () => {
             type: "Program",
         });
 
-        expect(parseScript("\"\uD83D\uDE80\"")).to.eql({
+        assert.match<Program>(parseScript("\"\uD83D\uDE80\""), {
             body: [
                 {
                     expression: {

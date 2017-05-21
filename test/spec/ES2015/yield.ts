@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2015 - `yield`", () => {
-
     it("should parse yield arg super", () => {
-        expect(parseScript("class A { *b() { yield super.c(); } }")).to.eql({
+        assert.match<Program>(parseScript("class A { *b() { yield super.c(); } }"), {
             type: "Program",
             body: [
                 {
@@ -56,10 +56,9 @@ describe.skip("ES2015 - `yield`", () => {
                                         ],
                                     },
                                     generator: true,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -71,7 +70,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield arg this", () => {
-        expect(parseScript("function *g() { yield this }")).to.eql({
+        assert.match<Program>(parseScript("function *g() { yield this }"), {
             type: "Program",
             body: [
                 {
@@ -106,7 +105,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield arg typeof", () => {
-        expect(parseScript("function *g() { yield typeof x }")).to.eql({
+        assert.match<Program>(parseScript("function *g() { yield typeof x }"), {
             type: "Program",
             body: [
                 {
@@ -138,7 +137,6 @@ describe.skip("ES2015 - `yield`", () => {
                         ],
                     },
                     generator: true,
-                    expression: false,
                     async: false,
                 },
             ],
@@ -147,7 +145,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield arrow parameter default", () => {
-        expect(parseScript("(x = yield) => {}")).to.eql({
+        assert.match<Program>(parseScript("(x = yield) => {}"), {
             type: "Program",
             body: [
                 {
@@ -183,7 +181,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield binding pattern", () => {
-        expect(parseScript("var { x: yield } = foo;")).to.eql({
+        assert.match<Program>(parseScript("var { x: yield } = foo;"), {
             type: "Program",
             body: [
                 {
@@ -225,7 +223,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield binding property", () => {
-        expect(parseScript("var { yield: x } = foo;")).to.eql({
+        assert.match<Program>(parseScript("var { yield: x } = foo;"), {
             type: "Program",
             body: [
                 {
@@ -267,7 +265,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield catch param", () => {
-        expect(parseScript("try {} catch (yield) {}")).to.eql({
+        assert.match<Program>(parseScript("try {} catch (yield) {}"), {
             type: "Program",
             body: [
                 {
@@ -295,7 +293,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield generator default parameter", () => {
-        expect(parseScript("function *g(x = yield){}")).to.eql({
+        assert.match<Program>(parseScript("function *g(x = yield){}"), {
             type: "Program",
             body: [
                 {
@@ -331,7 +329,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield generator method", () => {
-        expect(parseScript("({ *yield() {} })")).to.eql({
+        assert.match<Program>(parseScript("({ *yield() {} })"), {
             type: "Program",
             body: [
                 {
@@ -371,7 +369,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield lexical declaration", () => {
-        expect(parseScript("let yield = 42;")).to.eql({
+        assert.match<Program>(parseScript("let yield = 42;"), {
             type: "Program",
             body: [
                 {
@@ -397,7 +395,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield super property", () => {
-        expect(parseScript("class A extends B { X() { super.yield } }")).to.eql({
+        assert.match<Program>(parseScript("class A extends B { X() { super.yield } }"), {
             type: "Program",
             body: [
                 {
@@ -444,10 +442,9 @@ describe.skip("ES2015 - `yield`", () => {
                                         ],
                                     },
                                     generator: false,
-                                    expression: false,
                                     async: false,
                                 },
-                                kind: "method",
+                                kind: "init",
                                 static: false,
                             },
                         ],
@@ -459,7 +456,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield yield expression", () => {
-        expect(parseScript("let yield = 42;")).to.eql({
+        assert.match<Program>(parseScript("let yield = 42;"), {
             type: "Program",
             body: [
                 {
@@ -496,7 +493,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield strict method", () => {
-        expect(parseScript("\"use strict\"; ({ yield() {} })")).to.eql({
+        assert.match<Program>(parseScript("\"use strict\"; ({ yield() {} })"), {
             type: "Program",
             body: [
                 {
@@ -543,7 +540,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield generator declaration", () => {
-        expect(parseScript("function *yield(){}")).to.eql({
+        assert.match<Program>(parseScript("function *yield(){}"), {
             type: "Program",
             body: [
                 {
@@ -567,7 +564,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield generator arrow function body", () => {
-        expect(parseScript("function *g() { (z) => { yield + z }; }")).to.eql({
+        assert.match<Program>(parseScript("function *g() { (z) => { yield + z }; }"), {
             type: "Program",
             body: [
                 {
@@ -628,7 +625,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse ternary yield", () => {
-        expect(parseScript("function* g(){ x ? yield : y }")).to.eql({
+        assert.match<Program>(parseScript("function* g(){ x ? yield : y }"), {
             type: "Program",
             body: [
                 {
@@ -672,7 +669,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield arg array", () => {
-        expect(parseScript("function *g() { yield [x] }")).to.eql({
+        assert.match<Program>(parseScript("function *g() { yield [x] }"), {
             type: "Program",
             body: [
                 {
@@ -713,7 +710,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield arg bitnot", () => {
-        expect(parseScript("function *g() { yield ~x }")).to.eql({
+        assert.match<Program>(parseScript("function *g() { yield ~x }"), {
             type: "Program",
             body: [
                 {
@@ -754,7 +751,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield arg delete", () => {
-        expect(parseScript("function *g() { yield delete x }")).to.eql({
+        assert.match<Program>(parseScript("function *g() { yield delete x }"), {
             type: "Program",
             body: [
                 {
@@ -795,7 +792,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield arg let", () => {
-        expect(parseScript("function *g() { yield let }")).to.eql({
+        assert.match<Program>(parseScript("function *g() { yield let }"), {
             type: "Program",
             body: [
                 {
@@ -831,7 +828,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield arg minus", () => {
-        expect(parseScript("function *g() { yield -x }")).to.eql({
+        assert.match<Program>(parseScript("function *g() { yield -x }"), {
             type: "Program",
             body: [
                 {
@@ -872,7 +869,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield arg not", () => {
-        expect(parseScript("function *g() { yield !x }")).to.eql({
+        assert.match<Program>(parseScript("function *g() { yield !x }"), {
             type: "Program",
             body: [
                 {
@@ -913,7 +910,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield arg this", () => {
-        expect(parseScript("function *g() { yield this }")).to.eql({
+        assert.match<Program>(parseScript("function *g() { yield this }"), {
             type: "Program",
             body: [
                 {
@@ -948,7 +945,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield arg void", () => {
-        expect(parseScript("function *g() { yield void x }")).to.eql({
+        assert.match<Program>(parseScript("function *g() { yield void x }"), {
             type: "Program",
             body: [
                 {
@@ -989,7 +986,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield function declaration", () => {
-        expect(parseScript("function yield(){}")).to.eql({
+        assert.match<Program>(parseScript("function yield(){}"), {
             type: "Program",
             body: [
                 {
@@ -1013,7 +1010,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield expression precedence", () => {
-        expect(parseScript("function *g() { yield a=b, yield* c=d, e }")).to.eql({
+        assert.match<Program>(parseScript("function *g() { yield a=b, yield* c=d, e }"), {
             type: "Program",
             body: [
                 {
@@ -1082,7 +1079,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield generator arrow default", () => {
-        expect(parseScript("function *g() { (x = yield) => {} }")).to.eql({
+        assert.match<Program>(parseScript("function *g() { (x = yield) => {} }"), {
             type: "Program",
             body: [
                 {
@@ -1134,7 +1131,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield generator function expression", () => {
-        expect(parseScript("function *g(){ var y = function yield(){}; }")).to.eql({
+        assert.match<Program>(parseScript("function *g(){ var y = function yield(){}; }"), {
             type: "Program",
             body: [
                 {
@@ -1187,7 +1184,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield lexical declaration", () => {
-        expect(parseScript("let yield = 42;")).to.eql({
+        assert.match<Program>(parseScript("let yield = 42;"), {
             type: "Program",
             body: [
                 {
@@ -1213,7 +1210,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield arg not", () => {
-        expect(parseScript("function *g() { yield yield }")).to.eql({
+        assert.match<Program>(parseScript("function *g() { yield yield }"), {
             type: "Program",
             body: [
                 {
@@ -1250,7 +1247,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield variable expression", () => {
-        expect(parseScript("var yield;")).to.eql({
+        assert.match<Program>(parseScript("var yield;"), {
             type: "Program",
             body: [
                 {
@@ -1273,7 +1270,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield rest parameter", () => {
-        expect(parseScript("function f(...yield) {}")).to.eql({
+        assert.match<Program>(parseScript("function f(...yield) {}"), {
             type: "Program",
             body: [
                 {
@@ -1306,18 +1303,17 @@ describe.skip("ES2015 - `yield`", () => {
 
     it("should throw if generator parameters contain yield expression", () => {
         /* tslint:disable max-line-length */
-        expect(parseScript("\"use strict\"; function *g(){ var y = function yield(){}; }")).to.eql({});
+        assert.match(parseScript("\"use strict\"; function *g(){ var y = function yield(){}; }"), {});
         /* tslint:enable max-line-length */
     });
 
     it("should throw if generator parameters contain yield expression", () => {
         /* tslint:disable max-line-length */
-        expect(parseScript("\"use strict\"; function *g() { var z = function(yield) {} }")).to.eql({});
+        assert.match(parseScript("\"use strict\"; function *g() { var z = function(yield) {} }"), {});
         /* tslint:enable max-line-length */
     });
 
     it("should throw if generator parameters contain yield expression", () => {
-        expect(() => { parseScript("function *g(x = yield){}"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseScript("function *g(x = yield){}"); });
     });
-
 });

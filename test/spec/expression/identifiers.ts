@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Identifiers", () => {
-
     it("should parse \"x", () => {
-        expect(parseScript("x")).to.eql({
+        assert.match<Program>(parseScript("x"), {
             type: "Program",
             body: [
                 {
@@ -20,7 +20,7 @@ describe.skip("Expressions - Identifiers", () => {
     });
 
     it("should parse \"x;\"", () => {
-        expect(parseScript("x;")).to.eql({
+        assert.match<Program>(parseScript("x;"), {
             type: "Program",
             body: [
                 {
@@ -36,7 +36,7 @@ describe.skip("Expressions - Identifiers", () => {
     });
 
     it("should parse \"await\"", () => {
-        expect(parseScript("await")).to.eql({
+        assert.match<Program>(parseScript("await"), {
             type: "Program",
             body: [
                 {
@@ -52,7 +52,7 @@ describe.skip("Expressions - Identifiers", () => {
     });
 
     it("should parse \"let\"", () => {
-        expect(parseScript("let")).to.eql({
+        assert.match<Program>(parseScript("let"), {
             type: "Program",
             body: [
                 {
@@ -68,7 +68,7 @@ describe.skip("Expressions - Identifiers", () => {
     });
 
     it("should parse \"let()\"", () => {
-        expect(parseScript("let()")).to.eql({
+        assert.match<Program>(parseScript("let()"), {
             type: "Program",
             body: [
                 {
@@ -88,7 +88,7 @@ describe.skip("Expressions - Identifiers", () => {
     });
 
     it("should parse \"(let[let])\"", () => {
-        expect(parseScript("(let[let])")).to.eql({
+        assert.match<Program>(parseScript("(let[let])"), {
             type: "Program",
             body: [
                 {
@@ -112,7 +112,7 @@ describe.skip("Expressions - Identifiers", () => {
     });
 
     it("should parse \"let.let\"", () => {
-        expect(parseScript("let.let")).to.eql({
+        assert.match<Program>(parseScript("let.let"), {
             type: "Program",
             body: [
                 {
@@ -136,7 +136,7 @@ describe.skip("Expressions - Identifiers", () => {
     });
 
     it("should parse \"for(let;;);\"", () => {
-        expect(parseScript("日本語")).to.eql({
+        assert.match<Program>(parseScript("日本語"), {
             type: "Program",
             body: [
                 {
@@ -152,7 +152,7 @@ describe.skip("Expressions - Identifiers", () => {
     });
 
     it("should parse \"\uD800\uDC00\"", () => {
-        expect(parseScript("T\u203F")).to.eql({
+        assert.match<Program>(parseScript("T\u203F"), {
             type: "Program",
             body: [
                 {
@@ -168,7 +168,7 @@ describe.skip("Expressions - Identifiers", () => {
     });
 
     it("should parse \"T\u200C\"", () => {
-        expect(parseScript("T\u200C")).to.eql({
+        assert.match<Program>(parseScript("T\u200C"), {
             type: "Program",
             body: [
                 {
@@ -184,7 +184,7 @@ describe.skip("Expressions - Identifiers", () => {
     });
 
     it("should parse \"T\u200D\"", () => {
-        expect(parseScript("T\u200D")).to.eql({
+        assert.match<Program>(parseScript("T\u200D"), {
             type: "Program",
             body: [
                 {
@@ -200,7 +200,7 @@ describe.skip("Expressions - Identifiers", () => {
     });
 
     it("should parse \"\u2163\u2161\u200A\"", () => {
-        expect(parseScript("\u2163\u2161\u200A")).to.eql({
+        assert.match<Program>(parseScript("\u2163\u2161\u200A"), {
             body: [
                 {
                     expression: {

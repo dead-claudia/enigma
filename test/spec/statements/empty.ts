@@ -1,16 +1,12 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import * as assert from "clean-assert";
 
 describe.skip("Statements - Empty", () => {
     it("should parse \";\"", () => {
-        expect(parseScript(";")).to.eql({
+        assert.match(parseScript(";"), {
             type: "Program",
-            body: [
-                {
-                    type: "EmptyStatement",
-                },
-            ],
             sourceType: "script",
+            body: [{type: "EmptyStatement"}],
         });
     });
 });

@@ -1,9 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - `new.target`", () => {
     it("should parse \"function f() { new.target; }\"", () => {
-        expect(parseScript("function f() { new.target; }")).to.eql({
+        assert.match<Program>(parseScript("function f() { new.target; }"), {
             type: "Program",
             body: [
                 {
@@ -42,7 +43,7 @@ describe.skip("Expressions - `new.target`", () => {
     });
 
     it("should parse \"(function f(a = new.target){})\"", () => {
-        expect(parseScript("(function f(a = new.target){})")).to.eql({
+        assert.match<Program>(parseScript("(function f(a = new.target){})"), {
             body: [
                 {
                     expression: {
@@ -88,7 +89,7 @@ describe.skip("Expressions - `new.target`", () => {
     });
 
     it("should parse \"function f() { new new.target; }\"", () => {
-        expect(parseScript("function f() { new new.target; }")).to.eql({
+        assert.match<Program>(parseScript("function f() { new new.target; }"), {
             type: "Program",
             body: [
                 {
@@ -131,7 +132,7 @@ describe.skip("Expressions - `new.target`", () => {
     });
 
     it("should parse \"function f() { new.target(); }\"", () => {
-        expect(parseScript("function f() { new.target(); }")).to.eql({
+        assert.match<Program>(parseScript("function f() { new.target(); }"), {
             type: "Program",
             body: [
                 {
@@ -174,7 +175,7 @@ describe.skip("Expressions - `new.target`", () => {
     });
 
     it("should parse \"function f() { new[\"target\"]; }\"", () => {
-        expect(parseScript("function f() { new[\"target\"]; }")).to.eql({
+        assert.match<Program>(parseScript("function f() { new[\"target\"]; }"), {
             type: "Program",
             body: [
                 {
@@ -215,12 +216,14 @@ describe.skip("Expressions - `new.target`", () => {
     });
 
     it("should not parse \"function f() { new.anythingElse; }\"", () => {
-        expect(() => { parseScript("function f() { new.anythingElse; }"); })
-        .to.throw("Invalid Meta property");
+        assert.throws(SyntaxError, () => {
+            parseScript("function f() { new.anythingElse; }");
+        });
     });
 
     it("should not parse \"function f() { new..target; }\"", () => {
-        expect(() => { parseScript("function f() { new..target; }"); })
-        .to.throw("Invalid Meta property");
+        assert.throws(SyntaxError, () => {
+            parseScript("function f() { new..target; }");
+        });
     });
 });

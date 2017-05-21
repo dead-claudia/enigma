@@ -1,49 +1,53 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2018 - Async Generators", () => {
-
     it("should throw on async \"for await (;false;);\"", () => {
-        expect(() => { parseScript(`async function f() {
-  for await (;false;);
+        assert.throws(SyntaxError, () => {
+            parseScript(`async function f() {
+    for await (;false;);
 }
-`, { next: true }); }).to.throw();
+`, { next: true });
+        });
     });
 
     it("should throw on async \"for await (let i = 0;false;);\"", () => {
-        expect(() => { parseScript(`async function f() {
-  for await (let i = 0;false;);
-}`, { next: true }); }).to.throw();
+        assert.throws(SyntaxError, () => {
+            parseScript(`async function f() {
+    for await (let i = 0;false;);
+}`, { next: true });
+        });
     });
 
     it("should throw on async \"for await (x = 0;false;);\"", () => {
-        expect(() => { parseScript(`async function f() {
-  for await (x = 0;false;);
-}`, { next: true }); }).to.throw();
+        assert.throws(SyntaxError, () => {
+            parseScript(`async function f() {
+    for await (x = 0;false;);
+}`, { next: true });
+        });
     });
 
-// should parse
-
     it("should parse advance", () => {
-        expect(parseScript(`const query = {
+        assert.match(parseScript(`const query = {
     async *queryAll(ids) {
         for (const id of ids) {
             yield await this.query(id);
         }
     }
-};`, { next: true })).to.eql({});
+};`, { next: true }), {});
     });
 
     it("should parse async iterator in class instance method\"", () => {
-        expect(parseScript(`class A {
-     async *a(){}
-     }`, { next: true })).to.eql({});
+        assert.match(parseScript(`class A {
+    async *a(){}
+}`, { next: true }), {});
     });
 
     it("should parse \"async function *a(b, c) {}\"", () => {
-        expect(parseScript(`async function *f() {
-  for await (let x of y);
-}`, { next: true })).to.eql({
+        assert.match<Program>(parseScript(`async function *f() {
+    for await (let x of y);
+}`, { next: true }), {
             body: [
                 {
                     async: true,
@@ -93,10 +97,10 @@ describe.skip("ES2018 - Async Generators", () => {
     });
 
     it("should parse \"async function *a(b, c) {}\"", () => {
-        expect(parseScript(`function* f() {
-     yield 1;
-     yield* [2, 3];
-     }`, { next: true })).to.eql(
+        assert.match<Program>(parseScript(`function* f() {
+    yield 1;
+    yield* [2, 3];
+}`, { next: true }),
             {
                 body: [
                     {
@@ -169,7 +173,7 @@ describe.skip("ES2018 - Async Generators", () => {
     });
 
     it("should parse \"async function *a(b, c) {}\"", () => {
-        expect(parseScript("async function *a(b, c) {}", { next: true })).to.eql({
+        assert.match<Program>(parseScript("async function *a(b, c) {}", { next: true }), {
             body: [
                 {
                     async: true,
@@ -200,5 +204,4 @@ describe.skip("ES2018 - Async Generators", () => {
             type: "Program",
         });
     });
-
 });

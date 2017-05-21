@@ -1,87 +1,89 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Complex", () => {
-
     it("should parse a || b && c | d ^ e & f == g < h >>> i + j * k", () => {
-        expect(parseScript("a || b && c | d ^ e & f == g < h >>> i + j * k")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ExpressionStatement",
-            expression: {
-                type: "LogicalExpression",
-                operator: "||",
-                left: {
-                    type: "Identifier",
-                    name: "a",
-                },
-                right: {
-                    type: "LogicalExpression",
-                    operator: "&&",
-                    left: {
-                        type: "Identifier",
-                        name: "b",
-                    },
-                    right: {
-                        type: "BinaryExpression",
-                        operator: "|",
+        assert.match<Program>(parseScript("a || b && c | d ^ e & f == g < h >>> i + j * k"), {
+            type: "Program",
+            body: [
+                {
+                    type: "ExpressionStatement",
+                    expression: {
+                        type: "LogicalExpression",
+                        operator: "||",
                         left: {
                             type: "Identifier",
-                            name: "c",
+                            name: "a",
                         },
                         right: {
-                            type: "BinaryExpression",
-                            operator: "^",
+                            type: "LogicalExpression",
+                            operator: "&&",
                             left: {
                                 type: "Identifier",
-                                name: "d",
+                                name: "b",
                             },
                             right: {
                                 type: "BinaryExpression",
-                                operator: "&",
+                                operator: "|",
                                 left: {
                                     type: "Identifier",
-                                    name: "e",
+                                    name: "c",
                                 },
                                 right: {
                                     type: "BinaryExpression",
-                                    operator: "==",
+                                    operator: "^",
                                     left: {
                                         type: "Identifier",
-                                        name: "f",
+                                        name: "d",
                                     },
                                     right: {
                                         type: "BinaryExpression",
-                                        operator: "<",
+                                        operator: "&",
                                         left: {
                                             type: "Identifier",
-                                            name: "g",
+                                            name: "e",
                                         },
                                         right: {
                                             type: "BinaryExpression",
-                                            operator: ">>>",
+                                            operator: "==",
                                             left: {
                                                 type: "Identifier",
-                                                name: "h",
+                                                name: "f",
                                             },
                                             right: {
                                                 type: "BinaryExpression",
-                                                operator: "+",
+                                                operator: "<",
                                                 left: {
                                                     type: "Identifier",
-                                                    name: "i",
+                                                    name: "g",
                                                 },
                                                 right: {
                                                     type: "BinaryExpression",
-                                                    operator: "*",
+                                                    operator: ">>>",
                                                     left: {
                                                         type: "Identifier",
-                                                        name: "j",
+                                                        name: "h",
                                                     },
                                                     right: {
-                                                        type: "Identifier",
-                                                        name: "k",
+                                                        type: "BinaryExpression",
+                                                        operator: "+",
+                                                        left: {
+                                                            type: "Identifier",
+                                                            name: "i",
+                                                        },
+                                                        right: {
+                                                            type: "BinaryExpression",
+                                                            operator: "*",
+                                                            left: {
+                                                                type: "Identifier",
+                                                                name: "j",
+                                                            },
+                                                            right: {
+                                                                type: "Identifier",
+                                                                name: "k",
+                                                            },
+                                                        },
                                                     },
                                                 },
                                             },
@@ -92,58 +94,55 @@ describe.skip("Expressions - Complex", () => {
                         },
                     },
                 },
-            },
-        },
-    ],
-    sourceType: "script",
-});
+            ],
+            sourceType: "script",
+        });
     });
     it("should parse a + (b < (c * d)) + e", () => {
-        expect(parseScript("a + (b < (c * d)) + e")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ExpressionStatement",
-            expression: {
-                type: "BinaryExpression",
-                operator: "+",
-                left: {
-                    type: "BinaryExpression",
-                    operator: "+",
-                    left: {
-                        type: "Identifier",
-                        name: "a",
-                    },
-                    right: {
+        assert.match<Program>(parseScript("a + (b < (c * d)) + e"), {
+            type: "Program",
+            body: [
+                {
+                    type: "ExpressionStatement",
+                    expression: {
                         type: "BinaryExpression",
-                        operator: "<",
+                        operator: "+",
                         left: {
-                            type: "Identifier",
-                            name: "b",
-                        },
-                        right: {
                             type: "BinaryExpression",
-                            operator: "*",
+                            operator: "+",
                             left: {
                                 type: "Identifier",
-                                name: "c",
+                                name: "a",
                             },
                             right: {
-                                type: "Identifier",
-                                name: "d",
+                                type: "BinaryExpression",
+                                operator: "<",
+                                left: {
+                                    type: "Identifier",
+                                    name: "b",
+                                },
+                                right: {
+                                    type: "BinaryExpression",
+                                    operator: "*",
+                                    left: {
+                                        type: "Identifier",
+                                        name: "c",
+                                    },
+                                    right: {
+                                        type: "Identifier",
+                                        name: "d",
+                                    },
+                                },
                             },
+                        },
+                        right: {
+                            type: "Identifier",
+                            name: "e",
                         },
                     },
                 },
-                right: {
-                    type: "Identifier",
-                    name: "e",
-                },
-            },
-        },
-    ],
-    sourceType: "script",
-});
+            ],
+            sourceType: "script",
+        });
     });
-
 });

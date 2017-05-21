@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Static Members", () => {
-
     it("should parse \"a.if\"", () => {
-        expect(parseScript("a.if")).to.eql({
+        assert.match<Program>(parseScript("a.if"), {
             type: "Program",
             body: [
                 {
@@ -28,7 +28,7 @@ describe.skip("Expressions - Static Members", () => {
     });
 
     it("should parse \"a.null\"", () => {
-        expect(parseScript("a.null")).to.eql({
+        assert.match<Program>(parseScript("a.null"), {
             type: "Program",
             body: [
                 {
@@ -52,7 +52,7 @@ describe.skip("Expressions - Static Members", () => {
     });
 
     it("should parse \"a.true\"", () => {
-        expect(parseScript("a.true")).to.eql({
+        assert.match<Program>(parseScript("a.true"), {
             type: "Program",
             body: [
                 {
@@ -76,7 +76,7 @@ describe.skip("Expressions - Static Members", () => {
     });
 
     it("should parse \"a.false\"", () => {
-        expect(parseScript("a.false")).to.eql({
+        assert.match<Program>(parseScript("a.false"), {
             type: "Program",
             body: [
                 {
@@ -100,7 +100,7 @@ describe.skip("Expressions - Static Members", () => {
     });
 
     it("should parse \"a.$._.B0\"", () => {
-        expect(parseScript("a.$._.B0")).to.eql({
+        assert.match<Program>(parseScript("a.$._.B0"), {
             type: "Program",
             body: [
                 {
@@ -140,7 +140,7 @@ describe.skip("Expressions - Static Members", () => {
     });
 
     it("should parse \"a.b.c\"", () => {
-        expect(parseScript("a.b.c")).to.eql({
+        assert.match<Program>(parseScript("a.b.c"), {
             type: "Program",
             body: [
                 {
@@ -172,7 +172,7 @@ describe.skip("Expressions - Static Members", () => {
     });
 
     it("should parse \"a.b\"", () => {
-        expect(parseScript("a.b")).to.eql({
+        assert.match<Program>(parseScript("a.b"), {
             type: "Program",
             body: [
                 {

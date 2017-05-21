@@ -1,10 +1,11 @@
-import { parseScript, parseModule } from "../../../src";
-import {expect} from "chai";
+import {parseScript, parseModule} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2015 - Spread elements", () => {
 
     it("should call spread first", () => {
-        expect(parseScript("f(...x, y, z);")).to.eql({
+        assert.match<Program>(parseScript("f(...x, y, z);"), {
             type: "Program",
             body: [
                 {
@@ -40,7 +41,7 @@ describe.skip("ES2015 - Spread elements", () => {
     });
 
     it("should call multi spread", () => {
-        expect(parseScript("f(...x, ...y, ...z);")).to.eql({
+        assert.match<Program>(parseScript("f(...x, ...y, ...z);"), {
             type: "Program",
             body: [
                 {
@@ -82,7 +83,7 @@ describe.skip("ES2015 - Spread elements", () => {
     });
 
     it("should call spread default", () => {
-        expect(parseScript("f(g, ...h = i);")).to.eql({
+        assert.match<Program>(parseScript("f(g, ...h = i);"), {
             type: "Program",
             body: [
                 {
@@ -122,7 +123,7 @@ describe.skip("ES2015 - Spread elements", () => {
     });
 
     it("should call spread", () => {
-        expect(parseScript("f(...g);")).to.eql({
+        assert.match<Program>(parseScript("f(...g);"), {
             type: "Program",
             body: [
                 {
@@ -150,7 +151,7 @@ describe.skip("ES2015 - Spread elements", () => {
     });
 
     it("should handle new spread default", () => {
-        expect(parseScript("new f(g, ...h = i);")).to.eql({
+        assert.match<Program>(parseScript("new f(g, ...h = i);"), {
             type: "Program",
             body: [
                 {
@@ -190,7 +191,7 @@ describe.skip("ES2015 - Spread elements", () => {
     });
 
     it("should handle new spread first", () => {
-        expect(parseScript("new f(...x, y, z);")).to.eql({
+        assert.match<Program>(parseScript("new f(...x, y, z);"), {
             type: "Program",
             body: [
                 {
@@ -226,7 +227,7 @@ describe.skip("ES2015 - Spread elements", () => {
     });
 
     it("should handle new spread number", () => {
-        expect(parseScript("new f(....5);")).to.eql({
+        assert.match<Program>(parseScript("new f(....5);"), {
             type: "Program",
             body: [
                 {
@@ -254,7 +255,7 @@ describe.skip("ES2015 - Spread elements", () => {
     });
 
     it("should handle call spread", () => {
-        expect(parseScript("f(...g);")).to.eql({
+        assert.match<Program>(parseScript("f(...g);"), {
             type: "Program",
             body: [
                 {
@@ -282,7 +283,7 @@ describe.skip("ES2015 - Spread elements", () => {
     });
 
     it("should handle new multi spread", () => {
-        expect(parseScript("new f(...x, ...y, ...z);")).to.eql({
+        assert.match<Program>(parseScript("new f(...x, ...y, ...z);"), {
             type: "Program",
             body: [
                 {

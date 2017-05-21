@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Postfix", () => {
-
     it("should parse \"a++\"", () => {
-        expect(parseScript("a++")).to.eql({
+        assert.match<Program>(parseScript("a++"), {
             type: "Program",
             body: [
                 {
@@ -25,7 +25,7 @@ describe.skip("Expressions - Postfix", () => {
     });
 
     it("should parse \"x--\"", () => {
-        expect(parseScript("x--")).to.eql({
+        assert.match<Program>(parseScript("x--"), {
             type: "Program",
             body: [
                 {
@@ -46,7 +46,7 @@ describe.skip("Expressions - Postfix", () => {
     });
 
     it("should parse \"eval++\"", () => {
-        expect(parseScript("eval++")).to.eql({
+        assert.match<Program>(parseScript("eval++"), {
             type: "Program",
             body: [
                 {
@@ -67,7 +67,7 @@ describe.skip("Expressions - Postfix", () => {
     });
 
     it("should parse \"eval--\"", () => {
-        expect(parseScript("eval--")).to.eql({
+        assert.match<Program>(parseScript("eval--"), {
             type: "Program",
             body: [
                 {
@@ -88,7 +88,7 @@ describe.skip("Expressions - Postfix", () => {
     });
 
     it("should parse \"arguments++\"", () => {
-        expect(parseScript("arguments++")).to.eql({
+        assert.match<Program>(parseScript("arguments++"), {
             type: "Program",
             body: [
                 {
@@ -109,7 +109,7 @@ describe.skip("Expressions - Postfix", () => {
     });
 
     it("should parse \"arguments--\"", () => {
-        expect(parseScript("arguments--")).to.eql({
+        assert.match<Program>(parseScript("arguments--"), {
             type: "Program",
             body: [
                 {

@@ -1,11 +1,10 @@
-import { parseScript } from "../../../src";
-
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Unary", () => {
-
     it("should parse ++x", () => {
-        expect(parseScript("++x")).to.eql({
+        assert.match<Program>(parseScript("++x"), {
             type: "Program",
             body: [
                 {
@@ -26,7 +25,7 @@ describe.skip("Expressions - Unary", () => {
     });
 
     it("should parse -x", () => {
-        expect(parseScript("-x")).to.eql({
+        assert.match<Program>(parseScript("-x"), {
             type: "Program",
             body: [
                 {
@@ -47,7 +46,7 @@ describe.skip("Expressions - Unary", () => {
     });
 
     it("should parse +x", () => {
-        expect(parseScript("+x")).to.eql({
+        assert.match<Program>(parseScript("+x"), {
             type: "Program",
             body: [
                 {
@@ -68,7 +67,7 @@ describe.skip("Expressions - Unary", () => {
     });
 
     it("should parse ~x", () => {
-        expect(parseScript("~x")).to.eql({
+        assert.match<Program>(parseScript("~x"), {
             type: "Program",
             body: [
                 {
@@ -89,7 +88,7 @@ describe.skip("Expressions - Unary", () => {
     });
 
     it("should parse !x", () => {
-        expect(parseScript("!x")).to.eql({
+        assert.match<Program>(parseScript("!x"), {
             type: "Program",
             body: [
                 {
@@ -110,7 +109,7 @@ describe.skip("Expressions - Unary", () => {
     });
 
     it("should parse \"void x\"", () => {
-        expect(parseScript("void x")).to.eql({
+        assert.match<Program>(parseScript("void x"), {
             type: "Program",
             body: [
                 {
@@ -131,7 +130,7 @@ describe.skip("Expressions - Unary", () => {
     });
 
     it("should parse \"delete x\"", () => {
-        expect(parseScript("delete x")).to.eql({
+        assert.match<Program>(parseScript("delete x"), {
             type: "Program",
             body: [
                 {
@@ -152,7 +151,7 @@ describe.skip("Expressions - Unary", () => {
     });
 
     it("should parse typeof x", () => {
-        expect(parseScript("typeof x")).to.eql({
+        assert.match<Program>(parseScript("typeof x"), {
             type: "Program",
             body: [
                 {
@@ -173,7 +172,7 @@ describe.skip("Expressions - Unary", () => {
     });
 
     it("should parse \"delete a\"", () => {
-        expect(parseScript("delete a")).to.eql({
+        assert.match<Program>(parseScript("delete a"), {
             type: "Program",
             body: [
                 {
@@ -194,7 +193,7 @@ describe.skip("Expressions - Unary", () => {
     });
 
     it("should parse \"+a\"", () => {
-        expect(parseScript("+a")).to.eql({
+        assert.match<Program>(parseScript("+a"), {
             type: "Program",
             body: [
                 {
@@ -215,7 +214,7 @@ describe.skip("Expressions - Unary", () => {
     });
 
     it("should parse \"~a\"", () => {
-        expect(parseScript("~a")).to.eql({
+        assert.match<Program>(parseScript("~a"), {
             type: "Program",
             body: [
                 {
@@ -236,7 +235,7 @@ describe.skip("Expressions - Unary", () => {
     });
 
     it("should parse \"-a\"", () => {
-        expect(parseScript("-a")).to.eql({
+        assert.match<Program>(parseScript("-a"), {
             type: "Program",
             body: [
                 {

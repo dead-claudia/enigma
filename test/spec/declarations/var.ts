@@ -1,59 +1,60 @@
 import {parseScript, parseModule} from "../../../src";
-import {expect} from "chai";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Declarations - `var`", () => {
     it("should throw on invalid \"var catch = 123;\"", () => {
-        expect(() => parseModule(`var catch = 123;`)).to.throw();
+        assert.throws(SyntaxError, () => parseModule(`var catch = 123;`));
     });
 
     it("should throw on invalid \"var break = 123;;\"", () => {
-        expect(() => parseModule(`var break = 123;;`)).to.throw();
+        assert.throws(SyntaxError, () => parseModule(`var break = 123;;`));
     });
 
     it("should throw on invalid \"var class = 123;\"", () => {
-        expect(() => parseModule(`var class = 123;`)).to.throw();
+        assert.throws(SyntaxError, () => parseModule(`var class = 123;`));
     });
 
     it("should throw on invalid \"var class = 123;\"", () => {
-        expect(() => parseModule(`var delete = 123;`)).to.throw();
+        assert.throws(SyntaxError, () => parseModule(`var delete = 123;`));
     });
 
     it("should throw on invalid \"var class = 123;\"", () => {
-        expect(() => parseModule(`var do = 123;`)).to.throw();
+        assert.throws(SyntaxError, () => parseModule(`var do = 123;`));
     });
 
     it("should throw on invalid \"var class = 123;\"", () => {
-        expect(() => parseScript(`var delete = 123;`)).to.throw();
+        assert.throws(SyntaxError, () => parseScript(`var delete = 123;`));
     });
 
     it("should throw on invalid \"var class = 123;\"", () => {
-        expect(() => parseScript(`var do = 123;`)).to.throw();
+        assert.throws(SyntaxError, () => parseScript(`var do = 123;`));
     });
 
     it("should throw on invalid \"var class = 123;\"", () => {
-        expect(() => parseScript(`var else  = 123;`)).to.throw();
+        assert.throws(SyntaxError, () => parseScript(`var else  = 123;`));
     });
 
     it("should throw on invalid \"var typeof = 123;\"", () => {
-        expect(() => parseScript(`var typeof = 123;`)).to.throw();
+        assert.throws(SyntaxError, () => parseScript(`var typeof = 123;`));
     });
 
     it("should throw on invalid \"var throw = 123;\"", () => {
-        expect(() => parseScript(`var throw = 123;`)).to.throw();
+        assert.throws(SyntaxError, () => parseScript(`var throw = 123;`));
     });
     it("should throw on invalid \"var class = 123;\"", () => {
-        expect(() => parseModule(`var import = 123;`)).to.throw();
+        assert.throws(SyntaxError, () => parseModule(`var import = 123;`));
     });
 
     it("should throw on invalid \"var catch = 123;\"", () => {
-        expect(() => parseModule(`var catch = 123;`)).to.throw();
+        assert.throws(SyntaxError, () => parseModule(`var catch = 123;`));
     });
 
     it("should throw on invalid \"var let\"", () => {
-        expect(() => parseModule(`var let`)).to.throw();
+        assert.throws(SyntaxError, () => parseModule(`var let`));
     });
     it("should parse \"var static;\"", () => {
-        expect(parseScript(`var static;`)).to.eql({
+        assert.match<Program>(parseScript(`var static;`), {
             type: "Program",
             body: [
                 {
@@ -76,7 +77,7 @@ describe.skip("Declarations - `var`", () => {
     });
 
     it("should parse \"var let\"", () => {
-        expect(parseScript(`var let`)).to.eql({
+        assert.match<Program>(parseScript(`var let`), {
             type: "Program",
             body: [
                 {

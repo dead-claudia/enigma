@@ -1,9 +1,10 @@
 import {parseScript, parseModule} from "../../src";
-import {expect} from "chai";
+import {Program} from "../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Comments", () => {
     it("should parse \"a/*\n*/b\"", () => {
-        expect(parseScript("\"a/*\n*/b\"")).to.eql({
+        assert.match<Program>(parseScript("\"a/*\n*/b\""), {
             type: "Program",
             body: [],
             sourceType: "script",
@@ -11,7 +12,7 @@ describe.skip("Comments", () => {
     });
 
     it("should parse \"/* block comment */ 42\"", () => {
-        expect(parseScript(" /**\n\r\r\n**/")).to.eql({
+        assert.match<Program>(parseScript(" /**\n\r\r\n**/"), {
             type: "Program",
             body: [],
             sourceType: "script",
@@ -19,7 +20,7 @@ describe.skip("Comments", () => {
     });
 
     it("should parse \" \t /* block comment */ \"", () => {
-        expect(parseScript(" \t /* block comment */ ")).to.eql({
+        assert.match<Program>(parseScript(" \t /* block comment */ "), {
             type: "Program",
             body: [],
             sourceType: "script",
@@ -27,7 +28,7 @@ describe.skip("Comments", () => {
     });
 
     it("should parse \"/* block comment */ 42\"", () => {
-        expect(parseScript(`/* block comment */ 42`)).to.eql({
+        assert.match<Program>(parseScript(`/* block comment */ 42`), {
             type: "Program",
             body: [
                 {
@@ -43,7 +44,7 @@ describe.skip("Comments", () => {
     });
 
     it("should parse \"/* block comment */ 42\"", () => {
-        expect(parseScript(`/* block comment */ 42`)).to.eql({
+        assert.match<Program>(parseScript(`/* block comment */ 42`), {
             type: "Program",
             body: [
                 {
@@ -59,7 +60,7 @@ describe.skip("Comments", () => {
     });
 
     it("should parse \"42 /* block comment 1 */ /* block comment 2 */\"", () => {
-        expect(parseScript(`42 /* block comment 1 */ /* block comment 2 */`)).to.eql({
+        assert.match<Program>(parseScript(`42 /* block comment 1 */ /* block comment 2 */`), {
             type: "Program",
             body: [
                 {
@@ -75,7 +76,7 @@ describe.skip("Comments", () => {
     });
 
     it("should parse \"42 // line comment\"", () => {
-        expect(parseScript(`42 // line comment`)).to.eql({
+        assert.match<Program>(parseScript(`42 // line comment`), {
             type: "Program",
             body: [
                 {
@@ -91,7 +92,7 @@ describe.skip("Comments", () => {
     });
 
     it("should parse \"42 /*the*/ /*answer*/\"", () => {
-        expect(parseScript(`/* multiline\ncomment\nshould\nbe\nignored */ 42`)).to.eql({
+        assert.match<Program>(parseScript(`/* multiline\ncomment\nshould\nbe\nignored */ 42`), {
             type: "Program",
             body: [
                 {
@@ -107,7 +108,7 @@ describe.skip("Comments", () => {
     });
 
     it("should parse \"42 /*the*/ /*answer*/\"", () => {
-        expect(parseScript(`/*a\nb*/ 42`)).to.eql({
+        assert.match<Program>(parseScript(`/*a\nb*/ 42`), {
             type: "Program",
             body: [
                 {
@@ -123,7 +124,7 @@ describe.skip("Comments", () => {
     });
 
     it("should parse \"/*42*/\"", () => {
-        expect(parseScript(`/*42*/`)).to.eql({
+        assert.match<Program>(parseScript(`/*42*/`), {
             type: "Program",
             body: [],
             sourceType: "script",
@@ -131,7 +132,7 @@ describe.skip("Comments", () => {
     });
 
     it("should parse \"/*42*/\"", () => {
-        expect(parseScript(`/*42*/`)).to.eql({
+        assert.match<Program>(parseScript(`/*42*/`), {
             type: "Program",
             body: [],
             sourceType: "script",
@@ -139,7 +140,7 @@ describe.skip("Comments", () => {
     });
 
     it("should parse \"// \"", () => {
-        expect(parseScript(`// `)).to.eql({
+        assert.match<Program>(parseScript(`// `), {
             type: "Program",
             body: [],
             sourceType: "script",
@@ -147,7 +148,7 @@ describe.skip("Comments", () => {
     });
 
     it("should parse \"/**/42\"", () => {
-        expect(parseScript(`/**/42`)).to.eql({
+        assert.match<Program>(parseScript(`/**/42`), {
             type: "Program",
             body: [
                 {
@@ -163,7 +164,7 @@ describe.skip("Comments", () => {
     });
 
     it("should parse \"(a + /* assignment */b ) * c\"", () => {
-        expect(parseScript(`(a + /* assignment */b ) * c`)).to.eql({
+        assert.match<Program>(parseScript(`(a + /* assignment */b ) * c`), {
             type: "Program",
             body: [
                 {

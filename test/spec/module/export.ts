@@ -1,10 +1,10 @@
-import { parseModule } from "../../../src";
-import {expect} from "chai";
+import {parseModule} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Modules - `export`", () => {
-
     it("should parse \"export default function* a(){}\"", () => {
-        expect(parseModule("export default function* a(){}")).to.eql({
+        assert.match<Program>(parseModule("export default function* a(){}"), {
             type: "Program",
             body: [
                 {
@@ -31,7 +31,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export default 0;0\"", () => {
-        expect(parseModule("export default 0;0")).to.eql({
+        assert.match<Program>(parseModule("export default 0;0"), {
             body: [
                 {
                     declaration: {
@@ -54,7 +54,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export function f(){};0\"", () => {
-        expect(parseModule("export function f(){};0")).to.eql({
+        assert.match<Program>(parseModule("export function f(){};0"), {
             type: "Program",
             body: [
                 {
@@ -92,7 +92,7 @@ describe.skip("Modules - `export`", () => {
         });
     });
     it("should parse \"export default [];\"", () => {
-        expect(parseModule("export default [];")).to.eql({
+        assert.match<Program>(parseModule("export default [];"), {
             type: "Program",
             body: [
                 {
@@ -108,7 +108,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export default (1 + 2);\"", () => {
-        expect(parseModule("export default (1 + 2);")).to.eql({
+        assert.match<Program>(parseModule("export default (1 + 2);"), {
             type: "Program",
             body: [
                 {
@@ -132,7 +132,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export default class foo {}\"", () => {
-        expect(parseModule("export default class foo {}")).to.eql({
+        assert.match<Program>(parseModule("export default class foo {}"), {
             type: "Program",
             body: [
                 {
@@ -156,7 +156,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export default 42;\"", () => {
-        expect(parseModule("export default 42;")).to.eql({
+        assert.match<Program>(parseModule("export default 42;"), {
             type: "Program",
             body: [
                 {
@@ -172,7 +172,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export default { foo: 1 };\"", () => {
-        expect(parseModule("export default { foo: 1 };")).to.eql({
+        assert.match<Program>(parseModule("export default { foo: 1 };"), {
             type: "Program",
             body: [
                 {
@@ -204,7 +204,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export default foo;\"", () => {
-        expect(parseModule("export default foo;")).to.eql({
+        assert.match<Program>(parseModule("export default foo;"), {
             type: "Program",
             body: [
                 {
@@ -220,7 +220,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export default async x => x\"", () => {
-        expect(parseModule("export default async x => x")).to.eql({
+        assert.match<Program>(parseModule("export default async x => x"), {
             body: [
                 {
                     declaration: {
@@ -249,7 +249,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export default async function () {}\"", () => {
-        expect(parseModule("export default async function () {}")).to.eql({
+        assert.match<Program>(parseModule("export default async function () {}"), {
             body: [
                 {
                     declaration: {
@@ -273,7 +273,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export * from \"a\"", () => {
-        expect(parseModule("export * from \"a\"")).to.eql({
+        assert.match<Program>(parseModule("export * from \"a\""), {
             type: "Program",
             body: [
                 {
@@ -289,7 +289,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export {} from \"a\"", () => {
-        expect(parseModule("export {with} from \"a\"")).to.eql({
+        assert.match<Program>(parseModule("export {with} from \"a\""), {
             type: "Program",
             body: [
                 {
@@ -319,7 +319,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export {a,} from \"a\"", () => {
-        expect(parseModule("export {a,} from \"a\"")).to.eql({
+        assert.match<Program>(parseModule("export {a,} from \"a\""), {
             type: "Program",
             body: [
                 {
@@ -349,7 +349,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export {a,b} from \"a\"", () => {
-        expect(parseModule("export {a,b} from \"a\"")).to.eql({
+        assert.match<Program>(parseModule("export {a,b} from \"a\""), {
             type: "Program",
             body: [
                 {
@@ -390,7 +390,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export {a as b} from \"a\"", () => {
-        expect(parseModule("export {a as b} from \"a\"")).to.eql({
+        assert.match<Program>(parseModule("export {a as b} from \"a\""), {
             type: "Program",
             body: [
                 {
@@ -420,7 +420,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export {with as a} from \"a\"", () => {
-        expect(parseModule("export {with as a} from \"a\"")).to.eql({
+        assert.match<Program>(parseModule("export {with as a} from \"a\""), {
             type: "Program",
             body: [
                 {
@@ -450,7 +450,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export {as as as} from \"as\"", () => {
-        expect(parseModule("export {as as as} from \"as\"")).to.eql({
+        assert.match<Program>(parseModule("export {as as as} from \"as\""), {
             type: "Program",
             body: [
                 {
@@ -480,7 +480,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export {as as function} from \"as\"", () => {
-        expect(parseModule("export {as as function} from \"as\"")).to.eql({
+        assert.match<Program>(parseModule("export {as as function} from \"as\""), {
             type: "Program",
             body: [
                 {
@@ -510,7 +510,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export {if as var} from \"a\";", () => {
-        expect(parseModule("export {if as var} from \"a\";")).to.eql({
+        assert.match<Program>(parseModule("export {if as var} from \"a\";"), {
             type: "Program",
             body: [
                 {
@@ -540,7 +540,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export {a}\n var a;", () => {
-        expect(parseModule("export {a}\n var a;")).to.eql({
+        assert.match<Program>(parseModule("export {a}\n var a;"), {
             body: [
                 {
                     declaration:  null,
@@ -574,7 +574,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export {a,}\n var a;", () => {
-        expect(parseModule("export {a,}\n var a;")).to.eql({
+        assert.match<Program>(parseModule("export {a,}\n var a;"), {
             body: [
                 {
                     declaration: null,
@@ -608,7 +608,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export var a = 0, b;", () => {
-        expect(parseModule("export var a = 0, b;")).to.eql({
+        assert.match<Program>(parseModule("export var a = 0, b;"), {
             type: "Program",
             body: [
                 {
@@ -647,7 +647,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export const a = 0, b = 0;", () => {
-        expect(parseModule("export const a = 0, b = 0;")).to.eql({
+        assert.match<Program>(parseModule("export const a = 0, b = 0;"), {
             type: "Program",
             body: [
                 {
@@ -689,7 +689,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export let a = 0, b = 0;", () => {
-        expect(parseModule("export let a = 0, b = 0;")).to.eql({
+        assert.match<Program>(parseModule("export let a = 0, b = 0;"), {
             type: "Program",
             body: [
                 {
@@ -731,7 +731,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export let[a] = 0;", () => {
-        expect(parseModule("export let[a] = 0;")).to.eql({
+        assert.match<Program>(parseModule("export let[a] = 0;"), {
             type: "Program",
             body: [
                 {
@@ -767,7 +767,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export class A{} /* no semi */ false", () => {
-        expect(parseModule("export class A{} /* no semi */ false")).to.eql({
+        assert.match<Program>(parseModule("export class A{} /* no semi */ false"), {
             type: "Program",
             body: [
                 {
@@ -800,7 +800,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export function A(){} /* no semi */ false\"", () => {
-        expect(parseModule("export function A(){} /* no semi */ false")).to.eql({
+        assert.match<Program>(parseModule("export function A(){} /* no semi */ false"), {
             type: "Program",
             body: [
                 {
@@ -836,66 +836,69 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export default function a(){} let b; export {b as a};", () => {
-        expect(parseModule("export default function a(){} let b; export {b as a};")).to.eql({
-            type: "Program",
-            body: [
-                {
-                    type: "ExportDefaultDeclaration",
-                    declaration: {
-                        type: "FunctionDeclaration",
-                        id: {
-                            type: "Identifier",
-                            name: "a",
-                        },
-                        params: [],
-                        body: {
-                            type: "BlockStatement",
-                            body: [],
-                        },
-                        async: false,
-                        generator: false,
-                        expression: false,
-                    },
-                },
-                {
-                    type: "VariableDeclaration",
-                    declarations: [
-                        {
-                            type: "VariableDeclarator",
+        assert.match<Program>(
+            parseModule("export default function a(){} let b; export {b as a};"),
+            {
+                type: "Program",
+                body: [
+                    {
+                        type: "ExportDefaultDeclaration",
+                        declaration: {
+                            type: "FunctionDeclaration",
                             id: {
-                                type: "Identifier",
-                                name: "b",
-                            },
-                            init: null,
-                        },
-                    ],
-                    kind: "let",
-                },
-                {
-                    type: "ExportNamedDeclaration",
-                    declaration: null,
-                    specifiers: [
-                        {
-                            type: "ExportSpecifier",
-                            exported: {
                                 type: "Identifier",
                                 name: "a",
                             },
-                            local: {
-                                type: "Identifier",
-                                name: "b",
+                            params: [],
+                            body: {
+                                type: "BlockStatement",
+                                body: [],
                             },
+                            async: false,
+                            generator: false,
+                            expression: false,
                         },
-                    ],
-                    source: null,
-                },
-            ],
-            sourceType: "module",
-        });
+                    },
+                    {
+                        type: "VariableDeclaration",
+                        declarations: [
+                            {
+                                type: "VariableDeclarator",
+                                id: {
+                                    type: "Identifier",
+                                    name: "b",
+                                },
+                                init: null,
+                            },
+                        ],
+                        kind: "let",
+                    },
+                    {
+                        type: "ExportNamedDeclaration",
+                        declaration: null,
+                        specifiers: [
+                            {
+                                type: "ExportSpecifier",
+                                exported: {
+                                    type: "Identifier",
+                                    name: "a",
+                                },
+                                local: {
+                                    type: "Identifier",
+                                    name: "b",
+                                },
+                            },
+                        ],
+                        source: null,
+                    },
+                ],
+                sourceType: "module",
+            },
+        );
     });
 
     it("should parse \"export var bar;", () => {
-        expect(parseModule("export var bar;")).to.eql({
+        assert.match<Program>(parseModule("export var bar;"), {
             type: "Program",
             body: [
                 {
@@ -923,45 +926,45 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export {foo, bar};", () => {
-     expect(parseModule("export {foo, bar};")).to.eql({
-    type: "Program",
-    body: [
-        {
-            type: "ExportNamedDeclaration",
-            declaration: null,
-            specifiers: [
+        assert.match<Program>(parseModule("export {foo, bar};"), {
+            type: "Program",
+            body: [
                 {
-                    type: "ExportSpecifier",
-                    exported: {
-                        type: "Identifier",
-                        name: "foo",
-                    },
-                    local: {
-                        type: "Identifier",
-                        name: "foo",
-                    },
-                },
-                {
-                    type: "ExportSpecifier",
-                    exported: {
-                        type: "Identifier",
-                        name: "bar",
-                    },
-                    local: {
-                        type: "Identifier",
-                        name: "bar",
-                    },
+                    type: "ExportNamedDeclaration",
+                    declaration: null,
+                    specifiers: [
+                        {
+                            type: "ExportSpecifier",
+                            exported: {
+                                type: "Identifier",
+                                name: "foo",
+                            },
+                            local: {
+                                type: "Identifier",
+                                name: "foo",
+                            },
+                        },
+                        {
+                            type: "ExportSpecifier",
+                            exported: {
+                                type: "Identifier",
+                                name: "bar",
+                            },
+                            local: {
+                                type: "Identifier",
+                                name: "bar",
+                            },
+                        },
+                    ],
+                    source: null,
                 },
             ],
-            source: null,
-        },
-    ],
-    sourceType: "module",
-});
-     });
+            sourceType: "module",
+        });
+    });
 
     it("should parse \"export {}\"", () => {
-        expect(parseModule("export {};")).to.eql({
+        assert.match<Program>(parseModule("export {};"), {
             type: "Program",
             body: [
                 {
@@ -976,7 +979,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export {foo as bar};", () => {
-        expect(parseModule("export {foo as bar};")).to.eql({
+        assert.match<Program>(parseModule("export {foo as bar};"), {
             type: "Program",
             body: [
                 {
@@ -1003,7 +1006,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export default (1 + 2);", () => {
-        expect(parseModule("export default (1 + 2);")).to.eql({
+        assert.match<Program>(parseModule("export default (1 + 2);"), {
             type: "Program",
             body: [
                 {
@@ -1027,7 +1030,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export default class foo {}", () => {
-        expect(parseModule("export default class foo {}")).to.eql({
+        assert.match<Program>(parseModule("export default class foo {}"), {
             type: "Program",
             body: [
                 {
@@ -1050,7 +1053,7 @@ describe.skip("Modules - `export`", () => {
         });
     });
     it("should parse \"export const square = async x => x * x", () => {
-        expect(parseModule("export const square = async x => x * x")).to.eql({
+        assert.match<Program>(parseModule("export const square = async x => x * x"), {
             body: [
                 {
                     declaration: {
@@ -1102,7 +1105,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export default async x => x * x", () => {
-        expect(parseModule("export default async x => x * x")).to.eql({
+        assert.match<Program>(parseModule("export default async x => x * x"), {
             body: [
                 {
                     declaration: {
@@ -1139,7 +1142,7 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should parse \"export {foo, bar};", () => {
-        expect(parseModule("export {foo, bar};")).to.eql({
+        assert.match<Program>(parseModule("export {foo, bar};"), {
             type: "Program",
             body: [
                 {
@@ -1177,83 +1180,82 @@ describe.skip("Modules - `export`", () => {
     });
 
     it("should throw on \"export *\"", () => {
-        expect(() => { parseModule("export *"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export *"); });
     });
 
     it("should throw on \"export * +\"", () => {
-        expect(() => { parseModule("export * +"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export * +"); });
     });
 
     it("should throw on \"export default = 42\"", () => {
-        expect(() => { parseModule("export default = 42"); }).to.not.throw();
+        assert.throws(SyntaxError, () => { parseModule("export default = 42"); });
     });
 
     it("should throw on \"export default from \"foo\"\"", () => {
-        expect(() => { parseModule("export default from \"foo\""); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export default from \"foo\""); });
     });
 
     it("should throw on \"export {default}\"", () => {
-        expect(() => { parseModule("export {default}"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export {default}"); });
     });
 
     it("should throw on \"export default function\"", () => {
-        expect(() => { parseModule("export default function"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export default function"); });
     });
 
     it("should throw on \"export default default\"", () => {
-        expect(() => { parseModule("export default default"); }).to.not.throw();
+        assert.throws(SyntaxError, () => { parseModule("export default default"); });
     });
 
     it("should throw on \"export {default}\"", () => {
-        expect(() => { parseModule("export {as b} from a"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export {as b} from a"); });
     });
 
     it("should throw on \"export {a,b} from a\"", () => {
-        expect(() => { parseModule("export {a,b} from a"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export {a,b} from a"); });
     });
 
     it("should throw on \"export {a,,b}\"", () => {
-        expect(() => { parseModule("export {a,,b}"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export {a,,b}"); });
     });
 
     it("should throw on \"export {a,,}\"", () => {
-        expect(() => { parseModule("export {a,,}"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export {a,,}"); });
     });
 
     it("should throw on \"export {,,}\"", () => {
-        expect(() => { parseModule("export {,,}"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export {,,}"); });
     });
 
     it("should throw on \"export;\"", () => {
-        expect(() => { parseModule("export;"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export;"); });
     });
 
     it("should throw on \"export \"", () => {
-        expect(() => { parseModule("export "); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export "); });
     });
 
     it("should throw on \"export\"", () => {
-        expect(() => { parseModule("export"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export"); });
     });
 
     it("should throw on \"while (1) export default 3\"", () => {
-        expect(() => { parseModule("while (1) export default 3"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("while (1) export default 3"); });
     });
 
     it("should throw on \"{export {a};}\"", () => {
-        expect(() => { parseModule("{export {a};}"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("{export {a};}"); });
     });
 
     it("should throw on \"{export default 3;}\"", () => {
-        expect(() => { parseModule("{export default 3;}"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("{export default 3;}"); });
     });
 
     it("should throw on \"export * from \"a\"\"", () => {
-        expect(() => { parseModule("export * from \"a\""); }).to.not.throw();
+        assert.throws(SyntaxError, () => { parseModule("export * from \"a\""); });
     });
 
     it("should throw when the exported name is not an \"IdentifierReference\"", () => {
-        expect(() => { parseModule("export {try as bar};"); }).to.throw();
+        assert.throws(SyntaxError, () => { parseModule("export {try as bar};"); });
     });
-
 });

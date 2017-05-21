@@ -1,10 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2015 - Rest Parameters", () => {
-
     it("should parse function expression\"", () => {
-        expect(parseScript(`f = function(a, ...b) {}`)).to.eql({
+        assert.match<Program>(parseScript(`f = function(a, ...b) {}`), {
             type: "Program",
             body: [
                 {
@@ -48,8 +48,8 @@ describe.skip("ES2015 - Rest Parameters", () => {
     });
 
     it("should parse object method\"", () => {
-        expect(parseScript(`
-o = { f: function(a, ...b) {} }`)).to.eql({
+        assert.match<Program>(parseScript(`
+o = { f: function(a, ...b) {} }`), {
             type: "Program",
             body: [
                 {
@@ -109,7 +109,7 @@ o = { f: function(a, ...b) {} }`)).to.eql({
     });
 
     it("should parse rest paramater object\"", () => {
-        expect(parseScript(`function f(...{a}) {}`)).to.eql({
+        assert.match<Program>(parseScript(`function f(...{a}) {}`), {
             type: "Program",
             body: [
                 {
@@ -157,7 +157,7 @@ o = { f: function(a, ...b) {} }`)).to.eql({
     });
 
     it("should parse arrow rest parameter array\"", () => {
-        expect(parseScript(`(a, ...[b]) => c`)).to.eql({
+        assert.match<Program>(parseScript(`(a, ...[b]) => c`), {
             type: "Program",
             body: [
                 {
@@ -198,7 +198,7 @@ o = { f: function(a, ...b) {} }`)).to.eql({
     });
 
     it("should parse function declaration\"", () => {
-        expect(parseScript(`function f(a, ...b) {}`)).to.eql({
+        assert.match<Program>(parseScript(`function f(a, ...b) {}`), {
             type: "Program",
             body: [
                 {
@@ -234,7 +234,7 @@ o = { f: function(a, ...b) {} }`)).to.eql({
     });
 
     it("should parse rest paramater array\"", () => {
-        expect(parseScript(`function f(...[a]) {}`)).to.eql({
+        assert.match<Program>(parseScript(`function f(...[a]) {}`), {
             type: "Program",
             body: [
                 {
@@ -271,7 +271,7 @@ o = { f: function(a, ...b) {} }`)).to.eql({
     });
 
     it("should parse \"function f(...[a]) {}\"", () => {
-        expect(parseScript(`function f(...[a]) {}`)).to.eql({
+        assert.match<Program>(parseScript(`function f(...[a]) {}`), {
             type: "Program",
             body: [
                 {
@@ -308,7 +308,7 @@ o = { f: function(a, ...b) {} }`)).to.eql({
     });
 
     it("should parse \"x = { method(...test) { } }\"", () => {
-        expect(parseScript(`x = { method(...test) { } }`)).to.eql({
+        assert.match<Program>(parseScript(`x = { method(...test) { } }`), {
             type: "Program",
             body: [
                 {
@@ -364,7 +364,7 @@ o = { f: function(a, ...b) {} }`)).to.eql({
     });
 
     it("should parse \"f = function(a, ...b) {}\"", () => {
-        expect(parseScript(`f = function(a, ...b) {}`)).to.eql({
+        assert.match<Program>(parseScript(`f = function(a, ...b) {}`), {
             type: "Program",
             body: [
                 {
@@ -408,7 +408,7 @@ o = { f: function(a, ...b) {} }`)).to.eql({
     });
 
     it("should parse \"(a, ...{b}) => c\"", () => {
-        expect(parseScript(`(a, ...{b}) => c`)).to.eql({
+        assert.match<Program>(parseScript(`(a, ...{b}) => c`), {
             type: "Program",
             body: [
                 {

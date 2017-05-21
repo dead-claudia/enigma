@@ -1,9 +1,10 @@
-import { parseScript } from "../../../src";
-import {expect} from "chai";
+import {parseScript} from "../../../src";
+import {Program} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("ES2015 - Binary Integer Literals", () => {
     it("should parse \"0b0\"", () => {
-        expect(parseScript(`0b0`)).to.eql({
+        assert.match<Program>(parseScript(`0b0`), {
             type: "Program",
             body: [
                 {
@@ -19,7 +20,7 @@ describe.skip("ES2015 - Binary Integer Literals", () => {
     });
 
     it("should parse \"0b1\"", () => {
-        expect(parseScript(`0b1`)).to.eql({
+        assert.match<Program>(parseScript(`0b1`), {
             type: "Program",
             body: [
                 {
@@ -35,7 +36,7 @@ describe.skip("ES2015 - Binary Integer Literals", () => {
     });
 
     it("should parse \"0b10\"", () => {
-        expect(parseScript(`0b10`)).to.eql({
+        assert.match<Program>(parseScript(`0b10`), {
             type: "Program",
             body: [
                 {
@@ -51,7 +52,7 @@ describe.skip("ES2015 - Binary Integer Literals", () => {
     });
 
     it("should parse \"0B0\"", () => {
-        expect(parseScript(`0B0`)).to.eql({
+        assert.match<Program>(parseScript(`0B0`), {
             type: "Program",
             body: [
                 {
@@ -67,7 +68,7 @@ describe.skip("ES2015 - Binary Integer Literals", () => {
     });
 
     it("should parse \"0B10\"", () => {
-        expect(parseScript(`0B10`)).to.eql({
+        assert.match<Program>(parseScript(`0B10`), {
             type: "Program",
             body: [
                 {

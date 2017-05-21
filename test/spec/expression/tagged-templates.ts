@@ -1,6 +1,6 @@
-import { parseScript } from "../../../src";
-import { expect } from "chai";
-import { Expression } from "../../../src/estree";
+import {parseScript} from "../../../src";
+import {Program, Expression} from "../../../src/estree";
+import * as assert from "clean-assert";
 
 describe.skip("Expressions - Tagged Templates", () => {
     context("identifier tag", () => {
@@ -24,7 +24,7 @@ describe.skip("Expressions - Tagged Templates", () => {
 
 function test(src: string, node: Expression) {
     it("should parse escaped backslash", () => {
-        expect(parseScript("(" + src + " `\\\\\\'`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + " `\\\\\\'`)"), {
             body: [
                 {
                     type: "ExpressionStatement",
@@ -54,7 +54,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `Hello012World`", () => {
-        expect(parseScript(src + "`Hello\\012World`")).to.eql({
+        assert.match<Program>(parseScript(src + "`Hello\\012World`"), {
             type: "Program",
             body: [
                 {
@@ -84,7 +84,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `Hello\\122World`", () => {
-        expect(parseScript(src + "`Hello\\122World`")).to.eql({
+        assert.match<Program>(parseScript(src + "`Hello\\122World`"), {
             type: "Program",
             body: [
                 {
@@ -114,7 +114,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `Hello\\0122World`", () => {
-        expect(parseScript(src + "`Hello\\0122World`")).to.eql({
+        assert.match<Program>(parseScript(src + "`Hello\\0122World`"), {
             type: "Program",
             body: [
                 {
@@ -144,7 +144,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `Hello\\312World`", () => {
-        expect(parseScript(src + "`Hello\\312World`")).to.eql({
+        assert.match<Program>(parseScript(src + "`Hello\\312World`"), {
             type: "Program",
             body: [
                 {
@@ -174,7 +174,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `Hello\\412World`", () => {
-        expect(parseScript(src + "`Hello\\412World`")).to.eql({
+        assert.match<Program>(parseScript(src + "`Hello\\412World`"), {
             type: "Program",
             body: [
                 {
@@ -204,7 +204,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `Hello\\712World`", () => {
-        expect(parseScript(src + "`Hello\\712World`")).to.eql({
+        assert.match<Program>(parseScript(src + "`Hello\\712World`"), {
             type: "Program",
             body: [
                 {
@@ -234,7 +234,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `Hello\\0World`", () => {
-        expect(parseScript(src + "`Hello\\0World`")).to.eql({
+        assert.match<Program>(parseScript(src + "`Hello\\0World`"), {
             type: "Program",
             body: [
                 {
@@ -264,7 +264,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `Hello\\1World`", () => {
-        expect(parseScript(src + "`Hello\\1World`")).to.eql({
+        assert.match<Program>(parseScript(src + "`Hello\\1World`"), {
             type: "Program",
             body: [
                 {
@@ -294,7 +294,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\0`", () => {
-        expect(parseScript("(" + src + "`\\0`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\0`)"), {
             type: "Program",
             body: [
                 {
@@ -324,7 +324,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\7a`", () => {
-        expect(parseScript("(" + src + "`\\7a`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\7a`)"), {
             type: "Program",
             body: [
                 {
@@ -354,15 +354,15 @@ function test(src: string, node: Expression) {
     });
 
     it("should not parse unmatched single `", () => {
-        expect(() => parseScript(src + "`")).to.throw();
+        assert.throws(SyntaxError, () => parseScript(src + "`"));
     });
 
     it("should not parse parenthesized unmatched single `", () => {
-        expect(() => parseScript("(" + src + "`)")).to.throw();
+        assert.throws(SyntaxError, () => parseScript("(" + src + "`)"));
     });
 
     it("should parse `\\8`", () => {
-        expect(parseScript("(" + src + "`\\8`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\8`)"), {
             type: "Program",
             body: [
                 {
@@ -391,8 +391,8 @@ function test(src: string, node: Expression) {
         });
     });
 
-    it("should not parse `\\9`", () => {
-        expect(() => parseScript("(" + src + "`\\9`)")).to.eql({
+    it("should parse `\\9`", () => {
+        assert.match<Program>(parseScript("(" + src + "`\\9`)"), {
             type: "Program",
             body: [
                 {
@@ -406,7 +406,7 @@ function test(src: string, node: Expression) {
                                 {
                                     type: "TemplateElement",
                                     value: {
-                                        cooked: "9",
+                                        cooked: null,
                                         raw: "\\9",
                                     },
                                     tail: true,
@@ -422,7 +422,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\x0`", () => {
-        expect(parseScript("(" + src + "`\\x0`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\x0`)"), {
             type: "Program",
             body: [
                 {
@@ -436,7 +436,7 @@ function test(src: string, node: Expression) {
                                 {
                                     type: "TemplateElement",
                                     value: {
-                                        cooked: "\\undefined",
+                                        cooked: null,
                                         raw: "\\x0",
                                     },
                                     tail: true,
@@ -452,7 +452,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\u2028`", () => {
-        expect(parseScript("(" + src + "`\u2028`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\u2028`)"), {
             type: "Program",
             body: [
                 {
@@ -482,7 +482,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\u2029`", () => {
-        expect(parseScript("(" + src + "`\u2029`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\u2029`)"), {
             type: "Program",
             body: [
                 {
@@ -512,7 +512,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\u{2028`", () => {
-        expect(parseScript("(" + src + "`\\u{2028`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\u{2028`)"), {
             type: "Program",
             body: [
                 {
@@ -526,7 +526,7 @@ function test(src: string, node: Expression) {
                                 {
                                     type: "TemplateElement",
                                     value: {
-                                        cooked: "\\undefined",
+                                        cooked: null,
                                         raw: "\\u{2028",
                                     },
                                     tail: true,
@@ -542,7 +542,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse strict `\\1`", () => {
-        expect(parseScript("'use strict'; (" + src + "`\\1`)")).to.eql({
+        assert.match<Program>(parseScript("'use strict'; (" + src + "`\\1`)"), {
             type: "Program",
             body: [
                 {
@@ -556,7 +556,7 @@ function test(src: string, node: Expression) {
                                 {
                                     type: "TemplateElement",
                                     value: {
-                                        cooked: "\\undefined",
+                                        cooked: null,
                                         raw: "\\1",
                                     },
                                     tail: true,
@@ -572,7 +572,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse strict `\\4`", () => {
-        expect(parseScript("'use strict'; (" + src + "`\\4`)")).to.eql({
+        assert.match<Program>(parseScript("'use strict'; (" + src + "`\\4`)"), {
             type: "Program",
             body: [
                 {
@@ -586,7 +586,7 @@ function test(src: string, node: Expression) {
                                 {
                                     type: "TemplateElement",
                                     value: {
-                                        cooked: "\\undefined",
+                                        cooked: null,
                                         raw: "\\4",
                                     },
                                     tail: true,
@@ -602,7 +602,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse strict `\\11`", () => {
-        expect(parseScript("'use strict'; (" + src + "`\\11`)")).to.eql({
+        assert.match<Program>(parseScript("'use strict'; (" + src + "`\\11`)"), {
             type: "Program",
             body: [
                 {
@@ -632,7 +632,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse strict `\\000`", () => {
-        expect(parseScript("'use strict'; (" + src + "`\\000`)")).to.eql({
+        assert.match<Program>(parseScript("'use strict'; (" + src + "`\\000`)"), {
             type: "Program",
             body: [
                 {
@@ -662,7 +662,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse strict `\\123`", () => {
-        expect(parseScript("'use strict'; (" + src + "`\\123`)")).to.eql({
+        assert.match<Program>(parseScript("'use strict'; (" + src + "`\\123`)"), {
             type: "Program",
             body: [
                 {
@@ -692,7 +692,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\u{110000}`", () => {
-        expect(parseScript("(" + src + "`\\u{110000}`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\u{110000}`)"), {
             type: "Program",
             body: [
                 {
@@ -706,7 +706,7 @@ function test(src: string, node: Expression) {
                                 {
                                     type: "TemplateElement",
                                     value: {
-                                        cooked: "\\undefined}",
+                                        cooked: null,
                                         raw: "\\u{110000}",
                                     },
                                     tail: true,
@@ -722,7 +722,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\u{FFFFFFF}`", () => {
-        expect(parseScript("(" + src + "`\\u{FFFFFFF}`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\u{FFFFFFF}`)"), {
             type: "Program",
             body: [
                 {
@@ -736,7 +736,7 @@ function test(src: string, node: Expression) {
                                 {
                                     type: "TemplateElement",
                                     value: {
-                                        cooked: "\\undefined}",
+                                        cooked: null,
                                         raw: "\\u{FFFFFFF}",
                                     },
                                     tail: true,
@@ -752,7 +752,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse Unicode escape", () => {
-        expect(parseScript(src + "`\u2E2F;`")).to.eql({
+        assert.match<Program>(parseScript(src + "`\u2E2F;`"), {
             body: [
                 {
 
@@ -783,7 +783,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse carrian letter ES2015", () => {
-        expect(parseScript(src + "`\u{102A7};`")).to.eql({
+        assert.match<Program>(parseScript(src + "`\u{102A7};`"), {
             body: [
                 {
                     expression: {
@@ -813,7 +813,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `Hello`", () => {
-        expect(parseScript(src + "`Hello`")).to.eql({
+        assert.match<Program>(parseScript(src + "`Hello`"), {
             type: "Program",
             body: [
                 {
@@ -843,7 +843,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\n\r\t\v\b\f\\'\\\"\0`", () => {
-        expect(parseScript(src + "`\n\r\t\v\b\f\\'\\\"\0`")).to.eql({
+        assert.match<Program>(parseScript(src + "`\n\r\t\v\b\f\\'\\\"\0`"), {
             type: "Program",
             body: [
                 {
@@ -873,7 +873,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\u0061`", () => {
-        expect(parseScript("var source = " + src + "`\\u0061`;")).to.eql({
+        assert.match<Program>(parseScript("var source = " + src + "`\\u0061`;"), {
             type: "Program",
             body: [
                 {
@@ -909,7 +909,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\x61`", () => {
-        expect(parseScript(src + "`\\x61`;")).to.eql({
+        assert.match<Program>(parseScript(src + "`\\x61`;"), {
             type: "Program",
             body: [
                 {
@@ -939,7 +939,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `Hello\\02World`", () => {
-        expect(parseScript(src + "`Hello\\02World`")).to.eql({
+        assert.match<Program>(parseScript(src + "`Hello\\02World`"), {
             type: "Program",
             body: [
                 {
@@ -969,7 +969,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `Hello\\0World`", () => {
-        expect(parseScript(src + "`Hello\\0World`")).to.eql({
+        assert.match<Program>(parseScript(src + "`Hello\\0World`"), {
             type: "Program",
             body: [
                 {
@@ -999,7 +999,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `x`", () => {
-        expect(parseScript("(" + src + "`x`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`x`)"), {
             type: "Program",
             body: [
                 {
@@ -1029,7 +1029,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\u{0000000000F8}`", () => {
-        expect(parseScript("(" + src + "`\\u{0000000000F8}`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\u{0000000000F8}`)"), {
             type: "Program",
             body: [
                 {
@@ -1059,7 +1059,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\u{10FFFF}`", () => {
-        expect(parseScript("(" + src + "`\\u{10FFFF}`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\u{10FFFF}`)"), {
             type: "Program",
             body: [
                 {
@@ -1089,7 +1089,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\u{0}`", () => {
-        expect(parseScript("(" + src + "`\\u{0}`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\u{0}`)"), {
             type: "Program",
             body: [
                 {
@@ -1119,7 +1119,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\u{00F8}`", () => {
-        expect(parseScript("(" + src + "`\\u{00F8}`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\u{00F8}`)"), {
             type: "Program",
             body: [
                 {
@@ -1149,7 +1149,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\a`", () => {
-        expect(parseScript("(" + src + "`\\a`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\a`)"), {
             type: "Program",
             body: [
                 {
@@ -1179,7 +1179,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\u202a`", () => {
-        expect(parseScript("(" + src + "`\u202a`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\u202a`)"), {
             type: "Program",
             body: [
                 {
@@ -1209,7 +1209,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\\\\\``", () => {
-        expect(parseScript("(" + src + "`\\\\\\``)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\\\\\``)"), {
             type: "Program",
             body: [
                 {
@@ -1239,7 +1239,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\5111`", () => {
-        expect(parseScript("(" + src + "`\\5111`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\5111`)"), {
             type: "Program",
             body: [
                 {
@@ -1269,7 +1269,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\2111`", () => {
-        expect(parseScript("(" + src + "`\\2111`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\2111`)"), {
             type: "Program",
             body: [
                 {
@@ -1299,7 +1299,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\11`", () => {
-        expect(parseScript("(" + src + "`\\11`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\11`)"), {
             type: "Program",
             body: [
                 {
@@ -1329,7 +1329,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\111`", () => {
-        expect(parseScript("(" + src + "`\\111`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\111`)"), {
             type: "Program",
             body: [
                 {
@@ -1359,7 +1359,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\1111`", () => {
-        expect(parseScript("(" + src + "`\\1111`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\1111`)"), {
             type: "Program",
             body: [
                 {
@@ -1389,7 +1389,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse strict `\\0`", () => {
-        expect(parseScript("'use strict'; (" + src + "`\\0`)")).to.eql({
+        assert.match<Program>(parseScript("'use strict'; (" + src + "`\\0`)"), {
             body: [
                 {
                     expression: {
@@ -1426,7 +1426,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse use strict 0x", () => {
-        expect(parseScript("'use strict'; (" + src + "`\\0x`)")).to.eql({
+        assert.match<Program>(parseScript("'use strict'; (" + src + "`\\0x`)"), {
             body: [
                 {
                     expression: {
@@ -1463,7 +1463,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\<CR>`", () => {
-        expect(parseScript("(" + src + "`\\\r`)")).to.eql({
+        assert.match<Program>(parseScript("(" + src + "`\\\r`)"), {
             type: "Program",
             body: [
                 {
@@ -1493,7 +1493,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse `\\9`", () => {
-        expect(parseScript("(`\\9`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\9`)"), {
             type: "Program",
             body: [
                 {
@@ -1508,7 +1508,7 @@ function test(src: string, node: Expression) {
                                 {
                                     type: "TemplateElement",
                                     value: {
-                                        cooked: "\\undefined",
+                                        cooked: null,
                                         raw: "\\9",
                                     },
                                     tail: true,
@@ -1523,7 +1523,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse invalid hex", () => {
-        expect(parseScript("`\\xFG`")).to.eql({
+        assert.match<Program>(parseScript("`\\xFG`"), {
             type: "Program",
             body: [
                 {
@@ -1553,7 +1553,7 @@ function test(src: string, node: Expression) {
     });
 
     it("should parse invalid unicode hex", () => {
-        expect(parseScript("`\\u00FG`")).to.eql({
+        assert.match<Program>(parseScript("`\\u00FG`"), {
             type: "Program",
             body: [
                 {
@@ -1583,7 +1583,7 @@ function test(src: string, node: Expression) {
     });
 
     it("expect `\\u` to throw", () => {
-        expect(parseScript("(`\\u`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\u`)"), {
             type: "Program",
             body: [
                 {
@@ -1598,7 +1598,7 @@ function test(src: string, node: Expression) {
                                 {
                                     type: "TemplateElement",
                                     value: {
-                                        cooked: "\\undefined",
+                                        cooked: null,
                                         raw: "\\u",
                                     },
                                     tail: true,
@@ -1613,7 +1613,7 @@ function test(src: string, node: Expression) {
     });
 
     it("expect `\\x` to throw", () => {
-        expect(parseScript("(`\\x`)")).to.eql({
+        assert.match<Program>(parseScript("(`\\x`)"), {
             type: "Program",
             body: [
                 {
@@ -1628,7 +1628,7 @@ function test(src: string, node: Expression) {
                                 {
                                     type: "TemplateElement",
                                     value: {
-                                        cooked: "\\undefined",
+                                        cooked: null,
                                         raw: "\\x",
                                     },
                                     tail: true,
@@ -1643,7 +1643,7 @@ function test(src: string, node: Expression) {
     });
 
     it("expect `\\n` to throw", () => {
-        expect(parseScript("(`\n`)")).to.eql({
+        assert.match<Program>(parseScript("(`\n`)"), {
             type: "Program",
             body: [
                 {
