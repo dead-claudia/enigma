@@ -1,11 +1,6 @@
 #!/usr/bin/env node
 "use strict"
 
-// TODO: add tests for this
-//
-// Note: when editing the output, check the output to ensure it's actually valid asm.js:
-// https://anvaka.github.io/asmalidator/
-
 // This generates delta-encoded tables with a common lookup function aware of the encoding to
 // minimize the number of comparisons required, especially for the common case. I'd rather not have
 // a very slow runtime test.
