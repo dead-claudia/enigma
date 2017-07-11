@@ -947,7 +947,7 @@ describe.skip("ES2017 - `async`", () => {
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        assert.match<Program>(parseScript("class X { static async await(){} }"), {
+        assert.match<any>(parseScript("class X { static async await(){} }"), {
             type: "Program",
             body: [
                 {
@@ -1124,7 +1124,7 @@ x => x`), {
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        assert.match<Program>(parseScript("class X { async() {} }"), {
+        assert.match<any>(parseScript("class X { async() {} }"), {
             type: "Program",
             body: [
                 {
@@ -1207,7 +1207,7 @@ x => x`), {
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        assert.match<Program>(parseScript("class X { static *async() {} }"), {
+        assert.match<any>(parseScript("class X { static *async() {} }"), {
             type: "Program",
             body: [
                 {
@@ -1250,7 +1250,7 @@ x => x`), {
     });
 
     it("should parse async arrow parenthesized yield", () => {
-        assert.match<Program>(parseScript("class X { static async() {} }"), {
+        assert.match<any>(parseScript("class X { static async() {} }"), {
             type: "Program",
             body: [
                 {
@@ -3445,7 +3445,7 @@ x => x`), {
     });
 
     it("should parse \"class A {async foo() { }}\"", () => {
-        assert.match<Program>(parseScript("class A {async foo() { }}"), {
+        assert.match<any>(parseScript("class A {async foo() { }}"), {
             type: "Program",
             body: [
                 {
@@ -3488,7 +3488,7 @@ x => x`), {
     });
 
     it("should parse \"class A {static async() { }}\"", () => {
-        assert.match<Program>(parseScript("class A {static async() { }}"), {
+        assert.match<any>(parseScript("class A {static async() { }}"), {
             type: "Program",
             body: [
                 {
@@ -3531,7 +3531,7 @@ x => x`), {
     });
 
     it("should parse \"class A {*async() { }}\"", () => {
-        assert.match<Program>(parseScript("class A {*async() { }}"), {
+        assert.match<any>(parseScript("class A {*async() { }}"), {
             type: "Program",
             body: [
                 {
@@ -3574,7 +3574,7 @@ x => x`), {
     });
 
     it("should parse \"class A {async await() { }}\"", () => {
-        assert.match<Program>(parseScript("class A {async await() { }}"), {
+        assert.match<any>(parseScript("class A {async await() { }}"), {
             type: "Program",
             body: [
                 {
@@ -4126,7 +4126,7 @@ x => x`), {
     });
 
     it("should parse \"async function foo(a = class {async bar() { await b }}) {}\"", () => {
-        assert.match<Program>(
+        assert.match<any>(
             parseScript("async function foo(a = class {async bar() { await b }}) {}"),
             {
                 type: "Program",
@@ -4591,7 +4591,7 @@ x => x`), {
     });
 
     it("should parse \"(class {async foo(a) { await a }})\"", () => {
-        assert.match<Program>(parseScript("(class {async foo(a) { await a }})"), {
+        assert.match<any>(parseScript("(class {async foo(a) { await a }})"), {
             type: "Program",
             body: [
                 {

@@ -10,6 +10,9 @@ import {
     storeRaw, toHex,
 } from "./common";
 
+// TODO:
+// 1. Investigate using slices instead of `String.fromCharCode`
+
 /*
  * The string parsing works this way:
  *

@@ -53,7 +53,7 @@ describe.skip("JSX", () => {
                         name: n("JSXIdentifier", {name: "div"}),
                     }),
                     children: [
-                        n("Literal", {value: "\n          "}),
+                        n("JSXText", {value: "\n          "}),
                         n("JSXElement", {
                             openingElement: n("JSXOpeningElement", {
                                 selfClosing: false,
@@ -75,13 +75,13 @@ describe.skip("JSX", () => {
                                         name: n("JSXIdentifier", {name: "a"}),
                                     }),
                                     children: [
-                                        n("Literal", {value: "\n              Foo\n            "}),
+                                        n("JSXText", {value: "\n              Foo\n            "}),
                                     ],
                                 }),
                                 n("JSXText", {value: "\n          "}),
                             ],
                         }),
-                        n("Literal", {value: "\n        "}),
+                        n("JSXText", {value: "\n        "}),
                     ],
                 })}),
             ],
@@ -93,7 +93,7 @@ describe.skip("JSX", () => {
             sourceType: "script",
             body: [
                 n("ExpressionStatement", {expression: n("JSXElement", {
-                    openingElement: n("JSXElement", {
+                    openingElement: n("JSXOpeningElement", {
                         selfClosing: false,
                         name: n("JSXIdentifier", {name: "div"}),
                         attributes: [
@@ -143,30 +143,27 @@ describe.skip("JSX", () => {
         assert.match(parseScript(`<div x={"1"} y='0' />`, {jsx: true}), n("Program", {
             sourceType: "script",
             body: [
-                {
-                    type: "ExpressionStatement",
-                    expression: {
-                        type: "JSXElement",
-                        openingElement: n("JSXOpeningElement", {
-                            selfClosing: true,
-                            name: n("JSXIdentifier", {name: "div"}),
-                            attributes: [
-                                n("JSXAttribute", {
-                                    name: n("JSXIdentifier", {name: "x"}),
-                                    value: n("JSXExpressionContainer", {
-                                        expression: n("Literal", {value: "1"}),
-                                    }),
+                n("ExpressionStatement", {expression: {
+                    type: "JSXElement",
+                    openingElement: n("JSXOpeningElement", {
+                        selfClosing: true,
+                        name: n("JSXIdentifier", {name: "div"}),
+                        attributes: [
+                            n("JSXAttribute", {
+                                name: n("JSXIdentifier", {name: "x"}),
+                                value: n("JSXExpressionContainer", {
+                                    expression: n("Literal", {value: "1"}),
                                 }),
-                                n("JSXAttribute", {
-                                    name: n("JSXIdentifier", {name: "y"}),
-                                    value: n("Literal", {value: "0"}),
-                                }),
-                            ],
-                            closingElement: null,
-                            children: [],
-                        }),
-                    },
-                },
+                            }),
+                            n("JSXAttribute", {
+                                name: n("JSXIdentifier", {name: "y"}),
+                                value: n("Literal", {value: "0"}),
+                            }),
+                        ],
+                    }),
+                    closingElement: null,
+                    children: [],
+                }}),
             ],
         }));
     });
@@ -220,11 +217,11 @@ describe.skip("JSX", () => {
                             name: n("JSXIdentifier", {name: "div"}),
                         }),
                         children: [
-                            n("Literal", {value: "  "}),
+                            n("JSXText", {value: "  "}),
                             n("JSXExpressionContainer", {
                                 expression: n("Identifier", {name: "p"}),
                             }),
-                            n("Literal", {value: "    "}),
+                            n("JSXText", {value: "    "}),
                         ],
                     }),
                 }),
@@ -375,27 +372,27 @@ describe.skip("JSX", () => {
                     declarations: [n("VariableDeclarator", {
                         id: n("Identifier", {name: "x"}),
                         init: n("JSXElement", {
-                            selfClosing: false,
                             openingElement: n("JSXOpeningElement", {
                                 name: n("JSXIdentifier", {name: "div"}),
+                                selfClosing: false,
                                 attributes: [],
                             }),
                             closingElement: n("JSXClosingElement", {
                                 name: n("JSXIdentifier", {name: "div"}),
                             }),
                             children: [n("JSXElement", {
-                                selfClosing: false,
                                 openingElement: n("JSXOpeningElement", {
                                     name: n("JSXIdentifier", {name: "div"}),
+                                    selfClosing: false,
                                     attributes: [],
                                 }),
                                 closingElement: n("JSXClosingElement", {
                                     name: n("JSXIdentifier", {name: "div"}),
                                 }),
                                 children: [n("JSXElement", {
-                                    selfClosing: false,
                                     openingElement: n("JSXOpeningElement", {
                                         name: n("JSXIdentifier", {name: "span"}),
+                                        selfClosing: false,
                                         attributes: [],
                                     }),
                                     closingElement: n("JSXClosingElement", {
@@ -440,20 +437,20 @@ describe.skip("JSX", () => {
                         }),
                         attributes: [],
                     }),
-                }),
-                closingElement: n("JSXClosingElement", {
-                    name: n("JSXMemberExpression", {
-                        object: n("JSXMemberExpression", {
+                    closingElement: n("JSXClosingElement", {
+                        name: n("JSXMemberExpression", {
                             object: n("JSXMemberExpression", {
-                                object: n("JSXIdentifier", {name: "A"}),
-                                property: n("JSXIdentifier", {name: "B"}),
+                                object: n("JSXMemberExpression", {
+                                    object: n("JSXIdentifier", {name: "A"}),
+                                    property: n("JSXIdentifier", {name: "B"}),
+                                }),
+                                property: n("JSXIdentifier", {name: "C"}),
                             }),
-                            property: n("JSXIdentifier", {name: "C"}),
+                            property: n("JSXIdentifier", {name: "D"}),
                         }),
-                        property: n("JSXIdentifier", {name: "D"}),
                     }),
+                    children: [n("JSXText", {value: "foo"})],
                 }),
-                children: [n("Literal", {value: "foo"})],
             })],
         }));
     });
@@ -537,7 +534,7 @@ describe.skip("JSX", () => {
                                         closingElement: n("JSXClosingElement", {
                                             name: n("JSXIdentifier", {name: "b"}),
                                         }),
-                                        children: [n("Literal", {value: "monkeys /> gorillas"})],
+                                        children: [n("JSXText", {value: "monkeys /> gorillas"})],
                                     }),
                                 }),
                             ],
@@ -681,7 +678,7 @@ describe.skip("JSX", () => {
                         name: n("JSXIdentifier", {name: "div"}),
                     }),
                     children: [
-                        n("Literal", {value: "@test content"}),
+                        n("JSXText", {value: "@test content"}),
                     ],
                 }),
             })],
@@ -780,7 +777,7 @@ describe.skip("JSX", () => {
                     closingElement: n("JSXClosingElement", {
                         name: n("JSXIdentifier", {name: "A"}),
                     }),
-                    children: [n("Literal", {value: "&#1f4a9;"})],
+                    children: [n("JSXText", {value: "&#1f4a9;"})],
                 }),
             })],
         }));
@@ -832,8 +829,8 @@ describe.skip("JSX", () => {
                     params: [],
                     body: n("BlockStatement", {body: [
                         n("VariableDeclaration", {
+                            kind: "let",
                             declarations: [n("VariableDeclarator", {
-                                kind: "let",
                                 id: n("Identifier", {name: "x"}),
                                 init: null,
                             })],
@@ -869,7 +866,7 @@ describe.skip("JSX", () => {
                         name: n("JSXIdentifier", {name: "div"}),
                     }),
                     children: [
-                        n("Literal", {value: "&nbsp;"}),
+                        n("JSXText", {value: "&nbsp;"}),
                     ],
                 }),
             })],
@@ -944,7 +941,7 @@ describe.skip("JSX", () => {
                         name: n("JSXIdentifier", {name: "div"}),
                     }),
                     children: [
-                        n("Literal", {value: "/text"}),
+                        n("JSXText", {value: "/text"}),
                     ],
                 }),
             })],
@@ -1033,7 +1030,7 @@ describe.skip("JSX", () => {
                     closingElement: n("JSXClosingElement", {
                         name: n("JSXIdentifier", {name: "a"}),
                     }),
-                    children: [n("Literal", {value: "    "})],
+                    children: [n("JSXText", {value: "    "})],
                 }),
             })],
         }));
@@ -1199,7 +1196,7 @@ describe.skip("JSX", () => {
                     closingElement: n("JSXClosingElement", {
                         name: n("JSXIdentifier", {name: "em"}),
                     }),
-                    children: [n("Literal", {value: "\nOne\nTwo\nThree\n"})],
+                    children: [n("JSXText", {value: "\nOne\nTwo\nThree\n"})],
                 }),
             })],
         }));
@@ -1747,7 +1744,7 @@ describe.skip("JSX", () => {
                                         closingElement: n("JSXClosingElement", {
                                             name: n("JSXIdentifier", {name: "h1"}),
                                         }),
-                                        children: [n("Literal", {value: "Hello"})],
+                                        children: [n("JSXText", {value: "Hello"})],
                                     }),
                                     delegate: false,
                                 }),
@@ -2197,7 +2194,7 @@ describe.skip("JSX", () => {
                                     closingElement: n("JSXClosingElement", {
                                         name: n("JSXIdentifier", {name: "h1"}),
                                     }),
-                                    children: [n("Literal", {value: "Hello"})],
+                                    children: [n("JSXText", {value: "Hello"})],
                                 }),
                             }),
                         })],
@@ -2230,13 +2227,13 @@ describe.skip("JSX", () => {
                             name: n("JSXIdentifier", {name: "a"}),
                         }),
                         children: [
-                            n("Literal", {value: " "}),
+                            n("JSXText", {value: " "}),
                             n("JSXExpressionContainer", {
                                 expression: n("Identifier", {
                                     name: "value",
                                 }),
                             }),
-                            n("Literal", {value: " "}),
+                            n("JSXText", {value: " "}),
                             n("JSXElement", {
                                 openingElement: n("JSXOpeningElement", {
                                     selfClosing: false,
@@ -2467,7 +2464,7 @@ describe.skip("JSX", () => {
                                 closingElement: null,
                                 children: [],
                             }),
-                            n("Literal", {value: "7x invalid-js-identifier"}),
+                            n("JSXText", {value: "7x invalid-js-identifier"}),
                         ],
                     }),
                 })],
@@ -2575,11 +2572,11 @@ describe.skip("JSX", () => {
                             name: n("JSXIdentifier", {name: "a"}),
                         }),
                         children: [
-                            n("Literal", {value: " "}),
+                            n("JSXText", {value: " "}),
                             n("JSXExpressionContainer", {
                                 expression: n("Identifier", {name: "value"}),
                             }),
-                            n("Literal", {value: " "}),
+                            n("JSXText", {value: " "}),
                             n("JSXElement", {
                                 openingElement: n("JSXOpeningElement", {
                                     selfClosing: false,

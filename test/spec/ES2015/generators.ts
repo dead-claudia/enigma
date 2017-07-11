@@ -613,7 +613,7 @@ describe.skip("ES2015 - Generators", () => {
     });
 
     it("should parse static generator method", () => {
-        assert.match<Program>(parseScript("class Foo { static *foo() {} }"), {
+        assert.match<any>(parseScript("class Foo { static *foo() {} }"), {
             type: "Program",
             body: [
                 {

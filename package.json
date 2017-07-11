@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc src/*.ts --outDir dist",
-    "test": "mocha",
-    "test:fast": "mocha --grep '\\(slow\\)' --invert"
+    "test": "mocha test/internal/**",
+    "test:fast": "mocha test/internal/** --grep '\\(slow\\)' --invert"
   },
   "author": "Isiah Meadows",
   "license": "ISC",

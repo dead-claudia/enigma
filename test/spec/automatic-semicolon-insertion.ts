@@ -1,6 +1,7 @@
 import {parseScript, parseModule} from "../../src";
 import * as assert from "clean-assert";
 import {n} from "../../scripts/test-util";
+import * as ESTree from "../../src/estree";
 
 describe.skip("ASI", () => {
     describe("Script", () => {

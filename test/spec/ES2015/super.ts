@@ -3,9 +3,8 @@ import {Program} from "../../../src/estree";
 import * as assert from "clean-assert";
 
 describe.skip("ES2015 - `super`", () => {
-
     it("should parse empty function", () => {
-        assert.match<Program>(parseScript(`class A extends B {
+        assert.match<any>(parseScript(`class A extends B {
     constructor() {
         super();
     }
@@ -66,7 +65,7 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse new super", () => {
-        assert.match<Program>(parseScript(`class A extends B {
+        assert.match<any>(parseScript(`class A extends B {
     foo() {
         new super.bar()
     }
@@ -135,7 +134,7 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse empty function", () => {
-        assert.match<Program>(parseScript(`class A extends B {
+        assert.match<any>(parseScript(`class A extends B {
     X() {
         return super.y
     }
@@ -200,7 +199,7 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse empty function", () => {
-        assert.match<Program>(parseScript(`class A extends B {
+        assert.match<any>(parseScript(`class A extends B {
     X() {
         return super[1]
     }
@@ -266,7 +265,7 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse \"class A extends B { constructor() { super() } }\"", () => {
-        assert.match<Program>(parseScript(`class A extends B { constructor() { super() } }`), {
+        assert.match<any>(parseScript(`class A extends B { constructor() { super() } }`), {
             type: "Program",
             body: [
                 {
@@ -323,7 +322,7 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse \"class A extends B { \"constructor\"() { super() } }\"", () => {
-        assert.match<Program>(parseScript(`class A extends B { "constructor"() { super() } }`), {
+        assert.match<any>(parseScript(`class A extends B { "constructor"() { super() } }`), {
             type: "Program",
             body: [
                 {
@@ -380,7 +379,7 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse \"class A extends B { constructor(a = super()){} }\"", () => {
-        assert.match<Program>(parseScript(`class A extends B { constructor(a = super()){} }`), {
+        assert.match<any>(parseScript(`class A extends B { constructor(a = super()){} }`), {
             body: [
                 {
                     body: {
@@ -441,7 +440,7 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse \"class A extends B { constructor() { ({a: super()}); } }\"", () => {
-        assert.match<Program>(
+        assert.match<any>(
             parseScript(`class A extends B { constructor() { ({a: super()}); } }`),
             {
                 type: "Program",
@@ -517,7 +516,7 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse \"class A extends B { constructor() { () => super(); } }\"", () => {
-        assert.match<Program>(
+        assert.match<any>(
             parseScript(`class A extends B { constructor() { () => super(); } }`),
             {
                 type: "Program",
@@ -585,7 +584,7 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse \"class A extends B { constructor() { () => { super(); } } }\"", () => {
-        assert.match<Program>(
+        assert.match<any>(
             parseScript(`class A extends B { constructor() { () => { super(); } } }`),
             {
                 type: "Program",
@@ -806,7 +805,7 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse \"(class extends B { constructor() { super() } });\"", () => {
-        assert.match<Program>(parseScript(`(class extends B { constructor() { super() } });`), {
+        assert.match<any>(parseScript(`(class extends B { constructor() { super() } });`), {
             type: "Program",
             body: [
                 {
@@ -863,7 +862,7 @@ describe.skip("ES2015 - `super`", () => {
     });
 
     it("should parse empty function", () => {
-        assert.match<Program>(parseScript(`class A extends B {
+        assert.match<any>(parseScript(`class A extends B {
      constructor() {
          super();
      }

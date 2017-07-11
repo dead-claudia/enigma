@@ -29,7 +29,7 @@ describe.skip("ES2017 - Trailing Commas", () => {
     });
 
     it("should parse \"class X { constructor(a,) {} }\"", () => {
-        assert.match<Program>(parseScript("class X { constructor(a,) {} }"), {
+        assert.match<any>(parseScript("class X { constructor(a,) {} }"), {
             type: "Program",
             body: [
                 {
@@ -77,7 +77,7 @@ describe.skip("ES2017 - Trailing Commas", () => {
     });
 
     it("should parse \"class P { f(a,b,) { } }\"", () => {
-        assert.match<Program>(parseScript("class P { f(a,b,) { } }"), {
+        assert.match<any>(parseScript("class P { f(a,b,) { } }"), {
             type: "Program",
             body: [
                 {
@@ -269,7 +269,7 @@ describe.skip("ES2017 - Trailing Commas", () => {
     });
 
     it("should parse \"class A {foo(a,) {}}\"", () => {
-        assert.match<Program>(parseScript("class A {foo(a,) {}}"), {
+        assert.match<any>(parseScript("class A {foo(a,) {}}"), {
             type: "Program",
             body: [
                 {
@@ -317,7 +317,7 @@ describe.skip("ES2017 - Trailing Commas", () => {
     });
 
     it("should parse \"class A {static foo(a,) {}}\"", () => {
-        assert.match<Program>(parseScript("class A {static foo(a,) {}}"), {
+        assert.match<any>(parseScript("class A {static foo(a,) {}}"), {
             type: "Program",
             body: [
                 {
@@ -365,7 +365,7 @@ describe.skip("ES2017 - Trailing Commas", () => {
     });
 
     it("should parse \"(class {foo(a,) {}})\"", () => {
-        assert.match<Program>(parseScript("(class {foo(a,) {}})"), {
+        assert.match<any>(parseScript("(class {foo(a,) {}})"), {
             type: "Program",
             body: [
                 {
@@ -413,7 +413,7 @@ describe.skip("ES2017 - Trailing Commas", () => {
     });
 
     it("should parse \"(class {static foo(a,) {}})\"", () => {
-        assert.match<Program>(parseScript("(class {static foo(a,) {}})"), {
+        assert.match<any>(parseScript("(class {static foo(a,) {}})"), {
             type: "Program",
             body: [
                 {
@@ -542,7 +542,7 @@ describe.skip("ES2017 - Trailing Commas", () => {
     });
 
     it("should parse \"({foo(a,) {}})\"", () => {
-        assert.match<Program>(parseScript("({foo(a,) {}})"), {
+        assert.match<any>(parseScript("({foo(a,) {}})"), {
             type: "Program",
             body: [
                 {

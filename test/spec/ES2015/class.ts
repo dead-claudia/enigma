@@ -61,7 +61,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {a(){}}\"", () => {
-        assert.match<ESTree.Program>(parseScript("class A {a(){}}"), {
+        assert.match<any>(parseScript("class A {a(){}}"), {
             type: "Program",
             body: [
                 {
@@ -104,7 +104,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {a(){}b(){}}\"", () => {
-        assert.match<ESTree.Program>(parseScript("class A {a(){}b(){}}"), {
+        assert.match<any>(parseScript("class A {a(){}b(){}}"), {
             type: "Program",
             body: [
                 {
@@ -168,7 +168,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {;a(){};b(){};}\"", () => {
-        assert.match<ESTree.Program>(parseScript("class A {;a(){};b(){};}"), {
+        assert.match<any>(parseScript("class A {;a(){};b(){};}"), {
             type: "Program",
             body: [
                 {
@@ -232,7 +232,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {prototype(){}}\"", () => {
-        assert.match<ESTree.Program>(parseScript("class A {prototype(){}}"), {
+        assert.match<any>(parseScript("class A {prototype(){}}"), {
             type: "Program",
             body: [
                 {
@@ -371,7 +371,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {a(eval){}}\"", () => {
-        assert.match<ESTree.Program>(parseScript("class A {a(eval){}}"), {
+        assert.match<any>(parseScript("class A {a(eval){}}"), {
             body: [
                 {
                     body: {
@@ -419,7 +419,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {;a(){};b(){};}\"", () => {
-        assert.match<ESTree.Program>(parseScript("class A {;a(){};b(){};}"), {
+        assert.match<any>(parseScript("class A {;a(){};b(){};}"), {
             type: "Program",
             body: [
                 {
@@ -483,7 +483,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {a(){};b(){};}\"", () => {
-        assert.match<ESTree.Program>(parseScript("class A {a(){};b(){};}"), {
+        assert.match<any>(parseScript("class A {a(){};b(){};}"), {
             type: "Program",
             body: [
                 {
@@ -547,7 +547,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {static(){};}\"", () => {
-        assert.match<ESTree.Program>(parseScript("class A {static(){};}"), {
+        assert.match<any>(parseScript("class A {static(){};}"), {
             type: "Program",
             body: [
                 {
@@ -590,7 +590,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {get a(){} set b(c){};}\"", () => {
-        assert.match<ESTree.Program>(parseScript("class A {get a(){} set b(c){};}"), {
+        assert.match<any>(parseScript("class A {get a(){} set b(c){};}"), {
             type: "Program",
             body: [
                 {
@@ -659,7 +659,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {static[a](){}; static[b](){}}\"", () => {
-        assert.match<ESTree.Program>(parseScript("class A {static[a](){}; static[b](){}}"), {
+        assert.match<any>(parseScript("class A {static[a](){}; static[b](){}}"), {
             type: "Program",
             body: [
                 {
@@ -723,7 +723,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {static [a](){};}\"", () => {
-        assert.match<ESTree.Program>(parseScript("class A {static [a](){};}"), {
+        assert.match<any>(parseScript("class A {static [a](){};}"), {
             type: "Program",
             body: [
                 {
@@ -766,7 +766,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {static a(){};}\"", () => {
-        assert.match<ESTree.Program>(parseScript("class A {static a(){};}"), {
+        assert.match<any>(parseScript("class A {static a(){};}"), {
             type: "Program",
             body: [
                 {
@@ -809,7 +809,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {static static(){};}\"", () => {
-        assert.match<ESTree.Program>(parseScript("class A {static static(){};}"), {
+        assert.match<any>(parseScript("class A {static static(){};}"), {
             type: "Program",
             body: [
                 {
@@ -889,7 +889,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {prototype(){}}\"", () => {
-        assert.match<ESTree.Program>(parseScript("class A {prototype(){}}"), {
+        assert.match<any>(parseScript("class A {prototype(){}}"), {
             type: "Program",
             body: [
                 {
@@ -932,7 +932,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {constructor(){}}\"", () => {
-        assert.match<ESTree.Program>(parseScript("class A {constructor(){}}"), {
+        assert.match<any>(parseScript("class A {constructor(){}}"), {
             type: "Program",
             body: [
                 {
@@ -975,7 +975,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {\"constructor\"(){} [\"constructor\"](){}}\"", () => {
-        assert.match<ESTree.Program>(
+        assert.match<any>(
             parseScript("class A {\"constructor\"(){} [\"constructor\"](){}}"),
             {
                 type: "Program",
@@ -1042,7 +1042,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"(class A extends 0{})\"", () => {
-        assert.match<ESTree.Program>(parseScript("(class A extends 0{})"), {
+        assert.match<any>(parseScript("(class A extends 0{})"), {
             type: "Program",
             body: [
                 {
@@ -1069,7 +1069,7 @@ describe.skip("ES2015 - `class`", () => {
     });
 
     it("should parse \"class A {a(eval){}}\"", () => {
-        assert.match<ESTree.Program>(
+        assert.match<any>(
             parseScript("class A {a(eval){}}"),
             {
                 body: [

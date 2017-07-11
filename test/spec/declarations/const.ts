@@ -133,7 +133,7 @@ describe.skip("Declarations - `const`", () => {
                 n("VariableDeclaration", {declarations: [
                     n("VariableDeclarator", {
                         id: n("Identifier", {name: "x"}),
-                        init: n("Literal", 0),
+                        init: n("Literal", {value: 0}),
                     }),
                 ]}),
             ]})],

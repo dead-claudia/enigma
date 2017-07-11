@@ -99,7 +99,7 @@ describe.skip("Expressions - `class`", () => {
     });
 
     it("should parse \"(class {set a(b) {}})\"", () => {
-        assert.match<Program>(parseScript("(class {set a(b) {}})"), {
+        assert.match<any>(parseScript("(class {set a(b) {}})"), {
             type: "Program",
             body: [
                 {
@@ -147,7 +147,7 @@ describe.skip("Expressions - `class`", () => {
     });
 
     it("should parse \"(class {get a() {}})\"", () => {
-        assert.match<Program>(parseScript("(class {get a() {}})"), {
+        assert.match<any>(parseScript("(class {get a() {}})"), {
             type: "Program",
             body: [
                 {
@@ -190,7 +190,7 @@ describe.skip("Expressions - `class`", () => {
     });
 
     it("should parse \"(class {prototype() {}})\"", () => {
-        assert.match<Program>(parseScript("(class {prototype() {}})"), {
+        assert.match<any>(parseScript("(class {prototype() {}})"), {
             type: "Program",
             body: [
                 {
@@ -233,7 +233,7 @@ describe.skip("Expressions - `class`", () => {
     });
 
     it("should parse \"(class {a() {}})\"", () => {
-        assert.match<Program>(parseScript("(class {a() {}})"), {
+        assert.match<any>(parseScript("(class {a() {}})"), {
             type: "Program",
             body: [
                 {
@@ -276,7 +276,7 @@ describe.skip("Expressions - `class`", () => {
     });
 
     it("should parse \"(class {3() {}})\"", () => {
-        assert.match<Program>(parseScript("(class {3() {}})"), {
+        assert.match<any>(parseScript("(class {3() {}})"), {
             type: "Program",
             body: [
                 {
@@ -319,7 +319,7 @@ describe.skip("Expressions - `class`", () => {
     });
 
     it("should parse \"(class{[3+5](){}})\"", () => {
-        assert.match<Program>(parseScript("(class{[3+5](){}})"), {
+        assert.match<any>(parseScript("(class{[3+5](){}})"), {
             type: "Program",
             body: [
                 {
@@ -446,7 +446,7 @@ describe.skip("Expressions - `class`", () => {
     });
 
     it("should parse \"(class {static(){}})\"", () => {
-        assert.match<Program>(parseScript("(class {static(){}})"), {
+        assert.match<any>(parseScript("(class {static(){}})"), {
             type: "Program",
             body: [
                 {
@@ -489,7 +489,7 @@ describe.skip("Expressions - `class`", () => {
     });
 
     it("should parse \"(class {static constructor(){}})\"", () => {
-        assert.match<Program>(parseScript("(class {static constructor(){}})"), {
+        assert.match<any>(parseScript("(class {static constructor(){}})"), {
             type: "Program",
             body: [
                 {

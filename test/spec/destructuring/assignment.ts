@@ -47,7 +47,7 @@ describe.skip("Destructuring - Assignment", () => {
             assert.throws(SyntaxError, () => parseScript("({get a(){}})=0"));
         });
         it("should parse \"({x} = 0)\"", () => {
-            expect(parseScript("({x} = 0)")).to.eql({
+            assert.match(parseScript("({x} = 0)"), {
                 type: "Program",
                 body: [
                     {
@@ -87,7 +87,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({x,} = 0)\"", () => {
-            expect(parseScript("({x,} = 0)")).to.eql({
+            assert.match(parseScript("({x,} = 0)"), {
                 type: "Program",
                 body: [
                     {
@@ -127,7 +127,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({x,y} = 0)\"", () => {
-            expect(parseScript("({x,y} = 0)")).to.eql({
+            assert.match(parseScript("({x,y} = 0)"), {
                 type: "Program",
                 body: [
                     {
@@ -182,7 +182,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({x,y,} = 0)\"", () => {
-            expect(parseScript("({x,y,} = 0)")).to.eql({
+            assert.match(parseScript("({x,y,} = 0)"), {
                 type: "Program",
                 body: [
                     {
@@ -237,7 +237,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({[a]: a} = 1)\"", () => {
-            expect(parseScript("({[a]: a} = 1)")).to.eql({
+            assert.match(parseScript("({[a]: a} = 1)"), {
                 type: "Program",
                 body: [
                     {
@@ -277,7 +277,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({x = 0} = 1)\"", () => {
-            expect(parseScript("({x = 0} = 1)")).to.eql({
+            assert.match(parseScript("({x = 0} = 1)"), {
                 type: "Program",
                 body: [
                     {
@@ -324,7 +324,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({x = 0,} = 1)\"", () => {
-            expect(parseScript("({x = 0,} = 1)")).to.eql({
+            assert.match(parseScript("({x = 0,} = 1)"), {
                 type: "Program",
                 body: [
                     {
@@ -371,7 +371,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({x: y} = 0)\"", () => {
-            expect(parseScript("({x: y} = 0)")).to.eql({
+            assert.match(parseScript("({x: y} = 0)"), {
                 type: "Program",
                 body: [
                     {
@@ -411,7 +411,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({x: y,} = 0)\"", () => {
-            expect(parseScript("({x: y,} = 0)")).to.eql({
+            assert.match(parseScript("({x: y,} = 0)"), {
                 type: "Program",
                 body: [
                     {
@@ -451,7 +451,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({var: x} = 0)\"", () => {
-            expect(parseScript("({var: x} = 0)")).to.eql({
+            assert.match(parseScript("({var: x} = 0)"), {
                 type: "Program",
                 body: [
                     {
@@ -491,7 +491,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({\"x\": y} = 0)\"", () => {
-            expect(parseScript("({\"x\": y} = 0)")).to.eql({
+            assert.match(parseScript("({\"x\": y} = 0)"), {
                 type: "Program",
                 body: [
                     {
@@ -531,7 +531,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({0: y} = 0)\"", () => {
-            expect(parseScript("({0: y} = 0)")).to.eql({
+            assert.match(parseScript("({0: y} = 0)"), {
                 type: "Program",
                 body: [
                     {
@@ -571,7 +571,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({0: x, 1: x} = 0)\"", () => {
-            expect(parseScript("({0: x, 1: x} = 0)")).to.eql({
+            assert.match(parseScript("({0: x, 1: x} = 0)"), {
                 type: "Program",
                 body: [
                     {
@@ -626,7 +626,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({x: y = 0} = 1)\"", () => {
-            expect(parseScript("({x: y = 0} = 1)")).to.eql({
+            assert.match(parseScript("({x: y = 0} = 1)"), {
                 type: "Program",
                 body: [
                     {
@@ -673,7 +673,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({x: y = z = 0} = 1)\"", () => {
-            expect(parseScript("({x: y = z = 0} = 1)")).to.eql({
+            assert.match(parseScript("({x: y = z = 0} = 1)"), {
                 type: "Program",
                 body: [
                     {
@@ -728,7 +728,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({x: [y] = 0} = 1)\"", () => {
-            expect(parseScript("({x: [y] = 0} = 1)")).to.eql({
+            assert.match(parseScript("({x: [y] = 0} = 1)"), {
                 type: "Program",
                 body: [
                     {
@@ -780,7 +780,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({a:let} = 0);\"", () => {
-            expect(parseScript("({a:let} = 0);")).to.eql({
+            assert.match(parseScript("({a:let} = 0);"), {
                 type: "Program",
                 body: [
                     {
@@ -820,7 +820,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({let} = 0);\"", () => {
-            expect(parseScript("({let} = 0);")).to.eql({
+            assert.match(parseScript("({let} = 0);"), {
                 body: [
                     {
                         expression: {
@@ -860,7 +860,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({a:yield} = 0);\"", () => {
-            expect(parseScript("({a:yield} = 0);")).to.eql({
+            assert.match(parseScript("({a:yield} = 0);"), {
                 type: "Program",
                 body: [
                     {
@@ -900,7 +900,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({yield} = 0);\"", () => {
-            expect(parseScript("({yield} = 0);")).to.eql({
+            assert.match(parseScript("({yield} = 0);"), {
                 body: [
                     {
                         expression: {
@@ -940,7 +940,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"({yield = 0} = 0);\"", () => {
-            expect(parseScript("({yield = 0} = 0);")).to.eql({
+            assert.match(parseScript("({yield = 0} = 0);"), {
                 body: [
                     {
                         expression: {
@@ -987,7 +987,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"(function*() { [...{ x = yield }] = 0; })\"", () => {
-            expect(parseScript("(function*() { [...{ x = yield }] = 0; })")).to.eql({
+            assert.match(parseScript("(function*() { [...{ x = yield }] = 0; })"), {
                 type: "Program",
                 body: [
                     {
@@ -1059,7 +1059,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse empty object pattern assignment\"", () => {
-            expect(parseScript("({} = 0);")).to.eql({
+            assert.match(parseScript("({} = 0);"), {
                 type: "Program",
                 body: [
                     {
@@ -1086,7 +1086,7 @@ describe.skip("Destructuring - Assignment", () => {
     describe("Array", () => {
 
         it("should parse dup assignment\"", () => {
-            expect(parseScript("[a,a,,...a]=0;")).to.eql({
+            assert.match(parseScript("[a,a,,...a]=0;"), {
                 type: "Program",
                 body: [
                     {
@@ -1127,7 +1127,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse ellison\"", () => {
-            expect(parseScript("[,,]=0")).to.eql({
+            assert.match(parseScript("[,,]=0"), {
                 type: "Program",
                 body: [
                     {
@@ -1154,7 +1154,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse simple assignment\"", () => {
-            expect(parseScript("[a] = 0;")).to.eql({
+            assert.match(parseScript("[a] = 0;"), {
                 type: "Program",
                 body: [
                     {
@@ -1183,7 +1183,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse dup assignment\"", () => {
-            expect(parseScript("[a,a,,...a]=0;")).to.eql({
+            assert.match(parseScript("[a,a,,...a]=0;"), {
                 type: "Program",
                 body: [
                     {
@@ -1224,7 +1224,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"[x,] = 0\"", () => {
-            expect(parseScript("[x,] = 0")).to.eql({
+            assert.match(parseScript("[x,] = 0"), {
                 type: "Program",
                 body: [
                     {
@@ -1253,7 +1253,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"[x,,] = 0\"", () => {
-            expect(parseScript("[x,,] = 0")).to.eql({
+            assert.match(parseScript("[x,,] = 0"), {
                 type: "Program",
                 body: [
                     {
@@ -1283,7 +1283,7 @@ describe.skip("Destructuring - Assignment", () => {
         });
 
         it("should parse \"[x] = 0\"", () => {
-            expect(parseScript("[x] = 0")).to.eql({
+            assert.match(parseScript("[x] = 0"), {
                 type: "Program",
                 body: [
                     {
@@ -1313,7 +1313,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[x, y, ...z] = 0\"", () => {
-        expect(parseScript("[x, y, ...z] = 0")).to.eql({
+        assert.match(parseScript("[x, y, ...z] = 0"), {
             type: "Program",
             body: [
                 {
@@ -1353,7 +1353,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[, x,,] = 0\"", () => {
-        expect(parseScript("[, x,,] = 0")).to.eql({
+        assert.match(parseScript("[, x,,] = 0"), {
             type: "Program",
             body: [
                 {
@@ -1384,7 +1384,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[[x]] = 0\"", () => {
-        expect(parseScript("[[x]] = 0")).to.eql({
+        assert.match(parseScript("[[x]] = 0"), {
             type: "Program",
             body: [
                 {
@@ -1418,7 +1418,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[...a[0]] = 0;\"", () => {
-        expect(parseScript("[...a[0]] = 0;")).to.eql({
+        assert.match(parseScript("[...a[0]] = 0;"), {
             type: "Program",
             body: [
                 {
@@ -1458,7 +1458,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[x, ...{0: y}] = 0\"", () => {
-        expect(parseScript("[x, ...{0: y}] = 0")).to.eql({
+        assert.match(parseScript("[x, ...{0: y}] = 0"), {
             type: "Program",
             body: [
                 {
@@ -1510,7 +1510,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[...[x]] = 0\"", () => {
-        expect(parseScript("[...[x]] = 0")).to.eql({
+        assert.match(parseScript("[...[x]] = 0"), {
             type: "Program",
             body: [
                 {
@@ -1547,7 +1547,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[x, x] = 0\"", () => {
-        expect(parseScript("[x, x] = 0")).to.eql({
+        assert.match(parseScript("[x, x] = 0"), {
             type: "Program",
             body: [
                 {
@@ -1580,7 +1580,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[x, ...x] = 0\"", () => {
-        expect(parseScript("[x, ...x] = 0")).to.eql({
+        assert.match(parseScript("[x, ...x] = 0"), {
             type: "Program",
             body: [
                 {
@@ -1616,7 +1616,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[x.a=a] = b\"", () => {
-        expect(parseScript("[x.a=a] = b")).to.eql({
+        assert.match(parseScript("[x.a=a] = b"), {
             type: "Program",
             body: [
                 {
@@ -1660,7 +1660,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[x[a]=a] = b\"", () => {
-        expect(parseScript("[x[a]=a] = b")).to.eql({
+        assert.match(parseScript("[x[a]=a] = b"), {
             type: "Program",
             body: [
                 {
@@ -1704,7 +1704,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse [...[...a[x]]] = b\"", () => {
-        expect(parseScript("[...[...a[x]]] = b")).to.eql({
+        assert.match(parseScript("[...[...a[x]]] = b"), {
             type: "Program",
             body: [
                 {
@@ -1752,7 +1752,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[{a=0},{a=0}] = 0\"", () => {
-        expect(parseScript("[{a=0},{a=0}] = 0")).to.eql({
+        assert.match(parseScript("[{a=0},{a=0}] = 0"), {
             type: "Program",
             body: [
                 {
@@ -1831,7 +1831,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[a = 0, ...{b = 0}] = 0\"", () => {
-        expect(parseScript("[a = 0, ...{b = 0}] = 0")).to.eql({
+        assert.match(parseScript("[a = 0, ...{b = 0}] = 0"), {
             type: "Program",
             body: [
                 {
@@ -1897,7 +1897,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[{a=0}, ...b] = 0\"", () => {
-        expect(parseScript("[{a=0}, ...b] = 0")).to.eql({
+        assert.match(parseScript("[{a=0}, ...b] = 0"), {
             type: "Program",
             body: [
                 {
@@ -1956,7 +1956,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[] = 0\"", () => {
-        expect(parseScript("[] = 0")).to.eql({
+        assert.match(parseScript("[] = 0"), {
             type: "Program",
             body: [
                 {
@@ -1980,7 +1980,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[a, b] = [b, a]\"", () => {
-        expect(parseScript("[a, b] = [b, a]")).to.eql({
+        assert.match(parseScript("[a, b] = [b, a]"), {
     type: "Program",
     body: [
         {
@@ -2022,7 +2022,7 @@ describe.skip("Destructuring - Assignment", () => {
     });
 
     it("should parse \"[a, ...(b = c)] = 0\"", () => {
-        expect(parseScript("[a, ...(b = c)] = 0")).to.eql({
+        assert.match<any>(parseScript("[a, ...(b = c)] = 0"), {
     type: "Program",
     body: [
         {

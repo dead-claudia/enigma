@@ -1535,7 +1535,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse computed `static` class members", () => {
-        assert.match<Program>(parseScript(`class a {
+        assert.match<any>(parseScript(`class a {
     static [b]() {}
     static [c]() {}
 }`), {
@@ -1639,7 +1639,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse \"prototype()\" as an instance method", () => {
-        assert.match<Program>(parseScript(`class a {
+        assert.match<any>(parseScript(`class a {
     prototype() {}
 }`), {
             type: "Program",
@@ -1684,7 +1684,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse a dynamic \"constructor\" method name", () => {
-        assert.match<Program>(parseScript(`class a {
+        assert.match<any>(parseScript(`class a {
     constructor() {}
     ["constructor"]() {}
 }`), {
@@ -1751,7 +1751,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse duplicate \"static constructor() {}\"", () => {
-        assert.match<Program>(parseScript(`class a {
+        assert.match<any>(parseScript(`class a {
     static constructor() {}
     static constructor() {}
 }`), {
@@ -1818,7 +1818,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse dynamic static \"prototype\" method", () => {
-        assert.match<Program>(parseScript(`class a {
+        assert.match<any>(parseScript(`class a {
     static ["prototype"]() {}
 }`), {
             type: "Program",
@@ -2542,7 +2542,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse static generators", () => {
-        assert.match<Program>(parseScript(`class a {
+        assert.match<any>(parseScript(`class a {
     static *b() {}
 }`), {
             type: "Program",
@@ -3004,7 +3004,7 @@ describe.skip("TC39 - Pass Explicit", () => {
     });
 
     it("should parse super methods in subclasses", () => {
-        assert.match<Program>(parseScript(`class a extends b {
+        assert.match<any>(parseScript(`class a extends b {
             c() {
                 return super.d;
             }
@@ -5175,7 +5175,7 @@ a.c = (2);
     });
 
     it("should parse multiple classes", () => {
-        assert.match<Program>(parseScript(`class a {
+        assert.match<any>(parseScript(`class a {
     constructor() {}
     b() {}
 }
@@ -7757,7 +7757,7 @@ a = ((b + (32)) && (null))`), {
     });
 
     it("should parse `super` within arrow functions inside constructors", () => {
-        assert.match<Program>(parseScript(`class a extends b {
+        assert.match<any>(parseScript(`class a extends b {
     constructor() {
         () => { super(); };
     }
@@ -10032,7 +10032,7 @@ a["1_1"] = ("b");
     });
 
     it("should parse \"var [a, b] = (c);\"", () => {
-        assert.match<Program>(parseScript(`(class extends a {
+        assert.match<any>(parseScript(`(class extends a {
     constructor() { super(); }
 });`), {
             type: "Program",
@@ -10213,7 +10213,7 @@ a["1_1"] = ("b");
     });
 
     it("should parse \"var [a, b] = (c);\"", () => {
-        assert.match<Program>(parseScript(`class a {
+        assert.match<any>(parseScript(`class a {
     b() { new (super.c); }
 }`), {
             type: "Program",
@@ -10484,7 +10484,7 @@ a["1_1"] = ("b");
     });
 
     it("should parse \"var [a, b] = (c);\"", () => {
-        assert.match<Program>(parseScript(`class a extends b {
+        assert.match<any>(parseScript(`class a extends b {
     c() { [super.d] = e; }
 }`), {
             type: "Program",
@@ -10560,7 +10560,7 @@ a["1_1"] = ("b");
     });
 
     it("should parse \"var [a, b] = (c);\"", () => {
-        assert.match<Program>(parseScript(`class a extends b {
+        assert.match<any>(parseScript(`class a extends b {
     c() { ({d: super[e]} = f); }
 }`), {
             type: "Program",
@@ -10777,7 +10777,7 @@ a["1_1"] = ("b");
     });
 
     it("should parse \"var [a, b] = (c);\"", () => {
-    assert.match<Program>(parseModule(`export {}; 1;`), {
+        assert.match<Program>(parseModule(`export {}; 1;`), {
             type: "Program",
             body: [
                 {
@@ -11488,7 +11488,7 @@ a["1_1"] = ("b");
     });
 
     it("should parse \"\"use strict\"; (class A {constructor() { super() }})\"", () => {
-        assert.match<Program>(parseScript(`"use strict"; (class A {constructor() { super() }})`), {
+        assert.match<any>(parseScript(`"use strict"; (class A {constructor() { super() }})`), {
             type: "Program",
             body: [
                 {

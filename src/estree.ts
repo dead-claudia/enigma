@@ -1,7 +1,9 @@
 // Note:
 //
-// Union types have an identially named, non-exported interface whose name is
-// preceded with an underscore.
+// Union types have an identially named, non-exported interface whose name is preceded with an
+// underscore.
+//
+// Reverse mappings are in `T_Node` and friends, and are for testing.
 /* tslint:disable class-name no-empty-interface */
 
 interface _Node<T extends string> {
@@ -11,6 +13,31 @@ interface _Node<T extends string> {
     end?: number;
     leadingComments?: Comment[];
     trailingComments?: Comment[];
+}
+
+export interface T_Node extends T_Statement, T_Expression, T_Pattern,
+                                T_ModuleDeclaration, T_ModuleSpecifier {
+    "Program": Program;
+    "SwitchCase": SwitchCase;
+    "CatchClause": CatchClause;
+    "Property": Property | AssignmentProperty;
+    "Super": Super;
+    "SpreadElement": SpreadElement;
+    "TemplateElement": TemplateElement;
+    "ClassBody": ClassBody;
+    "MethodDefinition": MethodDefinition;
+    "VariableDeclarator": VariableDeclarator;
+    "JSXIdentifier": JSXIdentifier;
+    "JSXMemberExpression": JSXMemberExpression;
+    "JSXNamespacedName": JSXNamespacedName;
+    "JSXEmptyExpression": JSXEmptyExpression;
+    "JSXExpressionContainer": JSXExpressionContainer;
+    "JSXSpreadChild": JSXSpreadChild;
+    "JSXText": JSXText;
+    "JSXOpeningElement": JSXOpeningElement;
+    "JSXClosingElement": JSXClosingElement;
+    "JSXAttribute": JSXAttribute;
+    "JSXSpreadAttribute": JSXSpreadAttribute;
 }
 
 export type Node =
@@ -43,6 +70,28 @@ export type Node =
     | JSXSpreadAttribute;
 
 interface _Statement<T extends string> extends _Node<T> {}
+
+interface T_Statement extends T_Declaration {
+    "ExpressionStatement": ExpressionStatement;
+    "BlockStatement": BlockStatement;
+    "EmptyStatement": EmptyStatement;
+    "DebuggerStatement": DebuggerStatement;
+    "WithStatement": WithStatement;
+    "ReturnStatement": ReturnStatement;
+    "LabeledStatement": LabeledStatement;
+    "BreakStatement": BreakStatement;
+    "ContinueStatement": ContinueStatement;
+    "IfStatement": IfStatement;
+    "SwitchStatement": SwitchStatement;
+    "ThrowStatement": ThrowStatement;
+    "TryStatement": TryStatement;
+    "WhileStatement": WhileStatement;
+    "DoWhileStatement": DoWhileStatement;
+    "ForStatement": ForStatement;
+    "ForInStatement": ForInStatement;
+    "ForOfStatement": ForOfStatement;
+}
+
 export type Statement =
     | ExpressionStatement
     | BlockStatement
@@ -65,6 +114,34 @@ export type Statement =
     | Declaration;
 
 interface _Expression<T extends string> extends _Node<T> {}
+
+interface T_Expression {
+    "Identifier": Identifier;
+    "Literal": Literal | RegExpLiteral;
+    "ThisExpression": ThisExpression;
+    "ArrayExpression": ArrayExpression;
+    "ObjectExpression": ObjectExpression;
+    "FunctionExpression": FunctionExpression;
+    "UnaryExpression": UnaryExpression;
+    "UpdateExpression": UpdateExpression;
+    "BinaryExpression": BinaryExpression;
+    "AssignmentExpression": AssignmentExpression;
+    "LogicalExpression": LogicalExpression;
+    "MemberExpression": MemberExpression;
+    "ConditionalExpression": ConditionalExpression;
+    "CallExpression": CallExpression;
+    "NewExpression": NewExpression;
+    "SequenceExpression": SequenceExpression;
+    "ArrowFunctionExpression": ArrowFunctionExpression;
+    "YieldExpression": YieldExpression;
+    "TemplateLiteral": TemplateLiteral;
+    "TaggedTemplateExpression": TaggedTemplateExpression;
+    "ClassExpression": ClassExpression;
+    "MetaProperty": MetaProperty;
+    "AwaitExpression": AwaitExpression;
+    "JSXElement": JSXElement;
+}
+
 export type Expression =
     | Identifier
     | Literal
@@ -93,17 +170,42 @@ export type Expression =
     | JSXElement;
 
 interface _Pattern<T extends string> extends _Node<T> {}
+
+interface T_Pattern {
+    "Identifier": Identifier;
+    "ObjectPattern": ObjectPattern;
+    "ArrayPattern": ArrayPattern;
+    "MemberExpression": MemberExpression;
+    "AssignmentPattern": AssignmentPattern;
+    "RestElement": RestElement;
+}
+
 export type PatternTop = Identifier | ObjectPattern | ArrayPattern | MemberExpression;
 export type PatternNoRest = PatternTop | AssignmentPattern;
 export type Pattern = PatternTop | AssignmentPattern | RestElement;
 
 interface _Declaration<T extends string> extends _Statement<T> {}
+
+interface T_Declaration {
+    "FunctionDeclaration": FunctionDeclaration;
+    "VariableDeclaration": VariableDeclaration;
+    "ClassDeclaration": ClassDeclaration;
+}
+
 export type Declaration =
     | FunctionDeclaration
     | VariableDeclaration
     | ClassDeclaration;
 
 interface _ModuleDeclaration<T extends string> extends _Node<T> {}
+
+interface T_ModuleDeclaration {
+    "ImportDeclaration": ImportDeclaration;
+    "ExportNamedDeclaration": ExportNamedDeclaration;
+    "ExportDefaultDeclaration": ExportDefaultDeclaration;
+    "ExportAllDeclaration": ExportAllDeclaration;
+}
+
 export type ModuleDeclaration =
     | ImportDeclaration
     | ExportNamedDeclaration
@@ -112,6 +214,13 @@ export type ModuleDeclaration =
 
 interface _ModuleSpecifier<T extends string> extends _Node<T> {
     local: Identifier;
+}
+
+interface T_ModuleSpecifier {
+    "ImportSpecifier": ImportSpecifier;
+    "ImportDefaultSpecifier": ImportDefaultSpecifier;
+    "ImportNamespaceSpecifier": ImportNamespaceSpecifier;
+    "ExportSpecifier": ExportSpecifier;
 }
 
 export type ModuleSpecifier =
@@ -181,6 +290,7 @@ export interface ArrowFunctionExpression extends _Expression<"ArrowFunctionExpre
     body: BlockStatement | Expression;
     expression: boolean;
     async: boolean;
+    generator: false;
 }
 
 export interface AwaitExpression extends _Expression<"AwaitExpression"> {
@@ -305,6 +415,7 @@ export interface FunctionDeclaration extends _Declaration<"FunctionDeclaration">
     body: BlockStatement;
     generator: boolean;
     async: boolean;
+    expression: false;
 }
 
 export interface FunctionExpression extends _Expression<"FunctionExpression"> {
@@ -313,6 +424,7 @@ export interface FunctionExpression extends _Expression<"FunctionExpression"> {
     body: BlockStatement;
     generator: boolean;
     async: boolean;
+    expression: false;
 }
 
 export interface Identifier extends _Expression<"Identifier">, _Pattern<"Identifier"> {
@@ -365,7 +477,7 @@ export interface MetaProperty extends _Expression<"MetaProperty"> {
 export interface MethodDefinition extends _Node<"MethodDefinition"> {
     key: Expression | null;
     value: FunctionExpression | null;
-    kind: "constructor" | "init" | "get" | "set";
+    kind: "constructor" | "method" | "get" | "set";
     computed: boolean;
     static: boolean;
 }
@@ -528,7 +640,7 @@ export interface JSXExpressionContainer extends _Node<"JSXExpressionContainer"> 
 }
 
 export interface JSXSpreadChild extends _Node<"JSXSpreadChild"> {
-    name: Expression;
+    expression: Expression;
 }
 
 interface _JSXBoundaryElement<T extends string> extends _Node<T> {
@@ -550,7 +662,7 @@ export interface JSXClosingElement extends _JSXBoundaryElement<"JSXClosingElemen
 
 export interface JSXAttribute extends _Node<"JSXAttribute"> {
     name: JSXIdentifier | JSXNamespacedName;
-    value: JSXText | JSXElement | JSXSpreadAttribute | JSXExpressionContainer | null;
+    value: Literal | JSXElement | JSXSpreadAttribute | JSXExpressionContainer | null;
 }
 
 export interface JSXSpreadAttribute extends _Node<"JSXSpreadAttribute"> {

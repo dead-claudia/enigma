@@ -4,7 +4,7 @@ import * as assert from "clean-assert";
 
 describe.skip("ES2015 - `yield`", () => {
     it("should parse yield arg super", () => {
-        assert.match<Program>(parseScript("class A { *b() { yield super.c(); } }"), {
+        assert.match<any>(parseScript("class A { *b() { yield super.c(); } }"), {
             type: "Program",
             body: [
                 {
@@ -70,7 +70,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield arg this", () => {
-        assert.match<Program>(parseScript("function *g() { yield this }"), {
+        assert.match<any>(parseScript("function *g() { yield this }"), {
             type: "Program",
             body: [
                 {
@@ -105,7 +105,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield arg typeof", () => {
-        assert.match<Program>(parseScript("function *g() { yield typeof x }"), {
+        assert.match<any>(parseScript("function *g() { yield typeof x }"), {
             type: "Program",
             body: [
                 {
@@ -395,7 +395,7 @@ describe.skip("ES2015 - `yield`", () => {
     });
 
     it("should parse yield super property", () => {
-        assert.match<Program>(parseScript("class A extends B { X() { super.yield } }"), {
+        assert.match<any>(parseScript("class A extends B { X() { super.yield } }"), {
             type: "Program",
             body: [
                 {

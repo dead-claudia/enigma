@@ -1,3 +1,4 @@
+/* tslint:disable max-line-length */
 import {parseScript, parseModule} from "../../../src";
 import {Program} from "../../../src/estree";
 import * as assert from "clean-assert";
@@ -1103,7 +1104,7 @@ describe.skip("TC39 - Passes", () => {
     });
 
     it("should parse \"function eval() { function inner() { \"use strict\" } }\"", () => {
-        assert.match<Program>(parseScript(`function eval() { function inner() { "use strict" } }`), {
+        assert.match<any>(parseScript(`function eval() { function inner() { "use strict" } }`), {
             type: "Program",
             body: [
                 {
@@ -1815,7 +1816,7 @@ describe.skip("TC39 - Passes", () => {
     });
 
     it("should parse \"class a {b(){}}\"", () => {
-        assert.match<Program>(parseScript("class a {b(){}}"), {
+        assert.match<any>(parseScript("class a {b(){}}"), {
             type: "Program",
             body: [
                 {
@@ -1858,7 +1859,7 @@ describe.skip("TC39 - Passes", () => {
     });
 
     it("should parse \"class a {b(){};c(){}}\"", () => {
-        assert.match<Program>(parseScript("class a {b(){};c(){}}"), {
+        assert.match<any>(parseScript("class a {b(){};c(){}}"), {
             type: "Program",
             body: [
                 {
@@ -2266,7 +2267,7 @@ describe.skip("TC39 - Passes", () => {
     });
 
     it("should parse \"class a { static *b() {} }\"", () => {
-        assert.match<Program>(parseScript("class a { static *b() {} }"), {
+        assert.match<any>(parseScript("class a { static *b() {} }"), {
             type: "Program",
             body: [
                 {
@@ -3399,7 +3400,7 @@ describe.skip("TC39 - Passes", () => {
     });
 
     it("should parse \"class a extends b { c() { super.yield } }\"", () => {
-        assert.match<Program>(parseScript("class a extends b { c() { super.yield } }"), {
+        assert.match<any>(parseScript("class a extends b { c() { super.yield } }"), {
             type: "Program",
             body: [
                 {
@@ -3727,7 +3728,7 @@ describe.skip("TC39 - Passes", () => {
     });
 
     it("should parse \"class a extends b { constructor() { super() } }\"", () => {
-        assert.match<Program>(parseScript(`class a extends b { constructor() { super() } }`), {
+        assert.match<any>(parseScript(`class a extends b { constructor() { super() } }`), {
             type: "Program",
             body: [
                 {
@@ -3784,7 +3785,7 @@ describe.skip("TC39 - Passes", () => {
     });
 
     it("should parse \"(class extends a { constructor() { super() } });\"", () => {
-        assert.match<Program>(parseScript(`(class extends a { constructor() { super() } });`), {
+        assert.match<any>(parseScript(`(class extends a { constructor() { super() } });`), {
             type: "Program",
             body: [
                 {
@@ -5601,7 +5602,6 @@ a !== a ? a % a : a != a ? a - a - a : a == a ? a * a * a : a in a ? a >> a >> a
 a << a << a : a >= a ? a / a / a : a <= a ? a % a % a : a > a ? a * a / a : a < a ?
 (a >>> a) >> a << a - a + a % a / a * a : a;
 `), {
-            /* tslint:disable max-line-length */
             type: "Program",
             body: [
                 {
@@ -6130,7 +6130,6 @@ a << a << a : a >= a ? a / a / a : a <= a ? a % a % a : a > a ? a * a / a : a < 
                 },
             ],
             sourceType: "script",
-            /* tslint:enable max-line-length */
         });
     });
 
@@ -7635,7 +7634,6 @@ a = delete a;`), {
         });
     });
 
-    /* tslint:disable max-line-length */
     it("should parse \"function a({ a: A = 1 + 1, b: { c: { d: D = 1 + 1, e: { f = 1 + 1 } } } }) {}\"", () => {
         assert.match<Program>(parseScript(`function a({ a: A = 1 + 1, b: { c: { d: D = 1 + 1, e: { f = 1 + 1 } } } }) {}`), {
             type: "Program",
@@ -7803,7 +7801,6 @@ a = delete a;`), {
             sourceType: "script",
         });
     });
-    /* tslint:enable max-line-length */
 
     it("should parse \"function a(a = 1, b = 2 + 3, c, ...d) {}\"", () => {
         assert.match<Program>(parseScript(`function a(a = 1, b = 2 + 3, c, ...d) {}`), {
@@ -8648,7 +8645,7 @@ a = delete a;`), {
     });
 
     it("should parse \"(function() {\"use strict\";return 1;});\"", () => {
-        assert.match<Program>(parseScript(`class A {
+        assert.match<any>(parseScript(`class A {
             static *b() {}
         }`), {
             type: "Program",
@@ -8693,7 +8690,7 @@ a = delete a;`), {
     });
 
     it("should parse \"(function() {\"use strict\";return 1;});\"", () => {
-        assert.match<Program>(parseScript(`class A {
+        assert.match<any>(parseScript(`class A {
             constructor() {}
         }`), {
             type: "Program",
@@ -8738,7 +8735,7 @@ a = delete a;`), {
     });
 
     it("should parse \"(function() {\"use strict\";return 1;});\"", () => {
-        assert.match<Program>(parseScript(`class A {
+        assert.match<any>(parseScript(`class A {
             constructor() {}
             static b() {}
         }`), {
@@ -9660,7 +9657,7 @@ a = delete a;`), {
     });
 
     it("should parse \"(class extends a { constructor() { super() } });\"", () => {
-        assert.match<Program>(parseScript(`(class extends a { constructor() { super() } });`), {
+        assert.match<any>(parseScript(`(class extends a { constructor() { super() } });`), {
             type: "Program",
             body: [
                 {
@@ -9717,7 +9714,7 @@ a = delete a;`), {
     });
 
     it("should parse \"class a extends b { constructor() { super() } }\"", () => {
-        assert.match<Program>(parseScript(`class a extends b { constructor() { super() } }`), {
+        assert.match<any>(parseScript(`class a extends b { constructor() { super() } }`), {
             type: "Program",
             body: [
                 {
@@ -9774,7 +9771,7 @@ a = delete a;`), {
     });
 
     it("should parse \"class a extends b { \"constructor\"() { super() } }\"", () => {
-        assert.match<Program>(parseScript(`class a extends b { "constructor"() { super() } }`), {
+        assert.match<any>(parseScript(`class a extends b { "constructor"() { super() } }`), {
             type: "Program",
             body: [
                 {
@@ -9831,7 +9828,7 @@ a = delete a;`), {
     });
 
     it("should parse \"class a extends b { constructor(c = super()){} }\"", () => {
-        assert.match<Program>(parseScript(`class a extends b { constructor(c = super()){} }`), {
+        assert.match<any>(parseScript(`class a extends b { constructor(c = super()){} }`), {
             body: [
                 {
                     body: {
@@ -9892,7 +9889,7 @@ a = delete a;`), {
     });
 
     it("should parse \"class a extends b { constructor() { ({c: super()}); } }\"", () => {
-        assert.match<Program>(parseScript(`class a extends b { constructor() { ({c: super()}); } }`), {
+        assert.match<any>(parseScript(`class a extends b { constructor() { ({c: super()}); } }`), {
             type: "Program",
             body: [
                 {
@@ -10228,7 +10225,7 @@ a = delete a;`), {
     });
 
     it("should parse \"(class { constructor() { super.a } });\"", () => {
-        assert.match<Program>(parseScript(`(class { constructor() { super.a } });`), {
+        assert.match<any>(parseScript(`(class { constructor() { super.a } });`), {
             type: "Program",
             body: [
                 {
@@ -10286,7 +10283,7 @@ a = delete a;`), {
     });
 
     it("should parse \"class a extends b { constructor() { super.c } }\"", () => {
-        assert.match<Program>(parseScript(`class a extends b { constructor() { super.c } }`), {
+        assert.match<any>(parseScript(`class a extends b { constructor() { super.c } }`), {
             type: "Program",
             body: [
                 {
@@ -10347,7 +10344,7 @@ a = delete a;`), {
     });
 
     it("should parse \"class a { b() { () => super.c; } }\"", () => {
-        assert.match<Program>(parseScript(`class a { b() { () => super.c; } }`), {
+        assert.match<any>(parseScript(`class a { b() { () => super.c; } }`), {
             type: "Program",
             body: [
                 {
@@ -10413,7 +10410,7 @@ a = delete a;`), {
     });
 
     it("should parse \"class a { b() { new super.c; } }\"", () => {
-        assert.match<Program>(parseScript(`class a { b() { new super.c; } }`), {
+        assert.match<any>(parseScript(`class a { b() { new super.c; } }`), {
             type: "Program",
             body: [
                 {
@@ -10475,7 +10472,7 @@ a = delete a;`), {
     });
 
     it("should parse \"class a { b() { new super.c(); } }\"", () => {
-        assert.match<Program>(parseScript(`class a { b() { new super.c(); } }`), {
+        assert.match<any>(parseScript(`class a { b() { new super.c(); } }`), {
             type: "Program",
             body: [
                 {
@@ -11685,7 +11682,7 @@ a = delete a;`), {
     });
 
     it("should parse \"class a extends b { c() { [super.d] = e } }\"", () => {
-        assert.match<Program>(parseScript(`class a extends b { c() { [super.d] = e } }`), {
+        assert.match<any>(parseScript(`class a extends b { c() { [super.d] = e } }`), {
             type: "Program",
             body: [
                 {
@@ -13925,7 +13922,6 @@ var p = [].e("b");`), {
                 return { p: p };
             }
         `), {
-            /* tslint:disable max-line-length */
             type: "Program",
             body: [
                 {
@@ -15087,7 +15083,6 @@ var p = [].e("b");`), {
                 },
             ],
             sourceType: "script",
-            /* tslint:enable max-line-length */
         });
     });
 
@@ -19920,7 +19915,7 @@ var p = [].e("b");`), {
     });
 
     it("should parse \"(function() {\"use strict\";return 1;});\"", () => {
-        assert.match<Program>(parseScript(`(class {;;;\n;a(){}b(){}})`), {
+        assert.match<any>(parseScript(`(class {;;;\n;a(){}b(){}})`), {
             type: "Program",
             body: [
                 {
@@ -19984,7 +19979,7 @@ var p = [].e("b");`), {
     });
 
     it("should parse \"(class {a(b) {use strict;}})\"", () => {
-        assert.match<Program>(parseScript(`(class {a(b) {'use strict';}})`), {
+        assert.match<any>(parseScript(`(class {a(b) {'use strict';}})`), {
             type: "Program",
             body: [
                 {
@@ -20040,7 +20035,7 @@ var p = [].e("b");`), {
     });
 
     it("should parse \"(class {a() {}})\"", () => {
-        assert.match<Program>(parseScript(`(class {a() {}})`), {
+        assert.match<any>(parseScript(`(class {a() {}})`), {
             type: "Program",
             body: [
                 {
@@ -23473,7 +23468,7 @@ var p = [].e("b");`), {
     });
 
     it("should parse \"class a {;b(){};c(){};}\"", () => {
-        assert.match<Program>(parseScript(`class a {;b(){};c(){};}`), {
+        assert.match<any>(parseScript(`class a {;b(){};c(){};}`), {
             type: "Program",
             body: [
                 {
@@ -23537,7 +23532,7 @@ var p = [].e("b");`), {
     });
 
     it("should parse \"class a {static [b](){};}\"", () => {
-        assert.match<Program>(parseScript(`class a {static [b](){};}`), {
+        assert.match<any>(parseScript(`class a {static [b](){};}`), {
             type: "Program",
             body: [
                 {
@@ -23810,7 +23805,7 @@ var p = [].e("b");`), {
     });
 
     it("should parse \"function* a(){(class {[yield](){}})};\"", () => {
-        assert.match<Program>(parseScript(`function* a(){(class {[yield](){}})};`), {
+        assert.match<any>(parseScript(`function* a(){(class {[yield](){}})};`), {
             type: "Program",
             body: [
                 {
@@ -24153,7 +24148,6 @@ var p = [].e("b");`), {
 
     it("should parse \"!{ a() { !function* (a = super.b()){} } };\"", () => {
         assert.match<Program>(parseScript(`!{ a() { !function* (a = super.b()){} } };`), {
-            /* tslint:disable max-line-length */
             type: "Program",
             body: [
                 {
@@ -24238,7 +24232,6 @@ var p = [].e("b");`), {
                 },
             ],
             sourceType: "script",
-            /* tslint:enable max-line-length */
         });
     });
 
@@ -24287,7 +24280,7 @@ var p = [].e("b");`), {
     });
 
     it("should parse \"class a extends b { c() { function* d(){ super.e(); } } }\"", () => {
-        assert.match<Program>(parseScript(`class a extends b { c() { function* d(){ super.e(); } } }`), {
+        assert.match<any>(parseScript(`class a extends b { c() { function* d(){ super.e(); } } }`), {
             type: "Program",
             body: [
                 {
@@ -24368,7 +24361,7 @@ var p = [].e("b");`), {
     });
 
     it("should parse \"class a extends b { static c() { super(); } }\"", () => {
-        assert.match<Program>(parseScript(`class a extends b { static c() { super(); } }`), {
+        assert.match<any>(parseScript(`class a extends b { static c() { super(); } }`), {
             type: "Program",
             body: [
                 {
@@ -24424,9 +24417,8 @@ var p = [].e("b");`), {
         });
     });
 
-    /* tslint:disable max-line-length */
     it("should parse \"class a extends b { constructor() { !{*constructor() { super(); }}; } }\"", () => {
-        assert.match<Program>(parseScript(`class a extends b { constructor() { !{*constructor() { super(); }}; } }`), {
+        assert.match<any>(parseScript(`class a extends b { constructor() { !{*constructor() { super(); }}; } }`), {
             type: "Program",
             body: [
                 {
@@ -24518,10 +24510,9 @@ var p = [].e("b");`), {
             sourceType: "script",
         });
     });
-    /* tslint:enable max-line-length */
 
     it("should parse \"class A { *f(eval){} }\"", () => {
-        assert.match<Program>(parseScript(`class A { *f(eval){} }`), {
+        assert.match<any>(parseScript(`class A { *f(eval){} }`), {
             body: [
                 {
                     body: {
