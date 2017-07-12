@@ -28,7 +28,7 @@
 //
 // The codes are stored in a shared typed array as *n* packed sets of 2176 32-bit bit vectors.
 
-const UnicodeCodeCount = 0x11000 /* codes */
+const UnicodeCodeCount = 0x110000 /* codes */
 const VectorSize = Uint32Array.BYTES_PER_ELEMENT * 8
 const VectorMask = VectorSize - 1
 const VectorBitCount = 32 - Math.clz32(VectorMask)
