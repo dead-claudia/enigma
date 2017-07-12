@@ -170,6 +170,12 @@ export function seek(parser: Parser, context: Context): Seek {
 
             /* HTML single line comment */
             case Chars.LessThan: {
+                // In module contexts, `a <!-- b` is functionally equivalent to `a < !(--b)`. This
+                // is because whitespace is terminated by non-whitespace, and `<!--` in module code
+                // is not considered a comment start (and thus not whitespace). Thus, we just break
+                // the loop.
+                //
+                // See: https://tc39.github.io/ecma262/#sec-html-like-comments
                 if (context & Context.Module) break loop;
                 const {index} = parser;
                 advanceOne(parser); // skip `<`
@@ -185,6 +191,8 @@ export function seek(parser: Parser, context: Context): Seek {
 
             /* HTML close */
             case Chars.Hyphen: {
+                // Break the loop rather than throwing, so we can report it as an unexpected token
+                // instead.
                 if (context & Context.Module || !(state & SeekState.NewLine)) break loop;
                 const {index} = parser;
                 advanceOne(parser); // skip `-`
