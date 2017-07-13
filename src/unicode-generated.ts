@@ -21,12 +21,10 @@ function mustEscape(code:number) {
 }
 
 const _ = ((compressed, dict) => {
-    debugger
     const result = new Uint32Array(104448)
     let i = 0, j = 0
 
     while (i < 3196) {
-        debugger
         const inst = compressed[i++]
         if (inst < 0) {
             j -= inst

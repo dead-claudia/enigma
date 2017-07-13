@@ -143,12 +143,10 @@ function decompress(compressed) {
 }
 
 const makeDecompress = compressed => `((compressed, dict) => {
-    debugger
     const result = new Uint32Array(${compressed.size})
     let i = 0, j = 0
 
     while (i < ${compressed.result.length}) {
-        debugger
         const inst = compressed[i++]
         if (inst < 0) {
             j -= inst
