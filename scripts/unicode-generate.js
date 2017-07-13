@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 "use strict"
 
-// This generates delta-encoded tables with a common lookup function aware of the encoding to
-// minimize the number of comparisons required, especially for the common case. I'd rather not have
-// a very slow runtime test.
+// This generates lookup tables with a common lookup function aware of the encoding to minimize the
+// number of comparisons required, especially for the common case. I'd rather not have a very slow
+// runtime test.
 //
 // Note that this has a dependency on `unicode-9.0.0` if executed directly.
 //
@@ -28,18 +28,149 @@
 //
 // The codes are stored in a shared typed array as *n* packed sets of 2176 32-bit bit vectors.
 
+// TODO:
+// 1. Investigate code matching bugs
+
 const UnicodeCodeCount = 0x110000 /* codes */
 const VectorSize = Uint32Array.BYTES_PER_ELEMENT * 8
 const VectorMask = VectorSize - 1
 const VectorBitCount = 32 - Math.clz32(VectorMask)
 const VectorByteSize = UnicodeCodeCount / VectorSize
 
+// A basic, primitive run-length + dictionary compression algorithm, to trim the generated code
+// size by quite a bit.
+//
+// Format:
+//
+// - (-x) - Skip `x` iterations. (Used to optimize repeated zeroes)
+// - (0, x) - Define `x` as the `ref`th value if `>= 10`, and emit 1 instance of it.
+// - (Link, ref) - Emit 1 instance of the `ref`th value.
+// - (Many, x, len) - Define `x` as the `ref`th value if `>= 10`, and emit it `len` times.
+// - (Link | Many, ref, len) - Emit the `ref`th value `len` times.
+
+const DataInst = Object.freeze({
+    Empty: 0x0,
+    Many: 0x1,
+    Link: 0x2,
+})
+exports.DataInst = DataInst
+
+// Lazily consume codes, so I can send them without using up tons of memory.
+exports.compressorCreate = compressorCreate
+function compressorCreate() {
+    return {
+        result: [],
+        dictLocs: Object.create(null),
+        dictIn: Object.create(null),
+        dict: [],
+        count: 0,
+        prev: 0,
+        mask: DataInst.Empty,
+        size: 0,
+    }
+}
+
+exports.compressorSend = compressorSend
+function compressorSend(state, code) {
+    state.size++
+
+    if (state.count === 0) {
+        state.prev = code
+        state.count++
+        return
+    }
+
+    if (state.prev === code) {
+        state.mask |= DataInst.Many
+        state.count++
+        return
+    }
+
+    if (state.prev === 0) {
+        state.result.push(-state.count)
+    } else {
+        state.result.push(state.mask)
+
+        if (state.mask & DataInst.Link) {
+            state.result.push(state.dictIn[state.prev])
+        } else {
+            if (state.prev >= 10) state.dictLocs[state.prev] = state.result.length
+            state.result.push(state.prev)
+        }
+
+        if (state.mask & DataInst.Many) state.result.push(state.count)
+    }
+
+    state.prev = code
+    state.mask = DataInst.Empty
+    state.count = 1
+    const loc = state.dictLocs[code]
+
+    if (loc == null) return
+    state.mask |= DataInst.Link
+
+    // Upgrade the first use to a ref if necessary
+    if (loc !== 0) {
+        state.dictLocs[code] = 0
+        state.result[loc - 1] |= DataInst.Link
+        state.result[loc] = state.dict.length
+        state.dictIn[code] = state.dict.length
+        state.dict.push(code)
+    }
+}
+
+exports.compressorEnd = compressorEnd
+function compressorEnd(state) {
+    if (state.prev === 0) {
+        state.result.push(-state.count)
+    } else {
+        state.result.push(state.mask)
+
+        if (state.mask & DataInst.Link) {
+            state.result.push(state.dictIn[state.prev])
+        } else {
+            state.result.push(state.prev)
+        }
+
+        if (state.mask & DataInst.Many) state.result.push(state.count)
+    }
+}
+
+// Exported for testing
+exports.decompress = decompress
+function decompress(compressed) {
+    return new Function(`return ${makeDecompress(compressed)}`)()
+}
+
+const makeDecompress = compressed => `((compressed, dict) => {
+    debugger
+    const result = new Uint32Array(${compressed.size})
+    let i = 0, j = 0
+
+    while (i < ${compressed.result.length}) {
+        debugger
+        const inst = compressed[i++]
+        if (inst < 0) {
+            j -= inst
+        } else {
+            let code = compressed[i++]
+            if (inst & ${DataInst.Link}) code = dict[code]
+            if (inst & ${DataInst.Many}) {
+                result.fill(code, j, j += compressed[i++])
+            } else {
+                result[j++] = code
+            }
+        }
+    }
+
+    return result
+})(
+    [${compressed.result}],
+    [${compressed.dict}]
+)`
+
 exports.generate = generate
 async function generate(opts) {
-    const ts = str => opts.eval ? "" : str
-    const codes = new Uint32Array(Object.keys(opts.exports).length * VectorByteSize)
-    let offset = 0
-
     await opts.write(`/* tslint:disable */
 "use strict";
 /*
@@ -48,28 +179,35 @@ async function generate(opts) {
  */
 `)
 
-    for (const exported in opts.exports) {
-        if (hasOwnProperty.call(opts.exports, exported)) {
-            const items = opts.exports[exported]
+    const exportKeys = Object.keys(opts.exports)
+    const compress = compressorCreate()
 
-            for (const list of items) {
-                for (const item of list) {
-                    codes[(item >>> VectorBitCount) + offset] |= 1 << (item & VectorMask)
-                }
+    for (const [index, exported] of exportKeys.entries()) {
+        const codes = new Uint32Array(VectorByteSize)
+        const items = opts.exports[exported]
+
+        for (const list of items) {
+            for (const item of list) {
+                codes[item >>> VectorBitCount] |= 1 << (item & VectorMask)
             }
+        }
 
-            await opts.write(`
-function ${exported}(code${ts(":number")}) {
+        for (const code of codes) {
+            compressorSend(compress, code)
+        }
+
+        await opts.write(`
+function ${exported}(code${opts.eval ? "" : ":number"}) {
     const bit = code & ${VectorMask}
-    return (_[(code >>> ${VectorBitCount}) + ${offset}] >>> bit & 1) !== 0
+    return (_[(code >>> ${VectorBitCount}) + ${index * VectorByteSize}] >>> bit & 1) !== 0
 }
 `)
-            offset += VectorByteSize
-        }
     }
 
+    compressorEnd(compress)
+
     await opts.write(`
-const _ = new Uint32Array([${codes}])
+const _ = ${makeDecompress(compress)}
 ${opts.eval ? "return" : "export"} {${Object.keys(opts.exports)}};
 `)
 }

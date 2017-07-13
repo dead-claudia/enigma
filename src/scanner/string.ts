@@ -188,7 +188,7 @@ table[Chars.LowerU] = (parser, _, prev) => {
 
             // Check this early to avoid `code` wrapping to a negative on overflow (which is
             // reserved for abnormal conditions).
-            if (code > 0x10fff) return Escape.OutOfRange;
+            if (code > Chars.LastUnicodeChar) return Escape.OutOfRange;
             ch = parser.lastChar = readNext(parser, ch);
         }
 

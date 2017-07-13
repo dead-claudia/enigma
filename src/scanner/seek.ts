@@ -8,8 +8,6 @@ import {
 } from "./common";
 import {isIDStart} from "../unicode-generated";
 
-// TODO: ensure this disallows HTML comments in strict mode.
-
 // Skip initial BOM and/or shebang.
 export function skipMeta(parser: Parser) {
     let index = parser.index;

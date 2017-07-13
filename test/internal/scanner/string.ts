@@ -3,6 +3,7 @@ import {fromCodePoint} from "../../../src/scanner/common";
 import {Context} from "../../../src/common";
 import {create} from "../../../src/parser";
 import {Token} from "../../../src/token";
+import {Chars as InternalChars} from "../../../src/chars";
 import * as assert from "clean-assert";
 
 describe("src/scanner/string", () => {
@@ -414,9 +415,9 @@ describe("src/scanner/string", () => {
             });
 
             context("Unicode brace escapes", () => {
-                for (let i = 0; i < 0x10c; i++) {
-                    const start = i << 8;
-                    const end = start | 0xff;
+                for (let i = 0; i < 0x10e; i++) {
+                    const start = i << 12;
+                    const end = start | 0xfff;
 
                     const startStr = `\\u{${start.toString(16)}}`;
                     const endStr = `\\u{${end.toString(16)}}`;
@@ -440,9 +441,9 @@ describe("src/scanner/string", () => {
                     });
                 }
 
-                for (let i = 0x10c; i <= 0x10f; i++) {
-                    const start = i << 8;
-                    const end = start | 0xff;
+                {
+                    const start = 0x10f000;
+                    const end = InternalChars.LastUnicodeChar;
 
                     const startStr = `\\u{${start.toString(16)}}`;
                     const endStr = `\\u{${end.toString(16)}}`;
