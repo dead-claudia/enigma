@@ -5,7 +5,7 @@
 // number of comparisons required, especially for the common case. I'd rather not have a very slow
 // runtime test.
 //
-// Note that this has a dependency on `unicode-9.0.0` if executed directly.
+// Note that this has a dependency on `unicode-10.0.0` if executed directly.
 //
 // `generate(opts)`, default-exported, generates a source from one or more lists of code points and
 // associated exports.
@@ -215,7 +215,7 @@ ${opts.eval ? "return" : "export"} {${Object.keys(opts.exports)}};
 if (require.main === module) {
     const path = require("path")
     const load = name => {
-        const mod = require.resolve(`unicode-9.0.0/${name}/code-points`)
+        const mod = require.resolve(`unicode-10.0.0/${name}/code-points`)
         const list = require(mod)
 
         // Keep this out of persistent memory

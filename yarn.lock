@@ -414,9 +414,9 @@ typescript@^2.3.2:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.4.1.tgz#c3ccb16ddaa0b2314de031e7e6fee89e5ba346bc"
 
-unicode-9.0.0@^0.7.4:
+unicode-10.0.0@^0.7.4:
   version "0.7.4"
-  resolved "https://registry.yarnpkg.com/unicode-9.0.0/-/unicode-9.0.0-0.7.4.tgz#6dfe5add35c2ea6e84dd8c272b6db318a5e40e9e"
+  resolved "https://registry.yarnpkg.com/unicode-10.0.0/-/unicode-10.0.0-0.7.4.tgz#05e82c0ba30c0db01ae7d93f2ea8e2a8a1624b55"
 
 user-home@^1.1.1:
   version "1.1.1"
