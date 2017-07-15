@@ -105,11 +105,13 @@ function verifyRegExpPattern(
                             return fail("invalid group prefix");
                         }
 
-                        switch (read()) {
-                            case Chars.EqualSign: case Chars.Exclamation: break;
-                            default:
-                                i--;
-                                namedGroups[readName()] = true;
+                        const ch = read();
+
+                        if (ch !== Chars.EqualSign && ch !== Chars.Exclamation) {
+                            i--;
+                            const name = readName();
+                            if (read() !== Chars.LessThan) return fail("invalid group prefix");
+                            namedGroups[name] = true;
                         }
 
                         return readTerm(TermType.TopLevel, depth + 1);
