@@ -18,6 +18,7 @@ export function create(source: string, onComment: OnComment): Parser {
         column: 0,
         tokenValue: undefined,
         tokenRaw: "",
+        tokenRegExp: undefined,
         lastChar: 0,
     };
 }

@@ -12,6 +12,7 @@ import {isIDStart, isIDContinue} from "../unicode-generated";
 //   - Suffix tree checking will have potentially poor branch prediction.
 //   - String comparison could be O(mn) worst case, but won't have the JIT boilerplate.
 //   - Branch prediction will suffer regardless.
+//   - All keywords are of length 2 ≥ length ≥ 10, so that can be optimized for.
 
 export function scanKnownIdentifier(parser: Parser, context: Context): Token {
     // TODO

@@ -48,6 +48,10 @@ export interface Parser {
 
     tokenValue: any;
     tokenRaw: string;
+    tokenRegExp: void | {
+        pattern: string;
+        flags: string;
+    };
 
     // For the scanner to work around lack of multiple return.
     lastChar: number;

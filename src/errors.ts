@@ -57,6 +57,10 @@ export const duplicateConstructor = () => (
     "A class may only have one constructor"
 );
 
+export const duplicateRegExpFlag = (flag: string) => (
+    `Unexpected duplicate regular expression flag: ${flag}`
+);
+
 export const emptyVariableDeclList = () => (
     "Variable declaration list cannot be empty"
 );
@@ -277,12 +281,20 @@ export const unknownJSXChildKind = (kind: string) => (
     `Unknown JSX child kind ${kind}`
 );
 
+export const unknownRegExpFlagChar = (flag: string) => (
+    `Unknown regular expression flag character: ${flag}`
+);
+
 export const unterminatedComment = () => (
     "Unterminated comment"
 );
 
 export const unterminatedString = () => (
     "Unterminated string literal"
+);
+
+export const unterminatedRegExp = () => (
+    "Unterminated regular expression literal"
 );
 
 export const varDeclNeitherOfOrOIn = () => (
