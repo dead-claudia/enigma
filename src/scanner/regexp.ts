@@ -46,7 +46,6 @@ function verifyRegExpPattern(
 
     const enum TermType {
         TopLevel,
-        FromOctal,
         MaybeQuantifier,
         RestrictDigit,
         NoRightBrace,
