@@ -11,7 +11,8 @@ import {
 } from "./common";
 
 // TODO:
-// 1. Investigate using slices instead of `String.fromCharCode`
+// 1. Investigate using slices instead of `String.fromCharCode`.
+// 2. Do a better job of avoiding Unicode-aware code handling.
 
 /*
  * The string parsing works this way:
@@ -52,162 +53,161 @@ const enum Constants {
     Size = 128,
 }
 
-// By default, consuming escapes defaults to returning the character.
-type Callback = (parser: Parser, context: Context, first: number) => number;
-const table = new Array<Callback>(Constants.Size).fill(nextUnicodeChar);
+function parseEscape(parser: Parser, context: Context, first: number): number {
+    switch (first) {
+        // Magic escapes
+        case Chars.LowerB: return Chars.Backspace;
+        case Chars.LowerF: return Chars.FormFeed;
+        case Chars.LowerR: return Chars.CarriageReturn;
+        case Chars.LowerN: return Chars.LineFeed;
+        case Chars.LowerT: return Chars.Tab;
+        case Chars.LowerV: return Chars.VerticalTab;
 
-// Magic escapes
-table[Chars.LowerB] = () => Chars.Backspace;
-table[Chars.LowerF] = () => Chars.FormFeed;
-table[Chars.LowerR] = () => Chars.CarriageReturn;
-table[Chars.LowerN] = () => Chars.LineFeed;
-table[Chars.LowerT] = () => Chars.Tab;
-table[Chars.LowerV] = () => Chars.VerticalTab;
+        // Line continuations
+        case Chars.CarriageReturn: {
+            const {index} = parser;
 
-// Line continuations
-table[Chars.CarriageReturn] = parser => {
-    parser.column = -1;
-    parser.line++;
+            if (index < parser.source.length) {
+                const ch = parser.source.charCodeAt(index);
 
-    const {index} = parser;
-
-    if (index < parser.source.length) {
-        const ch = parser.source.charCodeAt(index);
-
-        if (ch === Chars.LineFeed) {
-            parser.lastChar = ch;
-            parser.index = index + 1;
+                if (ch === Chars.LineFeed) {
+                    parser.lastChar = ch;
+                    parser.index = index + 1;
+                }
+            }
         }
-    }
+            // falls through
 
-    return Escape.Empty;
-};
+        case Chars.LineFeed:
+        case Chars.LineSeparator:
+        case Chars.ParagraphSeparator:
+            parser.column = -1;
+            parser.line++;
+            return Escape.Empty;
 
-table[Chars.LineFeed] =
-table[Chars.LineSeparator] =
-table[Chars.ParagraphSeparator] = parser => {
-    parser.column = -1;
-    parser.line++;
-    return Escape.Empty;
-};
+        // Null character, octals
+        case Chars.Zero:
+        case Chars.One:
+        case Chars.Two:
+        case Chars.Three: {
+            let code = first - Chars.Zero;
+            let index = parser.index + 1;
+            let column = parser.column + 1;
 
-// Null character, octals
-table[Chars.Zero] =
-table[Chars.One] =
-table[Chars.Two] =
-table[Chars.Three] = (parser, context, first) => {
-    let code = first - Chars.Zero;
-    let index = parser.index + 1;
-    let column = parser.column + 1;
+            if (index < parser.source.length) {
+                const next = parser.source.charCodeAt(index);
 
-    if (index < parser.source.length) {
-        const next = parser.source.charCodeAt(index);
+                if (next < Chars.Zero || next > Chars.Seven) {
+                    // Verify that it's `\0` if we're in strict mode.
+                    if (code !== 0 && context & Context.Strict) return Escape.StrictOctal;
+                } else if (context & Context.Strict) {
+                    // This happens in cases like `\00` in strict mode.
+                    return Escape.StrictOctal;
+                } else {
+                    parser.lastChar = next;
+                    code = (code << 3) | (next - Chars.Zero);
+                    index++; column++;
 
-        if (next < Chars.Zero || next > Chars.Seven) {
-            // Verify that it's `\0` if we're in strict mode.
-            if (code !== 0 && context & Context.Strict) return Escape.StrictOctal;
-        } else if (context & Context.Strict) {
-            // This happens in cases like `\00` in strict mode.
-            return Escape.StrictOctal;
-        } else {
-            parser.lastChar = next;
-            code = (code << 3) | (next - Chars.Zero);
-            index++; column++;
+                    if (index < parser.source.length) {
+                        const next = parser.source.charCodeAt(index);
+
+                        if (next >= Chars.Zero && next <= Chars.Seven) {
+                            parser.lastChar = next;
+                            code = (code << 3) | (next - Chars.Zero);
+                            index++; column++;
+                        }
+                    }
+
+                    parser.index = index - 1;
+                    parser.column = column - 1;
+                }
+            }
+
+            return code;
+        }
+
+        case Chars.Four:
+        case Chars.Five:
+        case Chars.Six:
+        case Chars.Seven: {
+            if (context & Context.Strict) return Escape.StrictOctal;
+            let code = first - Chars.Zero;
+            const index = parser.index + 1;
+            const column = parser.column + 1;
 
             if (index < parser.source.length) {
                 const next = parser.source.charCodeAt(index);
 
                 if (next >= Chars.Zero && next <= Chars.Seven) {
-                    parser.lastChar = next;
                     code = (code << 3) | (next - Chars.Zero);
-                    index++; column++;
+                    parser.lastChar = next;
+                    parser.index = index;
+                    parser.column = column;
                 }
             }
 
-            parser.index = index - 1;
-            parser.column = column - 1;
+            return code;
         }
+
+        // `8`, `9` (invalid escapes)
+        case Chars.Eight: case Chars.Nine:
+            return Escape.EightOrNine;
+
+        // ASCII escapes
+        case Chars.LowerX: {
+            const ch1 = parser.lastChar = readNext(parser, first);
+            const hi = toHex(ch1);
+            if (hi < 0) return Escape.InvalidHex;
+            const ch2 = parser.lastChar = readNext(parser, ch1);
+            const lo = toHex(ch2);
+            if (lo < 0) return Escape.InvalidHex;
+
+            return hi << 4 | lo;
+        }
+
+        // UCS-2/Unicode escapes
+        case Chars.LowerU: {
+            let ch = parser.lastChar = readNext(parser, first);
+            if (ch === Chars.LeftBrace) {
+                // \u{N}
+                // The first digit is required, so handle it *out* of the loop.
+                ch = parser.lastChar = readNext(parser, ch);
+                let code = toHex(ch);
+                if (code < 0) return Escape.InvalidHex;
+
+                ch = parser.lastChar = readNext(parser, ch);
+                while (ch !== Chars.RightBrace) {
+                    const digit = toHex(ch);
+                    if (digit < 0) return Escape.InvalidHex;
+                    code = code << 4 | digit;
+
+                    // Check this early to avoid `code` wrapping to a negative on overflow (which is
+                    // reserved for abnormal conditions).
+                    if (code > Chars.LastUnicodeChar) return Escape.OutOfRange;
+                    ch = parser.lastChar = readNext(parser, ch);
+                }
+
+                return code;
+            } else {
+                // \uNNNN
+                let code = toHex(ch);
+                if (code < 0) return Escape.InvalidHex;
+
+                for (let i = 0; i < 3; i++) {
+                    ch = parser.lastChar = readNext(parser, ch);
+                    const digit = toHex(ch);
+                    if (digit < 0) return Escape.InvalidHex;
+                    code = code << 4 | digit;
+                }
+
+                return code;
+            }
+        }
+
+        default:
+            return nextUnicodeChar(parser);
     }
-
-    return code;
-};
-
-table[Chars.Four] =
-table[Chars.Five] =
-table[Chars.Six] =
-table[Chars.Seven] = (parser, context, first) => {
-    if (context & Context.Strict) return Escape.StrictOctal;
-    let code = first - Chars.Zero;
-    const index = parser.index + 1;
-    const column = parser.column + 1;
-
-    if (index < parser.source.length) {
-        const next = parser.source.charCodeAt(index);
-
-        if (next >= Chars.Zero && next <= Chars.Seven) {
-            code = (code << 3) | (next - Chars.Zero);
-            parser.lastChar = next;
-            parser.index = index;
-            parser.column = column;
-        }
-    }
-
-    return code;
-};
-
-// `8`, `9` (invalid escapes)
-table[Chars.Eight] = table[Chars.Nine] = () => Escape.EightOrNine;
-
-// ASCII escapes
-table[Chars.LowerX] = (parser, _, first) => {
-    const ch1 = parser.lastChar = readNext(parser, first);
-    const hi = toHex(ch1);
-    if (hi < 0) return Escape.InvalidHex;
-    const ch2 = parser.lastChar = readNext(parser, ch1);
-    const lo = toHex(ch2);
-    if (lo < 0) return Escape.InvalidHex;
-
-    return hi << 4 | lo;
-};
-
-// UCS-2/Unicode escapes
-table[Chars.LowerU] = (parser, _, prev) => {
-    let ch = parser.lastChar = readNext(parser, prev);
-    if (ch === Chars.LeftBrace) {
-        // \u{N}
-        // The first digit is required, so handle it *out* of the loop.
-        ch = parser.lastChar = readNext(parser, ch);
-        let code = toHex(ch);
-        if (code < 0) return Escape.InvalidHex;
-
-        ch = parser.lastChar = readNext(parser, ch);
-        while (ch !== Chars.RightBrace) {
-            const digit = toHex(ch);
-            if (digit < 0) return Escape.InvalidHex;
-            code = code << 4 | digit;
-
-            // Check this early to avoid `code` wrapping to a negative on overflow (which is
-            // reserved for abnormal conditions).
-            if (code > Chars.LastUnicodeChar) return Escape.OutOfRange;
-            ch = parser.lastChar = readNext(parser, ch);
-        }
-
-        return code;
-    } else {
-        // \uNNNN
-        let code = toHex(ch);
-        if (code < 0) return Escape.InvalidHex;
-
-        for (let i = 0; i < 3; i++) {
-            ch = parser.lastChar = readNext(parser, ch);
-            const digit = toHex(ch);
-            if (digit < 0) return Escape.InvalidHex;
-            code = code << 4 | digit;
-        }
-
-        return code;
-    }
-};
+}
 
 function handleStringError(
     parser: Parser,
@@ -259,7 +259,7 @@ export function scanString(parser: Parser, context: Context, quote: number): Tok
                     ret += fromCodePoint(ch);
                 } else {
                     parser.lastChar = ch;
-                    const code = table[ch](parser, context, ch);
+                    const code = parseEscape(parser, context, ch);
 
                     if (code >= 0) ret += fromCodePoint(code);
                     else handleStringError(parser, code as Escape, index, line, column);
@@ -359,7 +359,7 @@ export function scanTemplate(parser: Parser, context: Context, first: number): T
                     ret += fromCodePoint(ch);
                 } else {
                     parser.lastChar = ch;
-                    const code = table[ch](parser, context, ch);
+                    const code = parseEscape(parser, context, ch);
 
                     if (code >= 0) {
                         ret += fromCodePoint(code);

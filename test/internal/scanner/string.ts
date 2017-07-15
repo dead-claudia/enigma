@@ -423,7 +423,7 @@ describe("src/scanner/string", () => {
                     const endStr = `\\u{${end.toString(16)}}`;
 
                     it(`(slow) scans ${startStr} - ${endStr}`, function () {
-                        this.slow(150);
+                        this.slow(1000);
                         for (let code = start; code <= end; code++) {
                             const ch = fromCodePoint(code);
                             const escape = `\\u{${code.toString(16)}}`;
@@ -472,8 +472,8 @@ describe("src/scanner/string", () => {
                 fail("doesn't scan '\\u{0g}'", "'\\u{0g}'");
                 fail("doesn't scan '\\u{0g0}'", "'\\u{0g0}'");
                 fail("doesn't scan '\\u{g0g}'", "'\\u{g0g}'");
-                fail("doesn't scan '\\u{11000}'", "'\\u{11000}'");
-                fail("doesn't scan '\\u{11fff}'", "'\\u{11fff}'");
+                fail("doesn't scan '\\u{110000}'", "'\\u{110000}'");
+                fail("doesn't scan '\\u{11ffff}'", "'\\u{11ffff}'");
             });
 
             context("legacy octal", () => {
@@ -1455,28 +1455,28 @@ describe("src/scanner/string", () => {
                     line: 1, column: 10,
                 });
 
-                passTagged("scans `\\u{11000}`", {
-                    source: "`\\u{11000}`",
-                    raw: "\\u{11000}",
-                    line: 1, column: 11,
-                });
-
-                passTagged("scans `\\u{11000}${", {
-                    source: "`\\u{11000}${",
-                    raw: "\\u{11000}",
+                passTagged("scans `\\u{110000}`", {
+                    source: "`\\u{110000}`",
+                    raw: "\\u{110000}",
                     line: 1, column: 12,
                 });
 
-                passTagged("scans `\\u{11fff}`", {
-                    source: "`\\u{11fff}`",
-                    raw: "\\u{11fff}",
-                    line: 1, column: 11,
+                passTagged("scans `\\u{110000}${", {
+                    source: "`\\u{110000}${",
+                    raw: "\\u{110000}",
+                    line: 1, column: 13,
                 });
 
-                passTagged("scans `\\u{11fff}${", {
-                    source: "`\\u{11fff}${",
-                    raw: "\\u{11fff}",
+                passTagged("scans `\\u{11ffff}`", {
+                    source: "`\\u{11ffff}`",
+                    raw: "\\u{11ffff}",
                     line: 1, column: 12,
+                });
+
+                passTagged("scans `\\u{11ffff}${", {
+                    source: "`\\u{11ffff}${",
+                    raw: "\\u{11ffff}",
+                    line: 1, column: 13,
                 });
             });
 

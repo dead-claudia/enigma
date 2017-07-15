@@ -8,6 +8,10 @@ import {isIDStart, isIDContinue} from "../unicode-generated";
 //   the unescaped names. That way, I'm only (unlikely) branching once.
 // - Check the resulting codes for `isIDStart` and `isIDContinue` for raw characters and escapes
 //   identically.
+// - Investigate how to avoid string comparison for keyword checking. Complicating factors include:
+//   - Suffix tree checking will have potentially poor branch prediction.
+//   - String comparison could be O(mn) worst case, but won't have the JIT boilerplate.
+//   - Branch prediction will suffer regardless.
 
 export function scanKnownIdentifier(parser: Parser, context: Context): Token {
     // TODO

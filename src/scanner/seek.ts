@@ -8,6 +8,12 @@ import {
 } from "./common";
 import {isIDStart} from "../unicode-generated";
 
+// TODO: move seek state setting parser state flags:
+//
+// - Seek.None - 0
+// - Seek.SameLine - Flags.SeekMoved
+// - Seek.NewLine - Flags.SeekMoved | Flags.SeekLineTerminator
+
 // Skip initial BOM and/or shebang.
 export function skipMeta(parser: Parser) {
     let index = parser.index;
