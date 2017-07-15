@@ -16,6 +16,8 @@ function unterminated(parser: Parser): never {
 // TODO:
 // 1. Investigate using slices instead of `String.fromCharCode`
 // 2. Do Unicode side, which validates a lot more things.
+// 3. RegExp validation can compute the column from `parser.column - start + index` when updating
+//    after parsing names, since newlines are disallowed.
 
 function fail(message: string) {
     // TODO
@@ -36,14 +38,6 @@ function verifyRegExpPattern(
     // Cast required: https://github.com/Microsoft/TypeScript/issues/15835
     // let current = State.NoQuantifier as State;
 
-    function hasNext() {
-        return i === end;
-    }
-
-    function read() {
-        return parser.source.charCodeAt(i++);
-    }
-
     const enum TermType {
         TopLevel,
         MaybeQuantifier,
@@ -52,36 +46,52 @@ function verifyRegExpPattern(
         MaybeLazy,
     }
 
-    function readName(): string {
+    // TODO: return new index
+    function readName(target: {[key: string]: boolean}): void {
+        const name = "";
         // TODO
+        if (parser.source.charCodeAt(i++) === Chars.GreaterThan) readGroups[name] = true;
         return unimplemented();
     }
 
     function readTerm(type: TermType, depth: number): void {
-        if (!hasNext() && depth) return fail("unterminated group");
-        switch (read()) {
+        if (i === end) {
+            if (depth) return fail("unterminated group");
+            return;
+        }
+
+        switch (parser.source.charCodeAt(i++)) {
             // `^`, `$`
             case Chars.Caret: case Chars.Dollar:
                 return readTerm(TermType.TopLevel, depth);
 
             // `\`
             case Chars.Backslash: {
-                if (!hasNext()) return fail("unterminated regexp literal");
-                const ch = read();
-                switch (ch) {
+                if (i === end) return fail("unterminated regexp literal");
+                switch (parser.source.charCodeAt(i++)) {
                     case Chars.LowerU:
-                        if (!hasNext() || toHex(read()) >= 0) return fail("unterminated escape");
-                        if (!hasNext() || toHex(read()) >= 0) return fail("unterminated escape");
+                        if (i === end || toHex(parser.source.charCodeAt(i++)) >= 0) {
+                            return fail("unterminated escape");
+                        }
+                        if (i === end || toHex(parser.source.charCodeAt(i++)) >= 0) {
+                            return fail("unterminated escape");
+                        }
                         // falls through
                     case Chars.LowerX:
-                        if (!hasNext() || toHex(read()) >= 0) return fail("unterminated escape");
-                        if (!hasNext() || toHex(read()) >= 0) return fail("unterminated escape");
+                        if (i === end || toHex(parser.source.charCodeAt(i++)) >= 0) {
+                            return fail("unterminated escape");
+                        }
+                        if (i === end || toHex(parser.source.charCodeAt(i++)) >= 0) {
+                            return fail("unterminated escape");
+                        }
                         break;
 
                     case Chars.LowerK:
-                        if (context & Context.OptionsNext && read() === Chars.LessThan) {
-                            const name = readName();
-                            if (read() === Chars.LessThan) readGroups[name] = true;
+                        if (
+                            (context & Context.OptionsNext) &&
+                            i !== end && parser.source.charCodeAt(i++) === Chars.LessThan
+                        ) {
+                            readName(readGroups);
                         }
                         // falls through
                     default:
@@ -90,36 +100,26 @@ function verifyRegExpPattern(
             }
 
             // `(`
-            case Chars.LeftParen:
-                if (read() !== Chars.QuestionMark) {
-                    i--;
+            case Chars.LeftParen: {
+                let ch = parser.source.charCodeAt(i);
+
+                if (ch !== Chars.QuestionMark) return readTerm(TermType.TopLevel, depth + 1);
+                i++;
+                ch = parser.source.charCodeAt(i++);
+
+                if (ch === Chars.EqualSign || ch === Chars.Exclamation || ch === Chars.Colon) {
                     return readTerm(TermType.TopLevel, depth + 1);
                 }
 
-                switch (read()) {
-                    case Chars.EqualSign: case Chars.Exclamation: case Chars.Colon:
-                        return readTerm(TermType.TopLevel, depth + 1);
-
-                    case Chars.LessThan: {
-                        if (!hasNext() || !(context & Context.OptionsNext)) {
-                            return fail("invalid group prefix");
-                        }
-
-                        const ch = read();
-
-                        if (ch !== Chars.EqualSign && ch !== Chars.Exclamation) {
-                            i--;
-                            const name = readName();
-                            if (read() !== Chars.LessThan) return fail("invalid group prefix");
-                            namedGroups[name] = true;
-                        }
-
-                        return readTerm(TermType.TopLevel, depth + 1);
-                    }
-
-                    default:
-                        return fail("invalid group prefix");
+                if (ch === Chars.LessThan && (context & Context.OptionsNext) && i !== end) {
+                    ch = parser.source.charCodeAt(i);
+                    if (ch === Chars.EqualSign || ch === Chars.Exclamation) i++;
+                    else readName(namedGroups);
+                    return readTerm(TermType.TopLevel, depth + 1);
                 }
+
+                return fail("invalid group prefix");
+            }
 
             // `)`
             case Chars.RightParen:
@@ -129,9 +129,12 @@ function verifyRegExpPattern(
             // `?`
             case Chars.QuestionMark:
                 if (type === TermType.MaybeLazy) return readTerm(TermType.TopLevel, depth);
-                // falls through
+                if (type === TermType.TopLevel) return fail("nothing to repeat");
+                return readTerm(TermType.MaybeLazy, depth);
+
             // `*`, `+`
             case Chars.Asterisk: case Chars.Plus:
+                if (type === TermType.MaybeLazy) return fail("nothing to repeat");
                 if (type === TermType.TopLevel) return fail("nothing to repeat");
                 return readTerm(TermType.MaybeLazy, depth);
 
@@ -253,8 +256,8 @@ export function scanRegExp(parser: Parser, context: Context): Token {
 
     while (hasNext(parser)) {
         const code = nextChar(parser);
-        advanceOne(parser);
         if (!isFlag(code)) break;
+        advanceOne(parser);
         switch (code) {
         case Chars.LowerG:
             if (mask & Flags.Global) report(parser, Errors.duplicateRegExpFlag("g"));
