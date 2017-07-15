@@ -24,6 +24,19 @@ function fail(message: string) {
     unimplemented();
 }
 
+// TODO: return new index
+function readName(parser: Parser, start: number, target: {[key: string]: boolean}): number {
+    const i = start;
+    const name = "";
+    // TODO
+    unimplemented();
+    if (parser.source.charCodeAt(i) === Chars.GreaterThan) {
+        target[parser.source.slice(start, i)] = true;
+        return i + 1;
+    }
+    return start;
+}
+
 // TODO: optimize this for real. This is *super* unoptimized.
 function verifyRegExpPattern(
     parser: Parser,
@@ -31,14 +44,7 @@ function verifyRegExpPattern(
     end: number,
     context: Context,
 ): void {
-    const namedGroups = Object.create(null) as {[key: string]: boolean};
-    const readGroups = Object.create(null) as {[key: string]: boolean};
-    let i = start;
-
-    // Cast required: https://github.com/Microsoft/TypeScript/issues/15835
-    // let current = State.NoQuantifier as State;
-
-    const enum TermType {
+    const enum Type {
         TopLevel,
         MaybeQuantifier,
         RestrictDigit,
@@ -46,27 +52,21 @@ function verifyRegExpPattern(
         MaybeLazy,
     }
 
-    // TODO: return new index
-    function readName(target: {[key: string]: boolean}): void {
-        const name = "";
-        // TODO
-        if (parser.source.charCodeAt(i++) === Chars.GreaterThan) readGroups[name] = true;
-        return unimplemented();
-    }
+    const namedGroups = Object.create(null) as {[key: string]: boolean};
+    const readGroups = Object.create(null) as {[key: string]: boolean};
+    let i = start;
+    let depth = 0;
+    let type = Type.TopLevel;
 
-    function readTerm(type: TermType, depth: number): void {
-        if (i === end) {
-            if (depth) return fail("unterminated group");
-            return;
-        }
-
+    while (i !== end) {
         switch (parser.source.charCodeAt(i++)) {
             // `^`, `$`
             case Chars.Caret: case Chars.Dollar:
-                return readTerm(TermType.TopLevel, depth);
+                type = Type.TopLevel;
+                break;
 
             // `\`
-            case Chars.Backslash: {
+            case Chars.Backslash:
                 if (i === end) return fail("unterminated regexp literal");
                 switch (parser.source.charCodeAt(i++)) {
                     case Chars.LowerU:
@@ -91,31 +91,34 @@ function verifyRegExpPattern(
                             (context & Context.OptionsNext) &&
                             i !== end && parser.source.charCodeAt(i++) === Chars.LessThan
                         ) {
-                            readName(readGroups);
+                            i = readName(parser, i, readGroups);
                         }
                         // falls through
                     default:
                 }
-                return readTerm(TermType.MaybeQuantifier, depth);
-            }
+                type = Type.MaybeQuantifier;
+                break;
 
             // `(`
             case Chars.LeftParen: {
+                depth++;
                 let ch = parser.source.charCodeAt(i);
 
-                if (ch !== Chars.QuestionMark) return readTerm(TermType.TopLevel, depth + 1);
+                if (ch !== Chars.QuestionMark) { type = Type.TopLevel; break; }
                 i++;
                 ch = parser.source.charCodeAt(i++);
 
                 if (ch === Chars.EqualSign || ch === Chars.Exclamation || ch === Chars.Colon) {
-                    return readTerm(TermType.TopLevel, depth + 1);
+                    type = Type.TopLevel;
+                    break;
                 }
 
                 if (ch === Chars.LessThan && (context & Context.OptionsNext) && i !== end) {
                     ch = parser.source.charCodeAt(i);
                     if (ch === Chars.EqualSign || ch === Chars.Exclamation) i++;
-                    else readName(namedGroups);
-                    return readTerm(TermType.TopLevel, depth + 1);
+                    else i = readName(parser, i, namedGroups);
+                    type = Type.TopLevel;
+                    break;
                 }
 
                 return fail("invalid group prefix");
@@ -124,48 +127,57 @@ function verifyRegExpPattern(
             // `)`
             case Chars.RightParen:
                 if (depth === 0) return fail("no group to terminate");
-                return readTerm(TermType.MaybeQuantifier, depth - 1);
+                depth--;
+                type = Type.MaybeQuantifier;
+                break;
 
             // `?`
             case Chars.QuestionMark:
-                if (type === TermType.MaybeLazy) return readTerm(TermType.TopLevel, depth);
-                if (type === TermType.TopLevel) return fail("nothing to repeat");
-                return readTerm(TermType.MaybeLazy, depth);
+                if (type === Type.MaybeLazy) { type = Type.TopLevel; break; }
+                if (type === Type.TopLevel) return fail("nothing to repeat");
+                type = Type.MaybeLazy;
+                break;
 
             // `*`, `+`
             case Chars.Asterisk: case Chars.Plus:
-                if (type === TermType.MaybeLazy) return fail("nothing to repeat");
-                if (type === TermType.TopLevel) return fail("nothing to repeat");
-                return readTerm(TermType.MaybeLazy, depth);
+                if (type === Type.MaybeLazy) return fail("nothing to repeat");
+                if (type === Type.TopLevel) return fail("nothing to repeat");
+                type = Type.MaybeLazy;
+                break;
 
             // `}`
             case Chars.RightBrace:
-                if (type === TermType.NoRightBrace) return fail("nothing to repeat");
-                return readTerm(TermType.MaybeLazy, depth);
+                if (type === Type.NoRightBrace) return fail("nothing to repeat");
+                type = Type.MaybeLazy;
+                break;
 
             // `{`
             case Chars.LeftBrace:
-                return readTerm(TermType.RestrictDigit, depth);
+                type = Type.RestrictDigit;
+                break;
 
             // `0`...`9`
             case Chars.Zero: case Chars.One: case Chars.Two: case Chars.Three:
             case Chars.Four: case Chars.Five: case Chars.Six: case Chars.Seven:
             case Chars.Eight: case Chars.Nine:
-                if (type === TermType.RestrictDigit) return readTerm(TermType.NoRightBrace, depth);
+                if (type === Type.RestrictDigit) { type = Type.NoRightBrace; break; }
                 // falls through
             default:
-                return readTerm(TermType.MaybeQuantifier, depth);
+                type = Type.MaybeQuantifier;
+                break;
         }
     }
 
-    readTerm(TermType.TopLevel, 0);
+    if (depth) return fail("unterminated group");
 
-    for (const key of Object.keys(readGroups)) {
-        if (!namedGroups[key]) fail(`unmatched group name: ${key}`);
+    for (const key in readGroups) {
+        if (Object.prototype.hasOwnProperty.call(readGroups, key)) {
+            if (!namedGroups[key]) fail(`unmatched group name: ${key}`);
+        }
     }
 }
 
-// TODO: optimize this for real. This is *super* unoptimized.
+// TODO: start with tail calls and pseudo-recursive descent, transition to while-switch FSM.
 function verifyRegExpPatternUnicode(
     parser: Parser,
     start: number,
@@ -175,10 +187,18 @@ function verifyRegExpPatternUnicode(
     // let groups = 0;
     // let maxRef = 0;
 
+    // const enum Type {
+    //     TopLevel,
+    //     MaybeQuantifier,
+    //     RestrictDigit,
+    //     NoRightBrace,
+    //     MaybeLazy,
+    // }
+
     // TODO
     unimplemented();
 
-    // readTerm(TermType.TopLevel, 0);
+    // readTerm(Type.TopLevel, 0);
     // if (maxRef > groups) return fail("invalid backreference");
 }
 
