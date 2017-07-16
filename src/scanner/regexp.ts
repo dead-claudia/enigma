@@ -277,9 +277,7 @@ export function scanRegExp(parser: Parser, context: Context): Token {
     const flagsStart = parser.index;
 
     while (hasNext(parser)) {
-        const code = nextChar(parser);
-        if (!isFlagStart(code)) break;
-        advanceOne(parser);
+        let code = nextChar(parser);
         switch (code) {
         case Chars.LowerG:
             if (mask & Flags.Global) return report(parser, Errors.duplicateRegExpFlag("g"));
@@ -315,10 +313,14 @@ export function scanRegExp(parser: Parser, context: Context): Token {
             // falls through
 
         default:
-            return report(parser, Errors.unknownRegExpFlagChar(
-                fromCodePoint(nextUnicodeChar(parser)),
-            ));
+            // Check if we need to replace the code with the Unicode variant when we check to see
+            // if it's a valid flag start (and thus need to report an error).
+            if (code >= 0xd800 && code <= 0xdc00) code = nextUnicodeChar(parser);
+            if (!isFlagStart(code)) break;
+            return report(parser, Errors.unknownRegExpFlagChar(fromCodePoint(code)));
         }
+
+        advanceOne(parser);
     }
 
     const flagsEnd = parser.index;
