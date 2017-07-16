@@ -243,7 +243,7 @@ export function scanRegExp(parser: Parser, context: Context): Token {
             preparseState &= ~Preparse.Escape;
         } else {
             switch (ch) {
-            case Chars.Slash: break loop;
+            case Chars.Slash: if (!preparseState) break loop; else break;
             case Chars.Backslash: preparseState |= Preparse.Escape; break;
             case Chars.LeftBracket: preparseState |= Preparse.Class; break;
             case Chars.RightBracket: preparseState &= Preparse.Escape; break;
