@@ -276,6 +276,7 @@ export function scanRegExp(parser: Parser, context: Context): Token {
     let mask = Flags.Empty;
     const flagsStart = parser.index;
 
+    loop:
     while (hasNext(parser)) {
         let code = nextChar(parser);
         switch (code) {
@@ -316,7 +317,7 @@ export function scanRegExp(parser: Parser, context: Context): Token {
             // Check if we need to replace the code with the Unicode variant when we check to see
             // if it's a valid flag start (and thus need to report an error).
             if (code >= 0xd800 && code <= 0xdc00) code = nextUnicodeChar(parser);
-            if (!isFlagStart(code)) break;
+            if (!isFlagStart(code)) break loop;
             return report(parser, Errors.unknownRegExpFlagChar(fromCodePoint(code)));
         }
 
