@@ -202,8 +202,9 @@ function verifyRegExpPatternUnicode(
     // if (maxRef > groups) return fail("invalid backreference");
 }
 
-function isFlag(code: number) {
+function isFlagStart(code: number) {
     return isIDContinue(code) ||
+        code === Chars.Backslash ||
         code === Chars.Dollar ||
         code === Chars.Underscore ||
         code === Chars.ZeroWidthJoiner ||
@@ -220,9 +221,8 @@ function tryCreate(pattern: string, flags: string) {
 
 export function scanRegExp(parser: Parser, context: Context): Token {
     // 1. Preparse the regexp, to see what slice to parse.
-    const bodyStart = parser.index;
-
     if (!hasNext(parser)) return unterminated(parser);
+    const bodyStart = parser.index;
 
     const enum Preparse {
         Empty = 0,
@@ -230,19 +230,23 @@ export function scanRegExp(parser: Parser, context: Context): Token {
         Class = 0x2,
     }
 
-    // We *know* this can't be a `*`, because comments are tested first. Thus, we just enter the
-    // loop.
-    let preparseState = Preparse.Empty as number;
-    let ch = nextChar(parser);
+    // We *know* this can't be a `*`, because comments are tested first. Thus, we don't need to
+    // check for it.
+    let preparseState = Preparse.Empty;
 
-    while (preparseState || ch !== Chars.Slash) {
+    loop:
+    while (true) {
+        const ch = nextChar(parser);
+        advanceOne(parser);
+
         if (preparseState & Preparse.Escape) {
             preparseState &= ~Preparse.Escape;
         } else {
             switch (ch) {
+            case Chars.Slash: break loop;
             case Chars.Backslash: preparseState |= Preparse.Escape; break;
-            case Chars.LeftBrace: preparseState |= Preparse.Class; break;
-            case Chars.RightBrace: preparseState &= ~Preparse.Class; break;
+            case Chars.LeftBracket: preparseState |= Preparse.Class; break;
+            case Chars.RightBracket: preparseState &= Preparse.Escape; break;
             case Chars.CarriageReturn: case Chars.LineFeed:
             case Chars.LineSeparator: case Chars.ParagraphSeparator:
                 return unterminated(parser);
@@ -250,14 +254,12 @@ export function scanRegExp(parser: Parser, context: Context): Token {
             }
         }
 
-        if (!hasNext(parser)) return unterminated(parser);
-        advanceOne(parser);
-        ch = nextChar(parser);
+        if (!hasNext(parser)) {
+            return unterminated(parser);
+        }
     }
 
-    const bodyEnd = parser.index;
-
-    advanceOne(parser); // `/`
+    const bodyEnd = parser.index - 1; // drop the slash from the slice
 
     // 2. Parse the flags as normal, checking duplicates via a mask, and get them as a string.
     // Note: we can't parse the body as the `u` flag *will* change how we parse it.
@@ -276,44 +278,44 @@ export function scanRegExp(parser: Parser, context: Context): Token {
 
     while (hasNext(parser)) {
         const code = nextChar(parser);
-        if (!isFlag(code)) break;
+        if (!isFlagStart(code)) break;
         advanceOne(parser);
         switch (code) {
         case Chars.LowerG:
-            if (mask & Flags.Global) report(parser, Errors.duplicateRegExpFlag("g"));
+            if (mask & Flags.Global) return report(parser, Errors.duplicateRegExpFlag("g"));
             mask |= Flags.Global;
             break;
 
         case Chars.LowerI:
-            if (mask & Flags.IgnoreCase) report(parser, Errors.duplicateRegExpFlag("i"));
+            if (mask & Flags.IgnoreCase) return report(parser, Errors.duplicateRegExpFlag("i"));
             mask |= Flags.IgnoreCase;
             break;
 
         case Chars.LowerM:
-            if (mask & Flags.Multiline) report(parser, Errors.duplicateRegExpFlag("m"));
+            if (mask & Flags.Multiline) return report(parser, Errors.duplicateRegExpFlag("m"));
             mask |= Flags.Multiline;
             break;
 
         case Chars.LowerU:
-            if (mask & Flags.Unicode) report(parser, Errors.duplicateRegExpFlag("u"));
+            if (mask & Flags.Unicode) return report(parser, Errors.duplicateRegExpFlag("u"));
             mask |= Flags.Unicode;
             break;
 
         case Chars.LowerY:
-            if (mask & Flags.Sticky) report(parser, Errors.duplicateRegExpFlag("y"));
+            if (mask & Flags.Sticky) return report(parser, Errors.duplicateRegExpFlag("y"));
             mask |= Flags.Sticky;
             break;
 
         case Chars.LowerS:
             if (context & Context.OptionsNext) {
-                if (mask & Flags.DotAll) report(parser, Errors.duplicateRegExpFlag("s"));
+                if (mask & Flags.DotAll) return report(parser, Errors.duplicateRegExpFlag("s"));
                 mask |= Flags.DotAll;
                 break;
             }
             // falls through
 
         default:
-            report(parser, Errors.unknownRegExpFlagChar(
+            return report(parser, Errors.unknownRegExpFlagChar(
                 fromCodePoint(nextUnicodeChar(parser)),
             ));
         }
