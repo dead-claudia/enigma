@@ -10,306 +10,311 @@ describe("src/scanner/seek", () => {
             hasNext: boolean;
             line: number;
             column: number;
+            index: number;
         }
 
         function pass(name: string, opts: Opts) {
             it(name, () => {
                 const parser = create(opts.source, undefined);
 
+                delete opts.source;
                 skipMeta(parser);
-                assert.match(
-                    {hasNext: hasNext(parser), line: parser.line, column: parser.column},
-                    {hasNext: opts.hasNext, line: opts.line, column: opts.column},
-                );
+
+                assert.match({
+                    hasNext: hasNext(parser),
+                    line: parser.line,
+                    column: parser.column,
+                    index: parser.index,
+                }, opts);
+            });
+        }
+
+        function fail(name: string, source: string) {
+            it(name, () => {
+                const parser = create(source, undefined);
+
+                assert.throws(SyntaxError, () => skipMeta(parser));
             });
         }
 
         pass("skips nothing in an empty source", {
             source: "",
             hasNext: false,
-            line: 1, column: 0,
+            index: 0, line: 1, column: 0,
         });
 
         pass("skips nothing before an identifier", {
             source: "foo",
             hasNext: true,
-            line: 1, column: 0,
+            index: 0, line: 1, column: 0,
         });
 
-        pass("skips nothing before a lone hash", {
-            source: "# foo",
-            hasNext: true,
-            line: 1, column: 0,
-        });
+        fail("fails before a lone hash", "# foo");
 
         pass("skips nothing before a lone exclamation", {
             source: "! foo",
             hasNext: true,
-            line: 1, column: 0,
+            index: 0, line: 1, column: 0,
         });
 
         pass("skips a BOM in an otherwise empty source", {
             source: "\uFFEF",
             hasNext: false,
-            line: 1, column: 0,
+            index: 1, line: 1, column: 0,
         });
 
         pass("skips a BOM before an identifier", {
             source: "\uFFEFfoo",
             hasNext: true,
-            line: 1, column: 0,
+            index: 1, line: 1, column: 0,
         });
 
-        pass("skips a BOM before a lone hash", {
-            source: "\uFFEF# foo",
-            hasNext: true,
-            line: 1, column: 0,
-        });
+        fail("skips a BOM and fails before a lone hash", "\uFFEF# foo");
 
         pass("skips a BOM before a lone exclamation", {
             source: "\uFFEF! foo",
             hasNext: true,
-            line: 1, column: 0,
+            index: 1, line: 1, column: 0,
         });
 
         pass("skips a shebang+LF in an otherwise empty source", {
             source: "#!/foo/bar/baz -abc\n",
             hasNext: false,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a shebang+LF before an identifier", {
             source: "#!/foo/bar/baz -abc\nfoo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a shebang+LF before a lone hash", {
             source: "#!/foo/bar/baz -abc\n# foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a shebang+LF before a lone exclamation", {
             source: "#!/foo/bar/baz -abc\n! foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a shebang+CR in an otherwise empty source", {
             source: "#!/foo/bar/baz -abc\r",
             hasNext: false,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a shebang+CR before an identifier", {
             source: "#!/foo/bar/baz -abc\rfoo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a shebang+CR before a lone hash", {
             source: "#!/foo/bar/baz -abc\r# foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a shebang+CR before a lone exclamation", {
             source: "#!/foo/bar/baz -abc\r! foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a shebang+CRLF in an otherwise empty source", {
             source: "#!/foo/bar/baz -abc\r\n",
             hasNext: false,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a shebang+CRLF before an identifier", {
             source: "#!/foo/bar/baz -abc\r\nfoo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a shebang+CRLF before a lone hash", {
             source: "#!/foo/bar/baz -abc\r\n# foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a shebang+CRLF before a lone exclamation", {
             source: "#!/foo/bar/baz -abc\r\n! foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a shebang+line separator in an otherwise empty source", {
             source: "#!/foo/bar/baz -abc\u2028",
             hasNext: false,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a shebang+line separator before an identifier", {
             source: "#!/foo/bar/baz -abc\u2028foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a shebang+line separator before a lone hash", {
             source: "#!/foo/bar/baz -abc\u2028# foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a shebang+line separator before a lone exclamation", {
             source: "#!/foo/bar/baz -abc\u2028! foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a shebang+paragraph separator in an otherwise empty source", {
             source: "#!/foo/bar/baz -abc\u2029",
             hasNext: false,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a shebang+paragraph separator before an identifier", {
             source: "#!/foo/bar/baz -abc\u2029foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a shebang+paragraph separator before a lone hash", {
             source: "#!/foo/bar/baz -abc\u2029# foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a shebang+paragraph separator before a lone exclamation", {
             source: "#!/foo/bar/baz -abc\u2029! foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 20, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+LF in an otherwise empty source", {
             source: "\uFFEF#!/foo/bar/baz -abc\n",
             hasNext: false,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+LF before an identifier", {
             source: "\uFFEF#!/foo/bar/baz -abc\nfoo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+LF before a lone hash", {
             source: "\uFFEF#!/foo/bar/baz -abc\n# foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+LF before a lone exclamation", {
             source: "\uFFEF#!/foo/bar/baz -abc\n! foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+CR in an otherwise empty source", {
             source: "\uFFEF#!/foo/bar/baz -abc\r",
             hasNext: false,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+CR before an identifier", {
             source: "\uFFEF#!/foo/bar/baz -abc\rfoo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+CR before a lone hash", {
             source: "\uFFEF#!/foo/bar/baz -abc\r# foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+CR before a lone exclamation", {
             source: "\uFFEF#!/foo/bar/baz -abc\r! foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+CRLF in an otherwise empty source", {
             source: "\uFFEF#!/foo/bar/baz -abc\r\n",
             hasNext: false,
-            line: 2, column: 0,
+            index: 22, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+CRLF before an identifier", {
             source: "\uFFEF#!/foo/bar/baz -abc\r\nfoo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 22, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+CRLF before a lone hash", {
             source: "\uFFEF#!/foo/bar/baz -abc\r\n# foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 22, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+CRLF before a lone exclamation", {
             source: "\uFFEF#!/foo/bar/baz -abc\r\n! foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 22, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+line separator in an otherwise empty source", {
             source: "\uFFEF#!/foo/bar/baz -abc\u2028",
             hasNext: false,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+line separator before an identifier", {
             source: "\uFFEF#!/foo/bar/baz -abc\u2028foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+line separator before a lone hash", {
             source: "\uFFEF#!/foo/bar/baz -abc\u2028# foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+line separator before a lone exclamation", {
             source: "\uFFEF#!/foo/bar/baz -abc\u2028! foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+paragraph separator in an otherwise empty source", {
             source: "\uFFEF#!/foo/bar/baz -abc\u2029",
             hasNext: false,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+paragraph separator before an identifier", {
             source: "\uFFEF#!/foo/bar/baz -abc\u2029foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+paragraph separator before a lone hash", {
             source: "\uFFEF#!/foo/bar/baz -abc\u2029# foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
 
         pass("skips a BOM+shebang+paragraph separator before a lone exclamation", {
             source: "\uFFEF#!/foo/bar/baz -abc\u2029! foo",
             hasNext: true,
-            line: 2, column: 0,
+            index: 21, line: 2, column: 0,
         });
     });
 

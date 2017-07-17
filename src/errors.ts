@@ -97,6 +97,10 @@ export const illegalUseStrict = () => (
     "Illegal 'use strict' directive in function with non-simple parameter list"
 );
 
+export const missingShebangExclamation = () => (
+    "Missing exclamation in shebang"
+);
+
 export const invalidBinaryDigit = () => (
     "Invalid binary digit"
 );

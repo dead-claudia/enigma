@@ -30,6 +30,11 @@ export function skipMeta(parser: Parser) {
                 parser.source.charCodeAt(index) === Chars.Exclamation) {
             parser.index = index + 1;
             skipToNewline(parser, SeekState.None);
+        } else {
+            Errors.report(
+                index, parser.line, parser.column,
+                Errors.missingShebangExclamation(),
+            );
         }
     }
 }
