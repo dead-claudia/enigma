@@ -2,6 +2,12 @@
  * A list of character constants with much more human-readable names.
  */
 export const enum Chars {
+    UnicodeEscapeTag      = 0x10 << 24 /* | (skip & 0xf) << 24 */,
+    ErrorTag             = -0x80 << 24,
+    InvalidUnicodeEscape = ErrorTag | 0x00 << 24,
+    InvalidHex           = ErrorTag | 0x01 << 24,
+    UnterminatedEscape   = ErrorTag | 0x02 << 24,
+
     LastUnicodeChar = 0x10ffff,
 
     Null = 0x00,
